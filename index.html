@@ -370,9 +370,9 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     /* 财务表单：日期占整行，保存按钮与可转债并排 */
     #section-finance .form-row .form-group:nth-child(1) { grid-column: 1 / -1; }
     #section-finance .form-row .form-actions { grid-column: 2; align-items: stretch; }
-    /* 用电表单：读数 + 保存，日期整行 */
-    #section-electricity .form-row .form-group:nth-child(1),
-    #section-electricity .form-row .form-actions { grid-column: 1 / -1; }
+    /* 用电表单：日期整行，保存按钮与电表读数并排 */
+    #section-electricity .form-row .form-group:nth-child(1) { grid-column: 1 / -1; }
+    #section-electricity .form-row .form-actions { grid-column: 2; align-items: stretch; }
 
     .form-group { gap: 3px; min-width: 0; }
     .form-group label { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
