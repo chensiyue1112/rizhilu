@@ -367,9 +367,9 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     #incomeForm .form-group:nth-child(3) { grid-column: 1; }
     #expenseForm .form-group:nth-child(4),
     #incomeForm .form-group:nth-child(4) { grid-column: 2; }
-    /* 财务表单：日期 + 保存 占整行，其余数字两列排列 */
-    #section-finance .form-row .form-group:nth-child(1),
-    #section-finance .form-row .form-actions { grid-column: 1 / -1; }
+    /* 财务表单：日期占整行，保存按钮与可转债并排 */
+    #section-finance .form-row .form-group:nth-child(1) { grid-column: 1 / -1; }
+    #section-finance .form-row .form-actions { grid-column: 2; align-items: stretch; }
     /* 用电表单：读数 + 保存，日期整行 */
     #section-electricity .form-row .form-group:nth-child(1),
     #section-electricity .form-row .form-actions { grid-column: 1 / -1; }
