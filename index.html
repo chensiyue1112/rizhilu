@@ -367,12 +367,14 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     #incomeForm .form-group:nth-child(3) { grid-column: 1; }
     #expenseForm .form-group:nth-child(4),
     #incomeForm .form-group:nth-child(4) { grid-column: 2; }
-    /* 财务表单：日期占整行，保存按钮与可转债并排 */
+    /* 财务表单：日期占整行，保存按钮与可转债并排（与输入框严格对齐） */
     #section-finance .form-row .form-group:nth-child(1) { grid-column: 1 / -1; }
-    #section-finance .form-row .form-actions { grid-column: 2; align-items: stretch; }
-    /* 用电表单：日期整行，保存按钮与电表读数并排 */
+    #section-finance .form-row .form-actions { grid-column: 2; align-items: stretch; margin-top: 0; }
+    #section-finance .form-row .form-actions .btn { min-height: 0; height: 100%; flex: none; padding: 0 16px; }
+    /* 用电表单：日期整行，保存按钮与电表读数并排（与输入框严格对齐） */
     #section-electricity .form-row .form-group:nth-child(1) { grid-column: 1 / -1; }
-    #section-electricity .form-row .form-actions { grid-column: 2; align-items: stretch; }
+    #section-electricity .form-row .form-actions { grid-column: 2; align-items: stretch; margin-top: 0; }
+    #section-electricity .form-row .form-actions .btn { min-height: 0; height: 100%; flex: none; padding: 0 16px; }
 
     .form-group { gap: 3px; min-width: 0; }
     .form-group label { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
