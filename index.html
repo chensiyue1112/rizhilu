@@ -109,7 +109,15 @@ body {
 .more-sub .sidebar-item.active { color: var(--accent); background: var(--bg-active); font-weight: 500; }
 /* 移动端更多抽屉（桌面端隐藏） */
 .more-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.3); z-index: 230; }
-@media (min-width: 769px) { .more-drawer { display: none; } .more-overlay { display: none !important; } }
+@media (min-width: 769px) {
+    .more-drawer { display: none; }
+    .more-overlay { display: none !important; }
+    /* 桌面端：子项平铺，不需要"更多"按钮 */
+    #moreToggle { display: none; }
+    .more-arrow { display: none; }
+    .more-sub { display: block; }
+    .more-sub .sidebar-item { padding: 9px 12px; }
+}
 .more-overlay.show { display: block; }
 .more-drawer {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 240;
