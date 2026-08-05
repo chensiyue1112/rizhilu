@@ -427,6 +427,19 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     table { font-size: 12px; }
     th, td { padding: 6px 6px; }
     th { font-size: 10px; }
+    /* 收入/支出表格：固定列宽占满，操作列贴右不留白 */
+    #expenseTable, #incomeTable { table-layout: fixed; }
+    #expenseTable th, #incomeTable th,
+    #expenseTable td, #incomeTable td {
+        padding: 6px 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    #expenseTable th:nth-child(1), #incomeTable th:nth-child(1) { width: 23%; }
+    #expenseTable th:nth-child(2), #incomeTable th:nth-child(2) { width: 15%; }
+    #expenseTable th:nth-child(3), #incomeTable th:nth-child(3) { width: 18%; }
+    #expenseTable th:nth-child(4), #incomeTable th:nth-child(4) { width: 17%; }
+    #expenseTable th:nth-child(5), #incomeTable th:nth-child(5) { width: 27%; }
+    #expenseTable td:last-child, #incomeTable td:last-child { white-space: nowrap; }
+    #expenseTable .btn-sm, #incomeTable .btn-sm { padding: 5px 7px; font-size: 11px; }
 
     .toast { left: 12px; right: 12px; top: auto; bottom: 72px; text-align: center; border-radius: var(--radius-md); }
 
