@@ -620,11 +620,12 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="card">
         <h3>📌 纪录</h3>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <div style="display:flex;flex-direction:column;gap:2px">
-                <input type="date" id="recordDate" style="padding:7px 11px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
-                <span style="font-size:10.5px;color:var(--text-muted)">日期可不填</span>
-            </div>
-            <input type="text" id="recordContent" placeholder="想记下来的，先放在这里" style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
+            <input type="date" id="recordDate" style="padding:7px 11px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
+            <label style="display:flex;align-items:center;gap:4px;font-size:12.5px;color:var(--text-secondary);cursor:pointer;white-space:nowrap">
+                <input type="checkbox" id="recordNoDate" onchange="toggleRecordNoDate()" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
+                不需要日期
+            </label>
+            <input type="text" id="recordContent" placeholder="想记下来的，先放在这里" style="flex:1;min-width:150px;padding:8px 12px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
             <button class="btn btn-save" onclick="saveRecord()">记下来</button>
         </div>
     </div>
@@ -2423,14 +2424,22 @@ async function saveFollowup(id) {
     } catch(e) { toast(e.message, 'error'); }
 }
 
+function toggleRecordNoDate() {
+    const noDate = $('recordNoDate').checked;
+    $('recordDate').disabled = noDate;
+    if (noDate) $('recordDate').value = '';
+}
+
 async function saveRecord() {
     const content = $('recordContent').value.trim();
     if (!content) { toast('写点什么吧', 'error'); return; }
-    const date = $('recordDate').value || '';   // 日期可留空，事后补充
+    const date = $('recordDate').value || '';   // 勾选"不需要日期"时为空
     try {
         await api('/api/record', {method:'POST', body:{date, content, done: 0, due_date: '', followup: ''}});
         $('recordContent').value = '';
         $('recordDate').value = '';
+        $('recordNoDate').checked = false;
+        $('recordDate').disabled = false;
         invalidateCache();
         toast('已记下 📌', 'success');
         loadRecords().catch(() => {});
