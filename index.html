@@ -612,14 +612,21 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- ═══════════════ 纪录 ═══════════════ -->
 <section id="section-record" class="section">
     <div class="card">
-        <h3>📌 纪录</h3>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input type="text" id="recordContent" placeholder="此刻让你紧张、在意的事是？写下来，过几天回头看" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
+        <h3>📌 纪录担忧的事</h3>
+        <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+            <div class="form-group" style="flex:1;min-width:200px">
+                <label>担忧的事</label>
+                <input type="text" id="recordContent" placeholder="接下来有什么事让你担忧？写下来，等它过去" style="width:100%;padding:8px 12px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
+            </div>
+            <div class="form-group">
+                <label>预计发生</label>
+                <input type="date" id="recordDue" style="padding:7px 11px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
+            </div>
             <button class="btn btn-save" onclick="saveRecord()">记下来</button>
         </div>
     </div>
     <div class="card">
-        <h3>⏳ 正在发生 <span style="font-weight:400;font-size:12px;color:var(--muted)" id="recordActiveCount"></span></h3>
+        <h3>😟 正在担忧 <span style="font-weight:400;font-size:12px;color:var(--muted)" id="recordActiveCount"></span></h3>
         <div id="recordActiveList"></div>
         <h3 style="margin-top:22px">🌤 已经过去了 <span style="font-weight:400;font-size:12px;color:var(--muted)" id="recordDoneCount"></span></h3>
         <div id="recordDoneList"></div>
@@ -814,7 +821,7 @@ const TABLES_META = {
     electricity: { cols: ['date','reading'], numCols: ['reading'] },
     mood:      { cols: ['date','rating','note'], numCols: ['rating'] },
     weather:   { cols: ['date','weather','note'], numCols: [] },
-    record:    { cols: ['date','content','done'], numCols: ['done'] },
+    record:    { cols: ['date','content','done','due_date'], numCols: ['done'] },
 };
 
 function toTursoArgs(values) {
@@ -2342,12 +2349,12 @@ async function loadRecords() {
         $('recordActiveCount').textContent = active.length ? '(' + active.length + ')' : '';
         $('recordDoneCount').textContent = done.length ? '(' + done.length + ')' : '';
         $('recordActiveList').innerHTML = active.length === 0
-            ? '<div style="color:var(--text-muted);padding:20px;text-align:center;font-size:13px">此刻没有让你紧张的事 ✨</div>'
+            ? '<div style="color:var(--text-muted);padding:20px;text-align:center;font-size:13px">没有正在担忧的事 🍃</div>'
             : active.map(r => recordItemHTML(r)).join('');
         if (done.length === 0) {
             $('recordDoneList').innerHTML = '<div style="color:var(--text-muted);padding:14px;text-align:center;font-size:12px">还没有放下的，会有的</div>';
         } else {
-            $('recordDoneList').innerHTML = '<div style="color:var(--accent);font-size:12px;padding:8px 4px;font-weight:500">你已经放下了 ' + done.length + ' 件当时觉得天大的事 🌈</div>' +
+            $('recordDoneList').innerHTML = '<div style="color:var(--accent);font-size:12px;padding:8px 4px;font-weight:500">你已经放下了 ' + done.length + ' 件当时担心的事 🌈</div>' +
                 done.map(r => recordItemHTML(r, true)).join('');
         }
     };
@@ -2356,11 +2363,14 @@ async function loadRecords() {
 
 function recordItemHTML(r, isDone) {
     const safe = String(r.content).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const dueHtml = r.due_date
+        ? `<div style="font-size:10px;color:var(--text-muted);margin-top:2px;white-space:nowrap">预计 ${r.due_date.slice(5)}</div>`
+        : '';
     return `<div class="record-item${isDone ? ' done' : ''}">
-        <div class="record-date">${r.date.slice(5)}</div>
+        <div class="record-date">${r.date.slice(5)}${dueHtml}</div>
         <div class="record-content" title="${safe}">${safe}</div>
         <div class="record-actions">
-            ${isDone ? '' : '<button class="btn btn-cancel btn-sm" onclick="markRecordDone(' + r.id + ')">✓ 放下了</button>'}
+            ${isDone ? '' : '<button class="btn btn-cancel btn-sm" onclick="markRecordDone(' + r.id + ')">✓ 过去了</button>'}
             <button class="btn btn-danger btn-sm" onclick="deleteRecord(' + r.id + ')">删除</button>
         </div>
     </div>`;
@@ -2369,11 +2379,13 @@ function recordItemHTML(r, isDone) {
 async function saveRecord() {
     const content = $('recordContent').value.trim();
     if (!content) { toast('写点什么吧', 'error'); return; }
+    const due = $('recordDue').value || '';
     try {
-        await api('/api/record', {method:'POST', body:{date: todayStr(), content, done: 0}});
+        await api('/api/record', {method:'POST', body:{date: todayStr(), content, done: 0, due_date: due}});
         $('recordContent').value = '';
+        $('recordDue').value = '';
         invalidateCache();
-        toast('已纪录 📌', 'success');
+        toast('已记下，等它过去 📌', 'success');
         loadRecords();
     } catch(e) { toast(e.message, 'error'); }
 }
@@ -2382,7 +2394,7 @@ async function markRecordDone(id) {
     try {
         await api('/api/record/' + id, {method:'PUT', body:{done: 1}});
         invalidateCache();
-        toast('放下啦 🌤', 'success');
+        toast('这件事过去了 🌤', 'success');
         loadRecords();
     } catch(e) { toast(e.message, 'error'); }
 }
