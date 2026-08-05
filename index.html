@@ -2394,8 +2394,8 @@ function recordItemHTML(r, isDone) {
             <button class="fu-toggle" onclick="toggleFollowup(${r.id})">✎ 补充感受</button>
         </div>
         <div class="record-actions">
-            ${isDone ? '' : '<button class="btn btn-cancel btn-sm" onclick="markRecordDone(' + r.id + ')">✓ 过去了</button>'}
-            <button class="btn btn-danger btn-sm" onclick="deleteRecord(' + r.id + ')">删除</button>
+            ${isDone ? '' : `<button class="btn btn-cancel btn-sm" onclick="markRecordDone(${r.id})">✓ 过去了</button>`}
+            <button class="btn btn-danger btn-sm" onclick="deleteRecord(${r.id})">删除</button>
         </div>
     </div>`;
 }
