@@ -2344,8 +2344,8 @@ async function saveWeatherNow(key) {
 // ═══════════════ 纪录 CRUD ═══════════════
 async function loadRecords() {
     const render = (data) => {
-        const active = data.filter(r => !r.done);
-        const done = data.filter(r => r.done);
+        const active = data.filter(r => Number(r.done) !== 1);
+        const done = data.filter(r => Number(r.done) === 1);
         $('recordActiveCount').textContent = active.length ? '(' + active.length + ')' : '';
         $('recordDoneCount').textContent = done.length ? '(' + done.length + ')' : '';
         $('recordActiveList').innerHTML = active.length === 0
@@ -2367,12 +2367,17 @@ function recordItemHTML(r, isDone) {
     const fuView = fuSafe
         ? `<div class="record-followup" id="fu-view-${r.id}">后来：${fuSafe}</div>`
         : '';
+    const dateLabel = r.date ? r.date.slice(5) : '··';
     return `<div class="record-item${isDone ? ' done' : ''}">
-        <div class="record-date">${r.date.slice(5)}</div>
+        <div class="record-date">${dateLabel}</div>
         <div class="record-main">
             <div class="record-content" title="${safe}">${safe}</div>
             ${fuView}
             <div class="record-followup-edit" id="fu-edit-${r.id}" style="display:none">
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px">
+                    <input type="date" id="fu-date-${r.id}" value="${r.date || ''}" style="padding:6px 10px;border:1px solid var(--border-l3);border-radius:var(--radius-sm);background:var(--bg-base);font-size:12.5px;font-family:inherit;outline:none">
+                    <span style="font-size:11px;color:var(--text-muted)">日期可留空</span>
+                </div>
                 <textarea id="fu-input-${r.id}" placeholder="后来怎么样了？写下来"></textarea>
                 <div style="display:flex;gap:8px;margin-top:6px">
                     <button class="btn btn-save btn-sm" onclick="saveFollowup(${r.id})">保存</button>
@@ -2398,9 +2403,13 @@ function toggleFollowup(id) {
 
 async function saveFollowup(id) {
     const text = $('fu-input-' + id).value.trim();
-    if (!text) { toast('写点什么吧', 'error'); return; }
+    const date = $('fu-date-' + id).value || '';
+    if (!text && !date) { toast('写点什么吧', 'error'); return; }
+    const updates = {};
+    if (text) updates.followup = text;
+    if (date) updates.date = date;   // 事后补充日期
     try {
-        await api('/api/record/' + id, {method:'PUT', body:{followup: text}});
+        await api('/api/record/' + id, {method:'PUT', body:updates});
         invalidateCache();
         toast('已补充 🌱', 'success');
         loadRecords();
@@ -2410,10 +2419,11 @@ async function saveFollowup(id) {
 async function saveRecord() {
     const content = $('recordContent').value.trim();
     if (!content) { toast('写点什么吧', 'error'); return; }
-    const date = $('recordDate').value || todayStr();
+    const date = $('recordDate').value || '';   // 日期可留空，事后补充
     try {
         await api('/api/record', {method:'POST', body:{date, content, done: 0, due_date: '', followup: ''}});
         $('recordContent').value = '';
+        $('recordDate').value = '';
         invalidateCache();
         toast('已记下 📌', 'success');
         loadRecords();
