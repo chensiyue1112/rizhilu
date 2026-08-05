@@ -2438,7 +2438,7 @@ async function saveRecord() {
     try {
         await api('/api/record', {method:'POST', body:{date, content, done: 0, due_date: '', followup: ''}});
         $('recordContent').value = '';
-        $('recordDate').value = '';
+        $('recordDate').value = todayStr();   // 保存后恢复默认今天
         $('recordNoDate').checked = false;
         $('recordDate').disabled = false;
         invalidateCache();
