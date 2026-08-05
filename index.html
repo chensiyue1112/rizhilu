@@ -99,6 +99,27 @@ body {
 .sidebar-item:hover { color: var(--text-primary); background: var(--bg-hover); }
 .sidebar-item.active { color: var(--accent); background: var(--bg-active); font-weight: 500; }
 .sidebar-item svg { flex-shrink: 0; opacity: 0.55; color: var(--text-tertiary); transition: opacity var(--duration) var(--ease), color var(--duration) var(--ease); }
+/* 更多分组 */
+.sidebar-group { display: flex; flex-direction: column; }
+.more-arrow { margin-left: auto; font-size: 10px; opacity: 0.5; transition: transform var(--duration) var(--ease); }
+.sidebar-group.open .more-arrow { transform: rotate(180deg); }
+.more-sub { display: none; padding: 2px 0 2px 8px; }
+.sidebar-group.open .more-sub { display: block; }
+.more-sub .sidebar-item { font-size: 13.5px; padding-left: 12px; }
+.more-sub .sidebar-item.active { color: var(--accent); background: var(--bg-active); font-weight: 500; }
+/* 移动端更多抽屉（桌面端隐藏） */
+.more-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.3); z-index: 230; }
+@media (min-width: 769px) { .more-drawer { display: none; } .more-overlay { display: none !important; } }
+.more-overlay.show { display: block; }
+.more-drawer {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 240;
+    background: var(--bg-layer); border-radius: 14px 14px 0 0;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.12); padding: 8px 8px 16px;
+    transform: translateY(100%); transition: transform 0.2s var(--ease);
+}
+.more-drawer.open { transform: translateY(0); }
+.more-drawer-title { font-size: 12px; color: var(--text-tertiary); font-weight: 600; padding: 10px 12px 6px; letter-spacing: 0.5px; }
+.more-drawer .sidebar-item { padding: 12px 12px; }
 .sidebar-item:hover svg { opacity: 0.75; }
 .sidebar-item.active svg { opacity: 1; color: var(--accent); }
 .sidebar-footer {
@@ -342,7 +363,13 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         font-size: 10px; min-width: 44px; text-align: center;
     }
     .sidebar-item svg { width: 20px; height: 20px; }
+    .more-drawer { display: block; }
+    /* 抽屉子项：横向、正常字号 */
+    .more-drawer .sidebar-item { flex-direction: row; gap: 10px; font-size: 14px; padding: 13px 14px; }
+    .more-drawer .sidebar-item.active { color: var(--accent); background: var(--bg-active); }
     .sidebar-footer { display: none; }
+    /* 桌面"更多"子菜单在移动端隐藏（用抽屉代替） */
+    .sidebar-group .more-sub { display: none !important; }
 
     .main-wrap { margin-left: 0; margin-bottom: 64px; }
     main { padding: 10px 10px 20px; }
@@ -421,39 +448,43 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <span>日知录</span>
     </div>
     <nav class="sidebar-nav">
-        <a class="sidebar-item active" onclick="switchTab('overview')">
+        <a class="sidebar-item active" data-tab="overview" onclick="switchTab('overview')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             <span>概览</span>
         </a>
-        <a class="sidebar-item" onclick="switchTab('expense')">
+        <a class="sidebar-item" data-tab="expense" onclick="switchTab('expense')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
             <span>支出</span>
         </a>
-        <a class="sidebar-item" onclick="switchTab('income')">
+        <a class="sidebar-item" data-tab="income" onclick="switchTab('income')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
             <span>收入</span>
         </a>
-        <a class="sidebar-item" onclick="switchTab('finance')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            <span>财务</span>
-        </a>
-        <a class="sidebar-item" onclick="switchTab('electricity')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span>用电</span>
-        </a>
-        <a class="sidebar-item" onclick="switchTab('mood')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-            <span>心情</span>
-        </a>
-        <a class="sidebar-item" onclick="switchTab('weather')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
-            <span>天气</span>
-        </a>
-        <a class="sidebar-item" onclick="switchTab('stats')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            <span>统计</span>
-        </a>
+        <div class="sidebar-group">
+            <div class="sidebar-item" id="moreToggle" onclick="toggleMore()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                <span>更多</span>
+                <span class="more-arrow" id="moreArrow">▾</span>
+            </div>
+            <div class="more-sub" id="moreSub">
+                <a class="sidebar-item" data-tab="finance" onclick="switchTab('finance')"><span style="width:18px;display:inline-block"></span>财务</a>
+                <a class="sidebar-item" data-tab="electricity" onclick="switchTab('electricity')"><span style="width:18px;display:inline-block"></span>用电</a>
+                <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')"><span style="width:18px;display:inline-block"></span>心情</a>
+                <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')"><span style="width:18px;display:inline-block"></span>天气</a>
+                <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')"><span style="width:18px;display:inline-block"></span>统计</a>
+            </div>
+        </div>
     </nav>
+    <!-- 移动端"更多"抽屉 -->
+    <div class="more-overlay" id="moreOverlay" onclick="closeMore()"></div>
+    <div class="more-drawer" id="moreDrawer">
+        <div class="more-drawer-title">更多功能</div>
+        <a class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">财务</a>
+        <a class="sidebar-item" data-tab="electricity" onclick="switchTab('electricity')">用电</a>
+        <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
+        <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
+        <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
+    </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -961,6 +992,23 @@ function smartLoad(key, loader, renderer) {
     }).catch(e => { if (!apiCache[key]) throw e; }); // 无缓存才报错
 }
 
+// ═══════════════ "更多"展开/收起 ═══════════════
+function toggleMore() {
+    // 桌面：展开/收起子菜单
+    const grp = document.querySelector('.sidebar-group');
+    if (grp) grp.classList.toggle('open');
+    // 移动端：打开抽屉
+    if (window.innerWidth <= 768) {
+        const drawer = $('moreDrawer');
+        if (drawer) { drawer.classList.add('open'); $('moreOverlay').classList.add('show'); }
+        if (grp) grp.classList.remove('open');
+    }
+}
+function closeMore() {
+    const drawer = $('moreDrawer'); if (drawer) drawer.classList.remove('open');
+    const ov = $('moreOverlay'); if (ov) ov.classList.remove('show');
+}
+
 // ═══════════════ Tab 切换 ═══════════════
 function switchTab(name) {
     STATE.currentTab = name;
@@ -974,10 +1022,17 @@ function switchTab(name) {
     const target = $('section-' + name);
     target.style.display = (name === 'overview') ? 'flex' : 'block';
     target.classList.add('active');
-    // 高亮当前 tab
+    // 高亮当前 tab（data-tab 匹配，含"更多"里的子项）
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-    const map = {overview:0, expense:1, income:2, finance:3, electricity:4, mood:5, weather:6, stats:7};
-    if (map[name] !== undefined) document.querySelectorAll('.sidebar-item')[map[name]].classList.add('active');
+    document.querySelectorAll('.sidebar-item[data-tab="' + name + '"]').forEach(b => b.classList.add('active'));
+    // 低频页面：自动展开"更多"分组
+    if (['finance','electricity','mood','weather','stats'].includes(name)) {
+        const grp = document.querySelector('.sidebar-group');
+        if (grp) grp.classList.add('open');
+    }
+    // 关闭移动端"更多"抽屉
+    const mDrawer = $('moreDrawer'); if (mDrawer) mDrawer.classList.remove('open');
+    const mOverlay = $('moreOverlay'); if (mOverlay) mOverlay.classList.remove('show');
 
     // 切换离开概览/财务页时，清理图表热区和 tooltip，防止残留
     if (name !== 'overview') {
