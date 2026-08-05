@@ -620,7 +620,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="card">
         <h3>📌 纪录</h3>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input type="date" id="recordDate" style="padding:7px 11px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
+            <div style="display:flex;flex-direction:column;gap:2px">
+                <input type="date" id="recordDate" style="padding:7px 11px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
+                <span style="font-size:10.5px;color:var(--text-muted)">日期可不填</span>
+            </div>
             <input type="text" id="recordContent" placeholder="想记下来的，先放在这里" style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
             <button class="btn btn-save" onclick="saveRecord()">记下来</button>
         </div>
@@ -2358,7 +2361,11 @@ async function loadRecords() {
                 done.map(r => recordItemHTML(r, true)).join('');
         }
     };
-    await smartLoad('records', () => api('/api/record'), render);
+    try {
+        await smartLoad('records', () => api('/api/record'), render);
+    } catch(e) {
+        if (!apiCache.records) { toast('加载失败: ' + e.message, 'error'); }
+    }
 }
 
 function recordItemHTML(r, isDone) {
@@ -2412,7 +2419,7 @@ async function saveFollowup(id) {
         await api('/api/record/' + id, {method:'PUT', body:updates});
         invalidateCache();
         toast('已补充 🌱', 'success');
-        loadRecords();
+        loadRecords().catch(() => {});
     } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -2426,7 +2433,7 @@ async function saveRecord() {
         $('recordDate').value = '';
         invalidateCache();
         toast('已记下 📌', 'success');
-        loadRecords();
+        loadRecords().catch(() => {});
     } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -2435,7 +2442,7 @@ async function markRecordDone(id) {
         await api('/api/record/' + id, {method:'PUT', body:{done: 1}});
         invalidateCache();
         toast('这件事过去了 🌤', 'success');
-        loadRecords();
+        loadRecords().catch(() => {});
     } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -2445,7 +2452,7 @@ async function deleteRecord(id) {
         await api('/api/record/' + id, {method:'DELETE'});
         invalidateCache();
         toast('已删除', 'success');
-        loadRecords();
+        loadRecords().catch(() => {});
     } catch(e) { toast(e.message, 'error'); }
 }
 
