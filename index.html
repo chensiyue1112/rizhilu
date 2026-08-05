@@ -2427,7 +2427,8 @@ async function saveFollowup(id) {
 function toggleRecordNoDate() {
     const noDate = $('recordNoDate').checked;
     $('recordDate').disabled = noDate;
-    if (noDate) $('recordDate').value = '';
+    if (noDate) { $('recordDate').value = ''; }
+    else { $('recordDate').value = todayStr(); }   // 取消勾选：恢复默认今天
 }
 
 async function saveRecord() {
