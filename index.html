@@ -251,6 +251,23 @@ tbody tr { transition: background var(--duration) var(--ease); }
 tbody tr:hover td { background: var(--bg-hover); }
 .amount-plus, .amount-minus { color: var(--text-primary); font-weight: 550; }
 
+/* === 纪录 === */
+.record-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 4px; border-bottom: 1px solid var(--border-l1);
+}
+.record-item:last-child { border-bottom: none; }
+.record-date { flex-shrink: 0; font-size: 11px; color: var(--text-tertiary); padding-top: 3px; font-weight: 500; }
+.record-content {
+    flex: 1; font-size: 14px; line-height: 1.5; color: var(--text-primary);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    word-break: break-word; cursor: pointer;
+}
+.record-content:hover { color: var(--accent); }
+.record-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.record-item.done .record-content { color: var(--text-muted); text-decoration: line-through; }
+.record-item.done .record-content:hover { color: var(--text-muted); }
+
 /* === Mood === */
 .mood-picker { display: flex; gap: 10px; flex-wrap: wrap; }
 .mood-btn {
@@ -448,6 +465,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     .sidebar-item span { font-size: 10px; }
 
     .mood-btn { font-size: 26px; padding: 10px 6px; flex: 1; max-width: none; }
+    .record-content { font-size: 14px; }
+    .record-actions .btn-sm { padding: 5px 8px; font-size: 11px; }
     .weather-btn { font-size: 22px; padding: 8px 10px; min-width: 0; flex: 1; }
     .weather-btn span { font-size: 11px; }
     .mood-calendar { gap: 4px; }
@@ -480,6 +499,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="income" onclick="switchTab('income')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
             <span>收入</span>
+        </a>
+        <a class="sidebar-item" data-tab="record" onclick="switchTab('record')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <span>纪录</span>
         </a>
         <div class="sidebar-group">
             <div class="sidebar-item" id="moreToggle" onclick="toggleMore()">
@@ -583,6 +606,23 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="card">
         <h3>📋 收入记录 <span style="font-weight:400;font-size:12px;color:var(--muted);margin-left:8px" id="incomeTotal"></span></h3>
         <div class="table-wrap"><table id="incomeTable"><thead><tr><th>日期</th><th>分类</th><th>金额</th><th>备注</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+    </div>
+</section>
+
+<!-- ═══════════════ 纪录 ═══════════════ -->
+<section id="section-record" class="section">
+    <div class="card">
+        <h3>📌 纪录</h3>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input type="text" id="recordContent" placeholder="此刻让你紧张、在意的事是？写下来，过几天回头看" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
+            <button class="btn btn-save" onclick="saveRecord()">记下来</button>
+        </div>
+    </div>
+    <div class="card">
+        <h3>⏳ 正在发生 <span style="font-weight:400;font-size:12px;color:var(--muted)" id="recordActiveCount"></span></h3>
+        <div id="recordActiveList"></div>
+        <h3 style="margin-top:22px">🌤 已经过去了 <span style="font-weight:400;font-size:12px;color:var(--muted)" id="recordDoneCount"></span></h3>
+        <div id="recordDoneList"></div>
     </div>
 </section>
 
@@ -774,6 +814,7 @@ const TABLES_META = {
     electricity: { cols: ['date','reading'], numCols: ['reading'] },
     mood:      { cols: ['date','rating','note'], numCols: ['rating'] },
     weather:   { cols: ['date','weather','note'], numCols: [] },
+    record:    { cols: ['date','content','done'], numCols: ['done'] },
 };
 
 function toTursoArgs(values) {
@@ -992,7 +1033,7 @@ async function api(url, opts) {
 // ═══════════════ 数据缓存（先显示缓存，后台刷新） ═══════════════
 const CACHE_KEY = 'rizhilu_cache_v1';
 // 只缓存这 6 个核心数据，overview/stats 不区分月份（只保留最近一次）
-const CACHE_ALLOWED = ['expenses','incomes','finances','electricity','overview','stats','moods','weather'];
+const CACHE_ALLOWED = ['expenses','incomes','finances','electricity','overview','stats','moods','weather','records'];
 let apiCache = {};
 try { apiCache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch(e) {}
 function saveCache() {
@@ -1080,6 +1121,7 @@ function switchTab(name) {
 
     if (name === 'overview') loadOverview();
     if (name === 'expense') loadExpenses();
+    if (name === 'record') loadRecords();
     if (name === 'income') loadIncomes();
     if (name === 'finance') loadFinances();
     if (name === 'electricity') loadElectricities();
@@ -2291,6 +2333,70 @@ async function saveWeatherNow(key) {
     } catch(e) { toast(e.message, 'error'); }
 }
 
+
+// ═══════════════ 纪录 CRUD ═══════════════
+async function loadRecords() {
+    const render = (data) => {
+        const active = data.filter(r => !r.done);
+        const done = data.filter(r => r.done);
+        $('recordActiveCount').textContent = active.length ? '(' + active.length + ')' : '';
+        $('recordDoneCount').textContent = done.length ? '(' + done.length + ')' : '';
+        $('recordActiveList').innerHTML = active.length === 0
+            ? '<div style="color:var(--text-muted);padding:20px;text-align:center;font-size:13px">此刻没有让你紧张的事 ✨</div>'
+            : active.map(r => recordItemHTML(r)).join('');
+        if (done.length === 0) {
+            $('recordDoneList').innerHTML = '<div style="color:var(--text-muted);padding:14px;text-align:center;font-size:12px">还没有放下的，会有的</div>';
+        } else {
+            $('recordDoneList').innerHTML = '<div style="color:var(--accent);font-size:12px;padding:8px 4px;font-weight:500">你已经放下了 ' + done.length + ' 件当时觉得天大的事 🌈</div>' +
+                done.map(r => recordItemHTML(r, true)).join('');
+        }
+    };
+    await smartLoad('records', () => api('/api/record'), render);
+}
+
+function recordItemHTML(r, isDone) {
+    const safe = String(r.content).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return `<div class="record-item${isDone ? ' done' : ''}">
+        <div class="record-date">${r.date.slice(5)}</div>
+        <div class="record-content" title="${safe}">${safe}</div>
+        <div class="record-actions">
+            ${isDone ? '' : '<button class="btn btn-cancel btn-sm" onclick="markRecordDone(' + r.id + ')">✓ 放下了</button>'}
+            <button class="btn btn-danger btn-sm" onclick="deleteRecord(' + r.id + ')">删除</button>
+        </div>
+    </div>`;
+}
+
+async function saveRecord() {
+    const content = $('recordContent').value.trim();
+    if (!content) { toast('写点什么吧', 'error'); return; }
+    try {
+        await api('/api/record', {method:'POST', body:{date: todayStr(), content, done: 0}});
+        $('recordContent').value = '';
+        invalidateCache();
+        toast('已纪录 📌', 'success');
+        loadRecords();
+    } catch(e) { toast(e.message, 'error'); }
+}
+
+async function markRecordDone(id) {
+    try {
+        await api('/api/record/' + id, {method:'PUT', body:{done: 1}});
+        invalidateCache();
+        toast('放下啦 🌤', 'success');
+        loadRecords();
+    } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deleteRecord(id) {
+    if (!confirm('确定删除这条纪录？')) return;
+    try {
+        await api('/api/record/' + id, {method:'DELETE'});
+        invalidateCache();
+        toast('已删除', 'success');
+        loadRecords();
+    } catch(e) { toast(e.message, 'error'); }
+}
+
 // ═══════════════ 导入导出 ═══════════════
 async function exportData() {
     try {
@@ -2357,7 +2463,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('statsMonth').value = today.slice(0,7);
     // 刷新后停留在当前页面（从 URL hash 恢复）
     const savedTab = (location.hash || '').replace('#', '');
-    if (['overview','expense','income','finance','electricity','mood','weather','stats'].includes(savedTab)) {
+    if (['overview','expense','income','record','finance','electricity','mood','weather','stats'].includes(savedTab)) {
         switchTab(savedTab);
     } else {
         loadOverview();
