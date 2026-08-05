@@ -265,6 +265,12 @@ tbody tr:hover td { background: var(--bg-hover); }
 }
 .record-content:hover { color: var(--accent); }
 .record-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.record-main { flex: 1; min-width: 0; }
+.record-followup { font-size: 13px; color: var(--text-secondary); background: var(--bg-hover); border-radius: var(--radius-sm); padding: 8px 10px; margin-top: 6px; white-space: pre-wrap; line-height: 1.6; }
+.fu-toggle { font-size: 12px; color: var(--text-tertiary); background: none; border: none; cursor: pointer; padding: 5px 0 2px; margin-top: 2px; font-family: inherit; }
+.fu-toggle:hover { color: var(--accent); }
+.record-followup-edit textarea { width: 100%; min-height: 56px; font-size: 13px; font-family: inherit; padding: 8px 10px; border: 1px solid var(--border-l3); border-radius: var(--radius-sm); background: var(--bg-base); resize: vertical; outline: none; margin-top: 6px; }
+.record-followup-edit textarea:focus { border-color: var(--accent); }
 .record-item.done .record-content { color: var(--text-muted); text-decoration: line-through; }
 .record-item.done .record-content:hover { color: var(--text-muted); }
 
@@ -614,7 +620,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="card">
         <h3>📌 纪录</h3>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input type="text" id="recordContent" placeholder="想记下来的，先放在这里" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
+            <input type="date" id="recordDate" style="padding:7px 11px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
+            <input type="text" id="recordContent" placeholder="想记下来的，先放在这里" style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
             <button class="btn btn-save" onclick="saveRecord()">记下来</button>
         </div>
     </div>
@@ -814,7 +821,7 @@ const TABLES_META = {
     electricity: { cols: ['date','reading'], numCols: ['reading'] },
     mood:      { cols: ['date','rating','note'], numCols: ['rating'] },
     weather:   { cols: ['date','weather','note'], numCols: [] },
-    record:    { cols: ['date','content','done','due_date'], numCols: ['done'] },
+    record:    { cols: ['date','content','done','due_date','followup'], numCols: ['done'] },
 };
 
 function toTursoArgs(values) {
@@ -2356,9 +2363,24 @@ async function loadRecords() {
 
 function recordItemHTML(r, isDone) {
     const safe = String(r.content).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const fuSafe = r.followup ? String(r.followup).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+    const fuView = fuSafe
+        ? `<div class="record-followup" id="fu-view-${r.id}">后来：${fuSafe}</div>`
+        : '';
     return `<div class="record-item${isDone ? ' done' : ''}">
         <div class="record-date">${r.date.slice(5)}</div>
-        <div class="record-content" title="${safe}">${safe}</div>
+        <div class="record-main">
+            <div class="record-content" title="${safe}">${safe}</div>
+            ${fuView}
+            <div class="record-followup-edit" id="fu-edit-${r.id}" style="display:none">
+                <textarea id="fu-input-${r.id}" placeholder="后来怎么样了？写下来"></textarea>
+                <div style="display:flex;gap:8px;margin-top:6px">
+                    <button class="btn btn-save btn-sm" onclick="saveFollowup(${r.id})">保存</button>
+                    <button class="btn btn-cancel btn-sm" onclick="toggleFollowup(${r.id})">收起</button>
+                </div>
+            </div>
+            <button class="fu-toggle" onclick="toggleFollowup(${r.id})">✎ 补充感受</button>
+        </div>
         <div class="record-actions">
             ${isDone ? '' : '<button class="btn btn-cancel btn-sm" onclick="markRecordDone(' + r.id + ')">✓ 过去了</button>'}
             <button class="btn btn-danger btn-sm" onclick="deleteRecord(' + r.id + ')">删除</button>
@@ -2366,11 +2388,31 @@ function recordItemHTML(r, isDone) {
     </div>`;
 }
 
+function toggleFollowup(id) {
+    const edit = $('fu-edit-' + id);
+    if (!edit) return;
+    const isHidden = edit.style.display === 'none' || !edit.style.display;
+    edit.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) { const ta = $('fu-input-' + id); if (ta) ta.focus(); }
+}
+
+async function saveFollowup(id) {
+    const text = $('fu-input-' + id).value.trim();
+    if (!text) { toast('写点什么吧', 'error'); return; }
+    try {
+        await api('/api/record/' + id, {method:'PUT', body:{followup: text}});
+        invalidateCache();
+        toast('已补充 🌱', 'success');
+        loadRecords();
+    } catch(e) { toast(e.message, 'error'); }
+}
+
 async function saveRecord() {
     const content = $('recordContent').value.trim();
     if (!content) { toast('写点什么吧', 'error'); return; }
+    const date = $('recordDate').value || todayStr();
     try {
-        await api('/api/record', {method:'POST', body:{date: todayStr(), content, done: 0, due_date: ''}});
+        await api('/api/record', {method:'POST', body:{date, content, done: 0, due_date: '', followup: ''}});
         $('recordContent').value = '';
         invalidateCache();
         toast('已记下 📌', 'success');
@@ -2457,7 +2499,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 设置默认日期
     const today = todayStr();
-    ['exp_date','inc_date','fin_date','elec_date'].forEach(id => {
+    ['exp_date','inc_date','fin_date','elec_date','recordDate'].forEach(id => {
         const el = $(id); if (el) el.value = today;
     });
     $('statsMonth').value = today.slice(0,7);
