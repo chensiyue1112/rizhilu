@@ -841,7 +841,7 @@ async function tursoPipeline(requests) {
 
         // Auto-convert plain args to typed args for Turso
     const typed = requests.map(r => {
-        if (r.stmt && Array.isArray(r.stmt.args) && r.stmt.args.length > 0 && r.stmt.args[0] && typeof r.stmt.args[0] !== 'object') {
+        if (r.stmt && Array.isArray(r.stmt.args) && r.stmt.args.length > 0 && r.stmt.args[0] !== undefined && r.stmt.args[0] !== null && typeof r.stmt.args[0] !== 'object') {
             return { ...r, stmt: { ...r.stmt, args: toTursoArgs(r.stmt.args) } };
         }
         return r;
