@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.3.4</title>
+<title>日知录记账 v1.3.5</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -837,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.3.4</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.3.5</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.3.4</div>
+        <div class="sidebar-ver" id="appVersion">v1.3.5</div>
     </div>
 </aside>
 
@@ -1432,12 +1432,13 @@ function preloadMoreTabs() {
 }
 
 function smartLoad(key, loader, renderer) {
-    // 缓存损坏时忽略，继续后台加载（自愈）
-    try { if (apiCache[key]) renderer(apiCache[key]); } catch(e) {}
+    // 缓存损坏时删除并忽略，强制后台重新加载（自愈）
+    try { if (apiCache[key]) renderer(apiCache[key]); }
+    catch(e) { delete apiCache[key]; saveCache(); }
     return loader().then(data => {                 // 后台刷新
         apiCache[key] = data;
         saveCache();
-        renderer(data);
+        try { renderer(data); } catch(e) { throw e; }
     }).catch(e => { if (!apiCache[key]) throw e; }); // 无缓存才报错
 }
 
