@@ -837,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.3.3</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.3.4</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.3.3</div>
+        <div class="sidebar-ver" id="appVersion">v1.3.4</div>
     </div>
 </aside>
 
@@ -1575,9 +1575,17 @@ function switchTab(name) {
     }
 
     if (name === 'overview') loadOverview();
-    if (name === 'expense') loadExpenses();
+    if (name === 'expense') {
+        loadExpenses();
+        // 手机点开支出页自动聚焦金额框，直接弹键盘输入
+        setTimeout(() => { const el = $('exp_amount'); if (el) el.focus(); }, 350);
+    }
     if (name === 'record') loadRecords();
-    if (name === 'income') loadIncomes();
+    if (name === 'income') {
+        loadIncomes();
+        // 手机点开收入页自动聚焦金额框，直接弹键盘输入
+        setTimeout(() => { const el = $('inc_amount'); if (el) el.focus(); }, 350);
+    }
     if (name === 'finance') loadFinances();
     if (name === 'electricity') loadElectricities();
     if (name === 'mood') loadMoods();
