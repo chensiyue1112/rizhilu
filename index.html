@@ -443,11 +443,31 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         border-radius: var(--radius); border: 1px solid var(--border-l3);
         background: var(--bg-base); min-width: 0;
     }
-    /* 日期/分类下拉：宽度贴合内容，箭头贴近数字，不飘到最右 */
+    /* 分类下拉：去掉原生箭头，用紧贴文字的自定义小箭头 */
+    #expenseForm select, #incomeForm select,
+    #section-finance select, #section-electricity select {
+        appearance: none;
+        -webkit-appearance: none;
+        width: auto !important;
+        min-width: 0;
+        padding-right: 26px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2361666b' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 6px center;
+        background-size: 10px 6px;
+    }
+    /* 日期框：日历图标贴近文字，不飘到最右 */
     #expenseForm input[type="date"], #incomeForm input[type="date"],
-    #section-finance input[type="date"], #section-electricity input[type="date"],
-    #expenseForm select, #incomeForm select {
-        width: auto !important; min-width: 0; flex: 0 0 auto;
+    #section-finance input[type="date"], #section-electricity input[type="date"] {
+        width: auto !important; min-width: 0;
+        padding-right: 4px;
+    }
+    #expenseForm input[type="date"]::-webkit-calendar-picker-indicator,
+    #incomeForm input[type="date"]::-webkit-calendar-picker-indicator,
+    #section-finance input[type="date"]::-webkit-calendar-picker-indicator,
+    #section-electricity input[type="date"]::-webkit-calendar-picker-indicator {
+        margin: 0 0 0 2px;
+        padding: 0;
     }
 
     .btn { padding: 10px 20px; font-size: 14px; border-radius: var(--radius); }
