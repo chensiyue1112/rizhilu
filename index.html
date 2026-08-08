@@ -196,7 +196,27 @@ header { display: none; }
 /* === Form === */
 .form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
 /* 保存按钮格：空 label 占位，与左侧输入框对齐 */
-.align-btn .btn { width: 100%; white-space: nowrap; }
+.align-btn .custom-select {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; min-width: 96px; width: fit-content;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
+.custom-select.open .sel-arrow { transform: rotate(180deg); }
+.sel-options {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
+    min-width: 100%; max-height: 240px; overflow-y: auto;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-select.open .sel-options { display: block; }
+.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
+.sel-option:hover { background: var(--bg-hover); }
+.sel-option.sel-active { color: var(--accent); font-weight: 600; }
+.btn { width: 100%; white-space: nowrap; }
 .form-row .form-actions { align-items: flex-end; }
 .form-group { display: flex; flex-direction: column; gap: 4px; }
 .form-group label { font-size: 11.5px; color: var(--text-secondary); font-weight: 550; letter-spacing: 0.1px; }
@@ -221,6 +241,26 @@ header { display: none; }
 .form-actions { display: flex; align-items: flex-end; gap: 8px; }
 
 /* === Buttons === */
+.custom-select {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; min-width: 96px; width: fit-content;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
+.custom-select.open .sel-arrow { transform: rotate(180deg); }
+.sel-options {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
+    min-width: 100%; max-height: 240px; overflow-y: auto;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-select.open .sel-options { display: block; }
+.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
+.sel-option:hover { background: var(--bg-hover); }
+.sel-option.sel-active { color: var(--accent); font-weight: 600; }
 .btn {
     display: inline-flex; align-items: center; justify-content: center;
     padding: 7px 18px; border: none; border-radius: var(--radius-full);
@@ -424,7 +464,27 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         align-items: start;
     }
     .form-row .form-actions { grid-column: 1 / -1; display: flex; gap: 8px; margin-top: 4px; align-items: center; justify-content: space-between; }
-    .form-row .form-actions .btn { flex: 1; justify-content: center; padding: 12px; min-height: 44px; }
+    .form-row .form-actions .custom-select {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; min-width: 96px; width: fit-content;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
+.custom-select.open .sel-arrow { transform: rotate(180deg); }
+.sel-options {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
+    min-width: 100%; max-height: 240px; overflow-y: auto;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-select.open .sel-options { display: block; }
+.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
+.sel-option:hover { background: var(--bg-hover); }
+.sel-option.sel-active { color: var(--accent); font-weight: 600; }
+.btn { flex: 1; justify-content: center; padding: 12px; min-height: 44px; }
     /* 支出/收入表单：日期|金额，分类|描述 各占半列并排 */
     #expenseForm .form-group:nth-child(3),
     #incomeForm .form-group:nth-child(3) { grid-column: 1; }
@@ -433,11 +493,51 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     /* 财务表单：日期|流动资产 一行，其余两列排列，保存按钮单独整行 */
     #section-finance .form-row .align-btn { grid-column: 1 / -1; }
     #section-finance .align-btn label { display: none; }
-    #section-finance .align-btn .btn { width: 100%; min-height: 44px; }
+    #section-finance .align-btn .custom-select {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; min-width: 96px; width: fit-content;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
+.custom-select.open .sel-arrow { transform: rotate(180deg); }
+.sel-options {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
+    min-width: 100%; max-height: 240px; overflow-y: auto;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-select.open .sel-options { display: block; }
+.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
+.sel-option:hover { background: var(--bg-hover); }
+.sel-option.sel-active { color: var(--accent); font-weight: 600; }
+.btn { width: 100%; min-height: 44px; }
     /* 用电表单：日期|读数 一行，保存按钮单独整行 */
     #section-electricity .form-row .align-btn { grid-column: 1 / -1; }
     #section-electricity .align-btn label { display: none; }
-    #section-electricity .align-btn .btn { width: 100%; min-height: 44px; }
+    #section-electricity .align-btn .custom-select {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; min-width: 96px; width: fit-content;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
+.custom-select.open .sel-arrow { transform: rotate(180deg); }
+.sel-options {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
+    min-width: 100%; max-height: 240px; overflow-y: auto;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-select.open .sel-options { display: block; }
+.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
+.sel-option:hover { background: var(--bg-hover); }
+.sel-option.sel-active { color: var(--accent); font-weight: 600; }
+.btn { width: 100%; min-height: 44px; }
 
     .form-group { gap: 3px; min-width: 0; }
     .form-group label { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
@@ -445,19 +545,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         width: 100% !important; font-size: 16px; padding: 10px 12px;
         border-radius: var(--radius); border: 1px solid var(--border-l3);
         background: var(--bg-base); min-width: 0;
-    }
-    /* 分类下拉：去掉原生箭头，用紧贴文字的自定义小箭头 */
-    #expenseForm select, #incomeForm select,
-    #section-finance select, #section-electricity select {
-        appearance: none;
-        -webkit-appearance: none;
-        width: auto !important;
-        min-width: 0;
-        padding-right: 26px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2361666b' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 6px center;
-        background-size: 10px 6px;
     }
     /* 日期框：日历图标贴近文字，不飘到最右 */
     #expenseForm input[type="date"], #incomeForm input[type="date"],
@@ -472,8 +559,49 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         margin: 0 0 0 2px;
         padding: 0;
     }
+    /* 自定义分类下拉（div 实现，不依赖浏览器原生控件渲染） */
+    .custom-select {
+        position: relative; display: inline-flex; align-items: center; gap: 8px;
+        padding: 9px 12px; min-width: 96px; width: fit-content;
+        border: 1px solid var(--border-l3); border-radius: var(--radius);
+        background: var(--bg-base); cursor: pointer; user-select: none;
+        font-size: 15px; line-height: 1.4; color: var(--text-primary);
+    }
+    .custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
+    .custom-select.open .sel-arrow { transform: rotate(180deg); }
+    .sel-options {
+        position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
+        min-width: 100%; max-height: 240px; overflow-y: auto;
+        background: var(--bg-layer); border: 1px solid var(--border-l2);
+        border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+        display: none;
+    }
+    .custom-select.open .sel-options { display: block; }
+    .sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
+    .sel-option:hover { background: var(--bg-hover); }
+    .sel-option.sel-active { color: var(--accent); font-weight: 600; }
 
-    .btn { padding: 10px 20px; font-size: 14px; border-radius: var(--radius); }
+    .custom-select {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; min-width: 96px; width: fit-content;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
+.custom-select.open .sel-arrow { transform: rotate(180deg); }
+.sel-options {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
+    min-width: 100%; max-height: 240px; overflow-y: auto;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-select.open .sel-options { display: block; }
+.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
+.sel-option:hover { background: var(--bg-hover); }
+.sel-option.sel-active { color: var(--accent); font-weight: 600; }
+.btn { padding: 10px 20px; font-size: 14px; border-radius: var(--radius); }
     .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: var(--radius-sm); }
 
     table { font-size: 12px; }
@@ -621,9 +749,25 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <div class="form-row" id="expenseForm">
             <div class="form-group"><label>日期</label><input type="date" id="exp_date" style="width:140px"></div>
             <div class="form-group"><label>金额</label><input type="number" id="exp_amount" step="0.01" style="width:100px" placeholder="0.00"></div>
-            <div class="form-group"><label>分类</label><select id="exp_category" style="width:110px">
-                <option>餐饮</option><option>交通</option><option>通讯</option><option>房租</option><option>购物</option><option>医疗</option><option>工具</option><option>鱼缸</option><option>捐款</option><option>电动车</option><option>其他</option>
-            </select></div>
+            <div class="form-group"><label>分类</label>
+                <div class="custom-select" data-target="exp_category" onclick="toggleSel(this)">
+                    <span class="sel-value">餐饮</span><span class="sel-arrow">▾</span>
+                    <div class="sel-options">
+                        <div class="sel-option" data-value="餐饮">餐饮</div>
+                        <div class="sel-option" data-value="交通">交通</div>
+                        <div class="sel-option" data-value="通讯">通讯</div>
+                        <div class="sel-option" data-value="房租">房租</div>
+                        <div class="sel-option" data-value="购物">购物</div>
+                        <div class="sel-option" data-value="医疗">医疗</div>
+                        <div class="sel-option" data-value="工具">工具</div>
+                        <div class="sel-option" data-value="鱼缸">鱼缸</div>
+                        <div class="sel-option" data-value="捐款">捐款</div>
+                        <div class="sel-option" data-value="电动车">电动车</div>
+                        <div class="sel-option" data-value="其他">其他</div>
+                    </div>
+                </div>
+                <input type="hidden" id="exp_category" value="餐饮">
+            </div>
             <div class="form-group"><label>描述</label><input type="text" id="exp_desc" style="width:200px" placeholder="比如：午餐"></div>
             <label style="display:flex;align-items:center;gap:4px;font-size:12.5px;color:var(--text-secondary);cursor:pointer;padding-bottom:10px;white-space:nowrap">
                 <input type="checkbox" id="expLarge" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
@@ -649,7 +793,18 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <div class="form-row" id="incomeForm">
             <div class="form-group"><label>日期</label><input type="date" id="inc_date" style="width:140px"></div>
             <div class="form-group"><label>金额</label><input type="number" id="inc_amount" step="0.01" style="width:100px" placeholder="0.00"></div>
-            <div class="form-group"><label>分类</label><select id="inc_category" style="width:110px"><option>日常收入</option><option>立减金</option><option>生活费</option><option>其他</option></select></div>
+            <div class="form-group"><label>分类</label>
+                <div class="custom-select" data-target="inc_category" onclick="toggleSel(this)">
+                    <span class="sel-value">日常收入</span><span class="sel-arrow">▾</span>
+                    <div class="sel-options">
+                        <div class="sel-option" data-value="日常收入">日常收入</div>
+                        <div class="sel-option" data-value="立减金">立减金</div>
+                        <div class="sel-option" data-value="生活费">生活费</div>
+                        <div class="sel-option" data-value="其他">其他</div>
+                    </div>
+                </div>
+                <input type="hidden" id="inc_category" value="日常收入">
+            </div>
             <div class="form-group"><label>备注</label><input type="text" id="inc_note" style="width:200px"></div>
             <div class="form-actions"><button class="btn btn-save" id="incSaveBtn" onclick="saveIncome()">保存</button><button class="btn btn-cancel btn-sm" id="incCancelBtn" onclick="cancelIncome()" style="display:none">取消</button></div>
         </div>
@@ -1151,6 +1306,35 @@ function closeMore() {
     const ov = $('moreOverlay'); if (ov) ov.classList.remove('show');
 }
 
+// ═══════════════ 自定义下拉 ═══════════════
+function toggleSel(el) {
+    const isOpen = el.classList.toggle('open');
+    document.querySelectorAll('.custom-select.open').forEach(o => { if (o !== el) o.classList.remove('open'); });
+    if (!isOpen) return;
+    // 高亮当前选中项
+    const val = document.getElementById(el.dataset.target).value;
+    el.querySelectorAll('.sel-option').forEach(o => o.classList.toggle('sel-active', o.dataset.value === val));
+}
+function pickSel(opt) {
+    const sel = opt.closest('.custom-select');
+    document.getElementById(sel.dataset.target).value = opt.dataset.value;
+    sel.querySelector('.sel-value').textContent = opt.textContent;
+    sel.classList.remove('open');
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+}
+function closeAllSel() {
+    document.querySelectorAll('.custom-select.open').forEach(o => o.classList.remove('open'));
+}
+function syncSelUI(id) {
+    const input = document.getElementById(id);
+    const sel = document.querySelector('.custom-select[data-target="' + id + '"]');
+    if (!input || !sel) return;
+    sel.querySelector('.sel-value').textContent = input.value || sel.querySelector('.sel-value').textContent;
+}
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('.custom-select')) closeAllSel();
+});
+
 // ═══════════════ Tab 切换 ═══════════════
 function switchTab(name) {
     STATE.currentTab = name;
@@ -1556,6 +1740,7 @@ function editExpense(id, date, amount, category, desc) {
     $('exp_date').value = date;
     $('exp_amount').value = amount;
     $('exp_category').value = category;
+    syncSelUI('exp_category');
     $('exp_desc').value = desc;
     $('expLarge').checked = !!large;
     $('expSaveBtn').textContent = '更新';
@@ -1642,6 +1827,7 @@ function editIncome(id, date, amount, category, note) {
     $('inc_date').value = date;
     $('inc_amount').value = amount;
     $('inc_category').value = category;
+    syncSelUI('inc_category');
     $('inc_note').value = note;
     $('incSaveBtn').textContent = '更新';
     $('incCancelBtn').style.display = '';
