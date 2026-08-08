@@ -216,6 +216,34 @@ header { display: none; }
 .sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
 .sel-option:hover { background: var(--bg-hover); }
 .sel-option.sel-active { color: var(--accent); font-weight: 600; }
+/* 自定义日期选择器 */
+.custom-date {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; width: fit-content; min-width: 0;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
+.date-panel {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
+    width: 264px; padding: 10px;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-date.open .date-panel { display: block; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
+.cal-title { font-size: 13px; font-weight: 600; }
+.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
+.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
+.cal-day:hover { background: var(--bg-hover); }
+.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
+.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
+.cal-day.empty { cursor: default; }
 .btn { width: 100%; white-space: nowrap; }
 .form-row .form-actions { align-items: flex-end; }
 .form-group { display: flex; flex-direction: column; gap: 4px; }
@@ -261,6 +289,34 @@ header { display: none; }
 .sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
 .sel-option:hover { background: var(--bg-hover); }
 .sel-option.sel-active { color: var(--accent); font-weight: 600; }
+/* 自定义日期选择器 */
+.custom-date {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; width: fit-content; min-width: 0;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
+.date-panel {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
+    width: 264px; padding: 10px;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-date.open .date-panel { display: block; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
+.cal-title { font-size: 13px; font-weight: 600; }
+.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
+.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
+.cal-day:hover { background: var(--bg-hover); }
+.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
+.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
+.cal-day.empty { cursor: default; }
 .btn {
     display: inline-flex; align-items: center; justify-content: center;
     padding: 7px 18px; border: none; border-radius: var(--radius-full);
@@ -484,6 +540,34 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
 .sel-option:hover { background: var(--bg-hover); }
 .sel-option.sel-active { color: var(--accent); font-weight: 600; }
+/* 自定义日期选择器 */
+.custom-date {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; width: fit-content; min-width: 0;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
+.date-panel {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
+    width: 264px; padding: 10px;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-date.open .date-panel { display: block; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
+.cal-title { font-size: 13px; font-weight: 600; }
+.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
+.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
+.cal-day:hover { background: var(--bg-hover); }
+.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
+.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
+.cal-day.empty { cursor: default; }
 .btn { flex: 1; justify-content: center; padding: 12px; min-height: 44px; }
     /* 支出/收入表单：日期|金额，分类|描述 各占半列并排 */
     #expenseForm .form-group:nth-child(3),
@@ -513,6 +597,34 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
 .sel-option:hover { background: var(--bg-hover); }
 .sel-option.sel-active { color: var(--accent); font-weight: 600; }
+/* 自定义日期选择器 */
+.custom-date {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; width: fit-content; min-width: 0;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
+.date-panel {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
+    width: 264px; padding: 10px;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-date.open .date-panel { display: block; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
+.cal-title { font-size: 13px; font-weight: 600; }
+.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
+.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
+.cal-day:hover { background: var(--bg-hover); }
+.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
+.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
+.cal-day.empty { cursor: default; }
 .btn { width: 100%; min-height: 44px; }
     /* 用电表单：日期|读数 一行，保存按钮单独整行 */
     #section-electricity .form-row .align-btn { grid-column: 1 / -1; }
@@ -537,6 +649,34 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
 .sel-option:hover { background: var(--bg-hover); }
 .sel-option.sel-active { color: var(--accent); font-weight: 600; }
+/* 自定义日期选择器 */
+.custom-date {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; width: fit-content; min-width: 0;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
+.date-panel {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
+    width: 264px; padding: 10px;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-date.open .date-panel { display: block; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
+.cal-title { font-size: 13px; font-weight: 600; }
+.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
+.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
+.cal-day:hover { background: var(--bg-hover); }
+.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
+.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
+.cal-day.empty { cursor: default; }
 .btn { width: 100%; min-height: 44px; }
 
     .form-group { gap: 3px; min-width: 0; }
@@ -567,7 +707,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         background: var(--bg-base); cursor: pointer; user-select: none;
         font-size: 15px; line-height: 1.4; color: var(--text-primary);
     }
-    .custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
+    .custom-select .sel-arrow { display: inline-flex; color: var(--text-tertiary); transition: transform .18s; }
     .custom-select.open .sel-arrow { transform: rotate(180deg); }
     .sel-options {
         position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
@@ -601,6 +741,34 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
 .sel-option:hover { background: var(--bg-hover); }
 .sel-option.sel-active { color: var(--accent); font-weight: 600; }
+/* 自定义日期选择器 */
+.custom-date {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 12px; width: fit-content; min-width: 0;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); cursor: pointer; user-select: none;
+    font-size: 15px; line-height: 1.4; color: var(--text-primary);
+}
+.custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
+.date-panel {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
+    width: 264px; padding: 10px;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    display: none;
+}
+.custom-date.open .date-panel { display: block; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
+.cal-title { font-size: 13px; font-weight: 600; }
+.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
+.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
+.cal-day:hover { background: var(--bg-hover); }
+.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
+.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
+.cal-day.empty { cursor: default; }
 .btn { padding: 10px 20px; font-size: 14px; border-radius: var(--radius); }
     .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: var(--radius-sm); }
 
@@ -691,7 +859,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.1.0</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.2.0</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -703,7 +871,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.1.0</div>
+        <div class="sidebar-ver" id="appVersion">v1.2.0</div>
     </div>
 </aside>
 
@@ -747,11 +915,18 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="card">
         <h3 style="cursor:pointer;user-select:none" onclick="toggleExpForm()">➕ 新增支出 <span id="expFormArrow" style="font-size:11px;color:var(--muted)">▾ 收起</span></h3>
         <div class="form-row" id="expenseForm">
-            <div class="form-group"><label>日期</label><input type="date" id="exp_date" style="width:140px"></div>
+            <div class="form-group"><label>日期</label>
+                <div class="custom-date" data-target="exp_date" onclick="toggleDate(this)">
+                    <span class="date-value">选择日期</span>
+                    <span class="date-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                    <div class="date-panel"></div>
+                </div>
+                <input type="hidden" id="exp_date" value="">
+            </div>
             <div class="form-group"><label>金额</label><input type="number" id="exp_amount" step="0.01" style="width:100px" placeholder="0.00"></div>
             <div class="form-group"><label>分类</label>
                 <div class="custom-select" data-target="exp_category" onclick="toggleSel(this)">
-                    <span class="sel-value">餐饮</span><span class="sel-arrow">▾</span>
+                    <span class="sel-value">餐饮</span><span class="sel-arrow"><svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                     <div class="sel-options">
                         <div class="sel-option" data-value="餐饮">餐饮</div>
                         <div class="sel-option" data-value="交通">交通</div>
@@ -791,11 +966,18 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="card">
         <h3 style="cursor:pointer;user-select:none" onclick="toggleIncForm()">➕ 新增收入 <span id="incFormArrow" style="font-size:11px;color:var(--muted)">▾ 收起</span></h3>
         <div class="form-row" id="incomeForm">
-            <div class="form-group"><label>日期</label><input type="date" id="inc_date" style="width:140px"></div>
+            <div class="form-group"><label>日期</label>
+                <div class="custom-date" data-target="inc_date" onclick="toggleDate(this)">
+                    <span class="date-value">选择日期</span>
+                    <span class="date-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                    <div class="date-panel"></div>
+                </div>
+                <input type="hidden" id="inc_date" value="">
+            </div>
             <div class="form-group"><label>金额</label><input type="number" id="inc_amount" step="0.01" style="width:100px" placeholder="0.00"></div>
             <div class="form-group"><label>分类</label>
                 <div class="custom-select" data-target="inc_category" onclick="toggleSel(this)">
-                    <span class="sel-value">日常收入</span><span class="sel-arrow">▾</span>
+                    <span class="sel-value">日常收入</span><span class="sel-arrow"><svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                     <div class="sel-options">
                         <div class="sel-option" data-value="日常收入">日常收入</div>
                         <div class="sel-option" data-value="立减金">立减金</div>
@@ -1325,6 +1507,64 @@ function pickSel(opt) {
 function closeAllSel() {
     document.querySelectorAll('.custom-select.open').forEach(o => o.classList.remove('open'));
 }
+// ═══════════════ 自定义日期选择器 ═══════════════
+function toggleDate(el) {
+    const isOpen = el.classList.toggle('open');
+    document.querySelectorAll('.custom-date.open').forEach(o => { if (o !== el) o.classList.remove('open'); });
+    if (isOpen) {
+        const cur = el.dataset.cur || todayStr();
+        const [y, m] = cur.split('-').map(Number);
+        renderDatePanel(el, y, m - 1);
+    }
+}
+function renderDatePanel(el, year, month) {
+    const panel = el.querySelector('.date-panel');
+    const startWeek = new Date(year, month, 1).getDay();
+    const days = new Date(year, month + 1, 0).getDate();
+    const cur = el.dataset.cur || '';
+    const today = todayStr();
+    let h = '<div class="cal-head"><button type="button" onclick="calNav(this,-1)">◀</button><span class="cal-title">' + year + '年' + (month + 1) + '月</span><button type="button" onclick="calNav(this,1)">▶</button></div>';
+    h += '<div class="cal-week">' + '日一二三四五六'.split('').map(d => '<span>' + d + '</span>').join('') + '</div>';
+    h += '<div class="cal-grid">';
+    for (let i = 0; i < startWeek; i++) h += '<span class="cal-day empty"></span>';
+    for (let d = 1; d <= days; d++) {
+        const ds = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        let cls = 'cal-day';
+        if (ds === cur) cls += ' sel';
+        if (ds === today) cls += ' today';
+        h += '<span class="' + cls + '" data-date="' + ds + '" onclick="pickDate(this)">' + d + '</span>';
+    }
+    h += '</div>';
+    panel.innerHTML = h;
+    el.dataset.viewYear = year; el.dataset.viewMonth = month;
+}
+function calNav(btn, delta) {
+    const el = btn.closest('.custom-date');
+    let y = parseInt(el.dataset.viewYear), m = parseInt(el.dataset.viewMonth) + delta;
+    if (m < 0) { m = 11; y--; }
+    if (m > 11) { m = 0; y++; }
+    renderDatePanel(el, y, m);
+}
+function pickDate(span) {
+    const el = span.closest('.custom-date');
+    const v = span.dataset.date;
+    el.dataset.cur = v;
+    document.getElementById(el.dataset.target).value = v;
+    el.querySelector('.date-value').textContent = v;
+    el.classList.remove('open');
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+}
+function closeAllDate() {
+    document.querySelectorAll('.custom-date.open').forEach(o => o.classList.remove('open'));
+}
+function syncDateUI(id) {
+    const input = document.getElementById(id);
+    const sel = document.querySelector('.custom-date[data-target="' + id + '"]');
+    if (!input || !sel) return;
+    const v = input.value || todayStr();
+    sel.dataset.cur = v;
+    sel.querySelector('.date-value').textContent = v;
+}
 function syncSelUI(id) {
     const input = document.getElementById(id);
     const sel = document.querySelector('.custom-select[data-target="' + id + '"]');
@@ -1333,6 +1573,7 @@ function syncSelUI(id) {
 }
 document.addEventListener('click', function (e) {
     if (!e.target.closest('.custom-select')) closeAllSel();
+    if (!e.target.closest('.custom-date')) closeAllDate();
 });
 
 // ═══════════════ Tab 切换 ═══════════════
@@ -1738,6 +1979,7 @@ function editExpense(id, date, amount, category, desc) {
     STATE._expEditId = id;
     $('expenseForm').style.display = 'flex'; $('expFormArrow').textContent = '▾ 收起';
     $('exp_date').value = date;
+    syncDateUI('exp_date');
     $('exp_amount').value = amount;
     $('exp_category').value = category;
     syncSelUI('exp_category');
@@ -1825,6 +2067,7 @@ function editIncome(id, date, amount, category, note) {
     STATE._incEditId = id;
     $('incomeForm').style.display = 'flex'; $('incFormArrow').textContent = '▾ 收起';
     $('inc_date').value = date;
+    syncDateUI('inc_date');
     $('inc_amount').value = amount;
     $('inc_category').value = category;
     syncSelUI('inc_category');
@@ -2807,6 +3050,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['exp_date','inc_date','fin_date','elec_date','recordDate'].forEach(id => {
         const el = $(id); if (el) el.value = today;
     });
+    syncDateUI('exp_date'); syncDateUI('inc_date');
     $('statsMonth').value = today.slice(0,7);
     // 后台预加载"更多"分支数据（首屏渲染完再执行，不抢带宽）
     setTimeout(preloadMoreTabs, 1200);
