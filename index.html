@@ -443,6 +443,12 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         border-radius: var(--radius); border: 1px solid var(--border-l3);
         background: var(--bg-base); min-width: 0;
     }
+    /* 日期/分类下拉：宽度贴合内容，箭头贴近数字，不飘到最右 */
+    #expenseForm input[type="date"], #incomeForm input[type="date"],
+    #section-finance input[type="date"], #section-electricity input[type="date"],
+    #expenseForm select, #incomeForm select {
+        width: auto !important; min-width: 0; flex: 0 0 auto;
+    }
 
     .btn { padding: 10px 20px; font-size: 14px; border-radius: var(--radius); }
     .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: var(--radius-sm); }
