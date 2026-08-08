@@ -234,13 +234,10 @@ header { display: none; }
 }
 .custom-date.open .date-panel { display: block; }
 .date-opt {
-    display: flex; align-items: center; justify-content: space-between; gap: 18px;
     padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
 }
 .date-opt:hover { background: var(--bg-hover); }
 .date-opt.sel-active { color: var(--accent); font-weight: 600; }
-.date-opt-label { color: var(--text-primary); }
-.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn { width: 100%; white-space: nowrap; }
 .form-row .form-actions { align-items: flex-end; }
 .form-group { display: flex; flex-direction: column; gap: 4px; }
@@ -304,13 +301,10 @@ header { display: none; }
 }
 .custom-date.open .date-panel { display: block; }
 .date-opt {
-    display: flex; align-items: center; justify-content: space-between; gap: 18px;
     padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
 }
 .date-opt:hover { background: var(--bg-hover); }
 .date-opt.sel-active { color: var(--accent); font-weight: 600; }
-.date-opt-label { color: var(--text-primary); }
-.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn {
     display: inline-flex; align-items: center; justify-content: center;
     padding: 7px 18px; border: none; border-radius: var(--radius-full);
@@ -552,19 +546,18 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 }
 .custom-date.open .date-panel { display: block; }
 .date-opt {
-    display: flex; align-items: center; justify-content: space-between; gap: 18px;
     padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
 }
 .date-opt:hover { background: var(--bg-hover); }
 .date-opt.sel-active { color: var(--accent); font-weight: 600; }
-.date-opt-label { color: var(--text-primary); }
-.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn { flex: 1; justify-content: center; padding: 12px; min-height: 44px; }
-    /* 支出/收入表单：日期|金额，分类|描述 各占半列并排 */
-    #expenseForm .form-group:nth-child(3),
-    #incomeForm .form-group:nth-child(3) { grid-column: 1; }
+    /* 支出/收入表单：日期|分类|金额 一行，描述/备注|保存 一行 */
+    #expenseForm, #incomeForm { grid-template-columns: 1fr 1fr 1fr; }
     #expenseForm .form-group:nth-child(4),
-    #incomeForm .form-group:nth-child(4) { grid-column: 2; }
+    #incomeForm .form-group:nth-child(4) { grid-column: 1 / 3; }
+    #expenseForm .form-actions,
+    #incomeForm .form-actions { grid-column: 3; justify-content: flex-end; }
+    #expenseForm label { grid-column: 1 / -1; }
     /* 财务表单：日期|流动资产 一行，其余两列排列，保存按钮单独整行 */
     #section-finance .form-row .align-btn { grid-column: 1 / -1; }
     #section-finance .align-btn label { display: none; }
@@ -606,13 +599,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 }
 .custom-date.open .date-panel { display: block; }
 .date-opt {
-    display: flex; align-items: center; justify-content: space-between; gap: 18px;
     padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
 }
 .date-opt:hover { background: var(--bg-hover); }
 .date-opt.sel-active { color: var(--accent); font-weight: 600; }
-.date-opt-label { color: var(--text-primary); }
-.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn { width: 100%; min-height: 44px; }
     /* 用电表单：日期|读数 一行，保存按钮单独整行 */
     #section-electricity .form-row .align-btn { grid-column: 1 / -1; }
@@ -655,13 +645,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 }
 .custom-date.open .date-panel { display: block; }
 .date-opt {
-    display: flex; align-items: center; justify-content: space-between; gap: 18px;
     padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
 }
 .date-opt:hover { background: var(--bg-hover); }
 .date-opt.sel-active { color: var(--accent); font-weight: 600; }
-.date-opt-label { color: var(--text-primary); }
-.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn { width: 100%; min-height: 44px; }
 
     .form-group { gap: 3px; min-width: 0; }
@@ -744,13 +731,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 }
 .custom-date.open .date-panel { display: block; }
 .date-opt {
-    display: flex; align-items: center; justify-content: space-between; gap: 18px;
     padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
 }
 .date-opt:hover { background: var(--bg-hover); }
 .date-opt.sel-active { color: var(--accent); font-weight: 600; }
-.date-opt-label { color: var(--text-primary); }
-.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn { padding: 10px 20px; font-size: 14px; border-radius: var(--radius); }
     .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: var(--radius-sm); }
 
@@ -849,7 +833,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.2.3</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.3.0</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -861,7 +845,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.2.3</div>
+        <div class="sidebar-ver" id="appVersion">v1.3.0</div>
     </div>
 </aside>
 
@@ -913,7 +897,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                 </div>
                 <input type="hidden" id="exp_date" value="">
             </div>
-            <div class="form-group"><label>金额</label><input type="number" id="exp_amount" step="0.01" style="width:100px" placeholder="0.00"></div>
             <div class="form-group"><label>分类</label>
                 <div class="custom-select" data-target="exp_category" onclick="toggleSel(this)">
                     <span class="sel-value">餐饮</span><span class="sel-arrow"><svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -933,6 +916,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                 </div>
                 <input type="hidden" id="exp_category" value="餐饮">
             </div>
+            <div class="form-group"><label>金额</label><input type="number" id="exp_amount" step="0.01" style="width:100px" placeholder="0.00"></div>
             <div class="form-group"><label>描述</label><input type="text" id="exp_desc" style="width:200px" placeholder="比如：午餐"></div>
             <label style="display:flex;align-items:center;gap:4px;font-size:12.5px;color:var(--text-secondary);cursor:pointer;padding-bottom:10px;white-space:nowrap">
                 <input type="checkbox" id="expLarge" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
@@ -964,7 +948,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                 </div>
                 <input type="hidden" id="inc_date" value="">
             </div>
-            <div class="form-group"><label>金额</label><input type="number" id="inc_amount" step="0.01" style="width:100px" placeholder="0.00"></div>
             <div class="form-group"><label>分类</label>
                 <div class="custom-select" data-target="inc_category" onclick="toggleSel(this)">
                     <span class="sel-value">日常收入</span><span class="sel-arrow"><svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -977,6 +960,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                 </div>
                 <input type="hidden" id="inc_category" value="日常收入">
             </div>
+            <div class="form-group"><label>金额</label><input type="number" id="inc_amount" step="0.01" style="width:100px" placeholder="0.00"></div>
             <div class="form-group"><label>备注</label><input type="text" id="inc_note" style="width:200px"></div>
             <div class="form-actions"><button class="btn btn-save" id="incSaveBtn" onclick="saveIncome()">保存</button><button class="btn btn-cancel btn-sm" id="incCancelBtn" onclick="cancelIncome()" style="display:none">取消</button></div>
         </div>
@@ -1509,15 +1493,12 @@ function renderDatePanel(el) {
     const panel = el.querySelector('.date-panel');
     const cur = el.dataset.cur || '';
     const now = new Date();
-    const wds = ['日','一','二','三','四','五','六'];
-    const labels = ['今天','昨天','前天'];
     let h = '';
     for (let i = 0; i < 7; i++) {
         const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
         const ds = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-        const label = i < 3 ? labels[i] : wds[d.getDay()] + ' ' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
-        h += '<div class="date-opt' + (ds === cur ? ' sel-active' : '') + '" data-date="' + ds + '" onclick="pickDate(this)">' +
-             '<span class="date-opt-label">' + label + '</span><span class="date-opt-val">' + ds + '</span></div>';
+        const label = (d.getMonth() + 1) + '月' + d.getDate() + '日';
+        h += '<div class="date-opt' + (ds === cur ? ' sel-active' : '') + '" data-date="' + ds + '" onclick="pickDate(this)">' + label + '</div>';
     }
     panel.innerHTML = h;
 }
@@ -1526,7 +1507,7 @@ function pickDate(span) {
     const v = span.dataset.date;
     el.dataset.cur = v;
     document.getElementById(el.dataset.target).value = v;
-    el.querySelector('.date-value').textContent = v;
+    el.querySelector('.date-value').textContent = v.slice(5);
     el.classList.remove('open');
     el.dispatchEvent(new Event('change', { bubbles: true }));
 }
@@ -1539,7 +1520,7 @@ function syncDateUI(id) {
     if (!input || !sel) return;
     const v = input.value || todayStr();
     sel.dataset.cur = v;
-    sel.querySelector('.date-value').textContent = v;
+    sel.querySelector('.date-value').textContent = v.slice(5);
 }
 function syncSelUI(id) {
     const input = document.getElementById(id);
