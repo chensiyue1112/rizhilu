@@ -749,13 +749,15 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     #expenseTable td, #incomeTable td {
         padding: 6px 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    #expenseTable th:nth-child(1), #incomeTable th:nth-child(1) { width: 23%; }
-    #expenseTable th:nth-child(2), #incomeTable th:nth-child(2) { width: 15%; }
-    #expenseTable th:nth-child(3), #incomeTable th:nth-child(3) { width: 18%; }
-    #expenseTable th:nth-child(4), #incomeTable th:nth-child(4) { width: 17%; }
-    #expenseTable th:nth-child(5), #incomeTable th:nth-child(5) { width: 27%; }
+    #expenseTable th:nth-child(1), #incomeTable th:nth-child(1) { width: 20%; }
+    #expenseTable th:nth-child(2), #incomeTable th:nth-child(2) { width: 13%; }
+    #expenseTable th:nth-child(3), #incomeTable th:nth-child(3) { width: 17%; }
+    #expenseTable th:nth-child(4), #incomeTable th:nth-child(4) { width: 18%; }
+    #expenseTable th:nth-child(5), #incomeTable th:nth-child(5) { width: 32%; }
     #expenseTable td:last-child, #incomeTable td:last-child { white-space: nowrap; }
-    #expenseTable .btn-sm, #incomeTable .btn-sm { padding: 5px 7px; font-size: 11px; }
+    #expenseTable .btn-sm, #incomeTable .btn-sm { padding: 5px 6px; font-size: 11px; }
+    #expenseTable td:last-child, #incomeTable td:last-child { display: flex; gap: 4px; align-items: center; white-space: nowrap; }
+    #expenseTable .btn-danger, #incomeTable .btn-danger { color: #dc2626; background: rgba(220,38,38,.06); border-color: rgba(220,38,38,.3); }
 
     .toast { left: 12px; right: 12px; top: auto; bottom: 72px; text-align: center; border-radius: var(--radius-md); }
 
@@ -835,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.3.1</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.3.2</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -847,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.3.1</div>
+        <div class="sidebar-ver" id="appVersion">v1.3.2</div>
     </div>
 </aside>
 
