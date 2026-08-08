@@ -837,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.3.2</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.3.3</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.3.2</div>
+        <div class="sidebar-ver" id="appVersion">v1.3.3</div>
     </div>
 </aside>
 
@@ -886,12 +886,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 
 <!-- ═══════════════ 支出 ═══════════════ -->
 <section id="section-expense" class="section">
-    <div class="overview-cards" id="expenseCards" style="margin-bottom:12px">
-        <div class="overview-card"><div class="value" id="expMonthTotal">—</div><div class="label">本月支出</div></div>
-        <div class="overview-card"><div class="value" id="expMonthCount">—</div><div class="label">本月笔数</div></div>
-    </div>
     <div class="card">
-        <h3 style="cursor:pointer;user-select:none" onclick="toggleExpForm()">➕ 新增支出 <span id="expFormArrow" style="font-size:11px;color:var(--muted)">▾ 收起</span></h3>
+        <h3>➕ 新增支出</h3>
         <div class="form-row" id="expenseForm">
             <div class="form-group"><label>日期</label>
                 <div class="custom-date" data-target="exp_date" onclick="toggleDate(this)">
@@ -937,12 +933,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 
 <!-- ═══════════════ 收入 ═══════════════ -->
 <section id="section-income" class="section">
-    <div class="overview-cards" id="incomeCards" style="margin-bottom:12px">
-        <div class="overview-card"><div class="value" id="incMonthTotal">—</div><div class="label">本月收入</div></div>
-        <div class="overview-card"><div class="value" id="incMonthCount">—</div><div class="label">本月笔数</div></div>
-    </div>
     <div class="card">
-        <h3 style="cursor:pointer;user-select:none" onclick="toggleIncForm()">➕ 新增收入 <span id="incFormArrow" style="font-size:11px;color:var(--muted)">▾ 收起</span></h3>
+        <h3>➕ 新增收入</h3>
         <div class="form-row" id="incomeForm">
             <div class="form-group"><label>日期</label>
                 <div class="custom-date" data-target="inc_date" onclick="toggleDate(this)">
@@ -1842,30 +1834,6 @@ function drawOverviewChart(canvasId, labels, series, unit) {
 }
 
 // ═══════════════ 表单折叠 & 回车保存 ═══════════════
-function toggleExpForm() {
-    const form = $('expenseForm');
-    const arrow = $('expFormArrow');
-    if (form.style.display === 'none') {
-        form.style.display = 'flex';
-        arrow.textContent = '▾ 收起';
-        $('exp_amount').focus();
-    } else {
-        form.style.display = 'none';
-        arrow.textContent = '▸ 展开';
-    }
-}
-function toggleIncForm() {
-    const form = $('incomeForm');
-    const arrow = $('incFormArrow');
-    if (form.style.display === 'none') {
-        form.style.display = 'flex';
-        arrow.textContent = '▾ 收起';
-        $('inc_amount').focus();
-    } else {
-        form.style.display = 'none';
-        arrow.textContent = '▸ 展开';
-    }
-}
 
 // ═══════════════ 支出 CRUD ═══════════════
 let _expData = [];
@@ -1878,8 +1846,7 @@ async function loadExpenses() {
         const thisMonth = thisMonthStr();
         const monthData = data.filter(r => r.date.startsWith(thisMonth));
         const monthTotal = monthData.reduce((s, r) => s + r.amount, 0);
-        $('expMonthTotal').textContent = '-' + monthTotal.toFixed(1);
-        $('expMonthCount').textContent = monthData.length;
+        void monthTotal; void monthData;
         const tbody = document.querySelector('#expenseTable tbody');
         if (data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:28px">📭 还没有支出记录，点击上方「新增支出」开始记账</td></tr>';
@@ -1940,7 +1907,7 @@ function cancelExpense() {
 
 function editExpense(id, date, amount, category, desc) {
     STATE._expEditId = id;
-    $('expenseForm').style.display = 'flex'; $('expFormArrow').textContent = '▾ 收起';
+    $('expenseForm').style.display = 'flex';
     $('exp_date').value = date;
     syncDateUI('exp_date');
     $('exp_amount').value = amount;
@@ -1971,8 +1938,7 @@ async function loadIncomes() {
         const thisMonth = thisMonthStr();
         const monthData = data.filter(r => r.date.startsWith(thisMonth));
         const monthTotal = monthData.reduce((s, r) => s + r.amount, 0);
-        $('incMonthTotal').textContent = '+' + monthTotal.toFixed(1);
-        $('incMonthCount').textContent = monthData.length;
+        void monthTotal; void monthData;
         const tbody = document.querySelector('#incomeTable tbody');
         if (data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:28px">📭 还没有收入记录，点击上方「新增收入」开始记账</td></tr>';
@@ -2029,7 +1995,7 @@ function cancelIncome() {
 
 function editIncome(id, date, amount, category, note) {
     STATE._incEditId = id;
-    $('incomeForm').style.display = 'flex'; $('incFormArrow').textContent = '▾ 收起';
+    $('incomeForm').style.display = 'flex';
     $('inc_date').value = date;
     syncDateUI('inc_date');
     $('inc_amount').value = amount;
