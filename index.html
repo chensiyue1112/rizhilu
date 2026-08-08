@@ -790,9 +790,13 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     .sidebar-item { min-height: 44px; justify-content: center; }
     .btn-danger, .btn-cancel { min-height: 32px; }
 }
-@media (min-width: 769px) {
-    .custom-select { width: 110px; }
-    .custom-date { width: 140px; }
+/* 桌面端：日期/分类控件固定宽度，与金额/备注对齐（!important 强制） */
+.custom-select { width: 110px !important; }
+.custom-date { width: 140px !important; }
+/* 移动端：覆盖回贴合内容 */
+@media (max-width: 768px) {
+    #expenseForm .custom-select, #incomeForm .custom-select { width: fit-content !important; }
+    #expenseForm .custom-date, #incomeForm .custom-date { width: fit-content !important; }
 }
 </style>
 </head>
@@ -845,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.2.2</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.2.3</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -857,7 +861,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.2.2</div>
+        <div class="sidebar-ver" id="appVersion">v1.2.3</div>
     </div>
 </aside>
 
