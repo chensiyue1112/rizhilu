@@ -1078,6 +1078,21 @@ function saveCache() {
     try { localStorage.setItem(CACHE_KEY, JSON.stringify(apiCache)); } catch(e) {} // 超出配额则静默忽略
 }
 function invalidateCache() { apiCache = {}; saveCache(); }
+// 后台预加载低频页面数据，点击时秒开（不阻塞首屏）
+function preloadMoreTabs() {
+    const jobs = [
+        ['finances', () => api('/api/finance_snapshot')],
+        ['moods',    () => api('/api/mood')],
+        ['weather',  () => api('/api/weather')],
+        ['records',  () => api('/api/record')],
+    ];
+    jobs.forEach(([key, loader]) => {
+        if (!apiCache[key]) {
+            loader().then(data => { apiCache[key] = data; saveCache(); }).catch(() => {});
+        }
+    });
+}
+
 function smartLoad(key, loader, renderer) {
     // 缓存损坏时忽略，继续后台加载（自愈）
     try { if (apiCache[key]) renderer(apiCache[key]); } catch(e) {}
@@ -2576,6 +2591,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const el = $(id); if (el) el.value = today;
     });
     $('statsMonth').value = today.slice(0,7);
+    // 后台预加载"更多"分支数据（首屏渲染完再执行，不抢带宽）
+    setTimeout(preloadMoreTabs, 1200);
     // 刷新后停留在当前页面（从 URL hash 恢复）
     const savedTab = (location.hash || '').replace('#', '');
     if (['overview','expense','income','record','finance','electricity','mood','weather','stats'].includes(savedTab)) {
