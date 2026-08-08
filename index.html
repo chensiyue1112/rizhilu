@@ -790,6 +790,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     .sidebar-item { min-height: 44px; justify-content: center; }
     .btn-danger, .btn-cancel { min-height: 32px; }
 }
+@media (min-width: 769px) {
+    .custom-select { width: 110px; }
+    .custom-date { width: 140px; }
+}
 </style>
 </head>
 <body>
@@ -841,7 +845,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.2.1</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.2.2</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -853,7 +857,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.2.1</div>
+        <div class="sidebar-ver" id="appVersion">v1.2.2</div>
     </div>
 </aside>
 
