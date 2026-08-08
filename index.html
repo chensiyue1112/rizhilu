@@ -128,6 +128,7 @@ body {
 .more-drawer.open { transform: translateY(0); }
 .more-drawer-title { font-size: 12px; color: var(--text-tertiary); font-weight: 600; padding: 10px 12px 6px; letter-spacing: 0.5px; }
 .more-drawer .sidebar-item { padding: 12px 12px; }
+.more-drawer-ver { font-size: 11px; color: var(--text-tertiary); text-align: center; padding: 10px 0 14px; }
 .sidebar-item:hover svg { opacity: 0.75; }
 .sidebar-item.active svg { opacity: 1; color: var(--accent); }
 .sidebar-ver { font-size: 11px; color: var(--text-tertiary); text-align: center; padding: 6px 0 2px; }
@@ -562,6 +563,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
+        <div class="more-drawer-ver" id="appVersionM">v2026.08.07</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
