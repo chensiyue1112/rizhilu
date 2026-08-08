@@ -130,6 +130,7 @@ body {
 .more-drawer .sidebar-item { padding: 12px 12px; }
 .sidebar-item:hover svg { opacity: 0.75; }
 .sidebar-item.active svg { opacity: 1; color: var(--accent); }
+.sidebar-ver { font-size: 11px; color: var(--text-tertiary); text-align: center; padding: 6px 0 2px; }
 .sidebar-footer {
     padding: 8px;
     border-top: 1px solid var(--border-l1);
@@ -398,7 +399,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     /* 抽屉子项：横向、正常字号 */
     .more-drawer .sidebar-item { flex-direction: row; gap: 10px; font-size: 14px; padding: 13px 14px; }
     .more-drawer .sidebar-item.active { color: var(--accent); background: var(--bg-active); }
-    .sidebar-footer { display: none; }
+    .sidebar-ver { font-size: 11px; color: var(--text-tertiary); text-align: center; padding: 6px 0 2px; }
+.sidebar-footer { display: none; }
     /* 桌面"更多"子菜单在移动端隐藏（用抽屉代替） */
     .sidebar-group .more-sub { display: none !important; }
 
@@ -571,6 +573,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
+        <div class="sidebar-ver" id="appVersion">v2026.08.07</div>
     </div>
 </aside>
 
