@@ -227,23 +227,20 @@ header { display: none; }
 .custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
 .date-panel {
     position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    width: 264px; padding: 10px;
+    min-width: 100%; max-height: 280px; overflow-y: auto;
     background: var(--bg-layer); border: 1px solid var(--border-l2);
     border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
     display: none;
 }
 .custom-date.open .date-panel { display: block; }
-.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
-.cal-title { font-size: 13px; font-weight: 600; }
-.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
-.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
-.cal-day:hover { background: var(--bg-hover); }
-.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
-.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
-.cal-day.empty { cursor: default; }
+.date-opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
+}
+.date-opt:hover { background: var(--bg-hover); }
+.date-opt.sel-active { color: var(--accent); font-weight: 600; }
+.date-opt-label { color: var(--text-primary); }
+.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn { width: 100%; white-space: nowrap; }
 .form-row .form-actions { align-items: flex-end; }
 .form-group { display: flex; flex-direction: column; gap: 4px; }
@@ -300,23 +297,20 @@ header { display: none; }
 .custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
 .date-panel {
     position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    width: 264px; padding: 10px;
+    min-width: 100%; max-height: 280px; overflow-y: auto;
     background: var(--bg-layer); border: 1px solid var(--border-l2);
     border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
     display: none;
 }
 .custom-date.open .date-panel { display: block; }
-.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
-.cal-title { font-size: 13px; font-weight: 600; }
-.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
-.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
-.cal-day:hover { background: var(--bg-hover); }
-.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
-.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
-.cal-day.empty { cursor: default; }
+.date-opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
+}
+.date-opt:hover { background: var(--bg-hover); }
+.date-opt.sel-active { color: var(--accent); font-weight: 600; }
+.date-opt-label { color: var(--text-primary); }
+.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn {
     display: inline-flex; align-items: center; justify-content: center;
     padding: 7px 18px; border: none; border-radius: var(--radius-full);
@@ -551,23 +545,20 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
 .date-panel {
     position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    width: 264px; padding: 10px;
+    min-width: 100%; max-height: 280px; overflow-y: auto;
     background: var(--bg-layer); border: 1px solid var(--border-l2);
     border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
     display: none;
 }
 .custom-date.open .date-panel { display: block; }
-.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
-.cal-title { font-size: 13px; font-weight: 600; }
-.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
-.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
-.cal-day:hover { background: var(--bg-hover); }
-.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
-.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
-.cal-day.empty { cursor: default; }
+.date-opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
+}
+.date-opt:hover { background: var(--bg-hover); }
+.date-opt.sel-active { color: var(--accent); font-weight: 600; }
+.date-opt-label { color: var(--text-primary); }
+.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn { flex: 1; justify-content: center; padding: 12px; min-height: 44px; }
     /* 支出/收入表单：日期|金额，分类|描述 各占半列并排 */
     #expenseForm .form-group:nth-child(3),
@@ -608,23 +599,20 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
 .date-panel {
     position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    width: 264px; padding: 10px;
+    min-width: 100%; max-height: 280px; overflow-y: auto;
     background: var(--bg-layer); border: 1px solid var(--border-l2);
     border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
     display: none;
 }
 .custom-date.open .date-panel { display: block; }
-.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
-.cal-title { font-size: 13px; font-weight: 600; }
-.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
-.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
-.cal-day:hover { background: var(--bg-hover); }
-.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
-.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
-.cal-day.empty { cursor: default; }
+.date-opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
+}
+.date-opt:hover { background: var(--bg-hover); }
+.date-opt.sel-active { color: var(--accent); font-weight: 600; }
+.date-opt-label { color: var(--text-primary); }
+.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn { width: 100%; min-height: 44px; }
     /* 用电表单：日期|读数 一行，保存按钮单独整行 */
     #section-electricity .form-row .align-btn { grid-column: 1 / -1; }
@@ -660,23 +648,20 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
 .date-panel {
     position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    width: 264px; padding: 10px;
+    min-width: 100%; max-height: 280px; overflow-y: auto;
     background: var(--bg-layer); border: 1px solid var(--border-l2);
     border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
     display: none;
 }
 .custom-date.open .date-panel { display: block; }
-.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
-.cal-title { font-size: 13px; font-weight: 600; }
-.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
-.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
-.cal-day:hover { background: var(--bg-hover); }
-.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
-.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
-.cal-day.empty { cursor: default; }
+.date-opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
+}
+.date-opt:hover { background: var(--bg-hover); }
+.date-opt.sel-active { color: var(--accent); font-weight: 600; }
+.date-opt-label { color: var(--text-primary); }
+.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn { width: 100%; min-height: 44px; }
 
     .form-group { gap: 3px; min-width: 0; }
@@ -752,23 +737,20 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
 .date-panel {
     position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    width: 264px; padding: 10px;
+    min-width: 100%; max-height: 280px; overflow-y: auto;
     background: var(--bg-layer); border: 1px solid var(--border-l2);
     border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
     display: none;
 }
 .custom-date.open .date-panel { display: block; }
-.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.cal-head button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; color: var(--text-secondary); }
-.cal-title { font-size: 13px; font-weight: 600; }
-.cal-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 2px; }
-.cal-week span { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 4px 0; }
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.cal-day { text-align: center; font-size: 13px; padding: 6px 0; border-radius: 6px; cursor: pointer; }
-.cal-day:hover { background: var(--bg-hover); }
-.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
-.cal-day.sel { background: var(--accent); color: #fff; font-weight: 600; }
-.cal-day.empty { cursor: default; }
+.date-opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
+}
+.date-opt:hover { background: var(--bg-hover); }
+.date-opt.sel-active { color: var(--accent); font-weight: 600; }
+.date-opt-label { color: var(--text-primary); }
+.date-opt-val { color: var(--text-tertiary); font-size: 13px; }
 .btn { padding: 10px 20px; font-size: 14px; border-radius: var(--radius); }
     .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: var(--radius-sm); }
 
@@ -859,7 +841,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.2.0</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.2.1</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -871,7 +853,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.2.0</div>
+        <div class="sidebar-ver" id="appVersion">v1.2.1</div>
     </div>
 </aside>
 
@@ -1512,38 +1494,24 @@ function toggleDate(el) {
     const isOpen = el.classList.toggle('open');
     document.querySelectorAll('.custom-date.open').forEach(o => { if (o !== el) o.classList.remove('open'); });
     if (isOpen) {
-        const cur = el.dataset.cur || todayStr();
-        const [y, m] = cur.split('-').map(Number);
-        renderDatePanel(el, y, m - 1);
+        renderDatePanel(el);
     }
 }
-function renderDatePanel(el, year, month) {
+function renderDatePanel(el) {
     const panel = el.querySelector('.date-panel');
-    const startWeek = new Date(year, month, 1).getDay();
-    const days = new Date(year, month + 1, 0).getDate();
     const cur = el.dataset.cur || '';
-    const today = todayStr();
-    let h = '<div class="cal-head"><button type="button" onclick="calNav(this,-1)">◀</button><span class="cal-title">' + year + '年' + (month + 1) + '月</span><button type="button" onclick="calNav(this,1)">▶</button></div>';
-    h += '<div class="cal-week">' + '日一二三四五六'.split('').map(d => '<span>' + d + '</span>').join('') + '</div>';
-    h += '<div class="cal-grid">';
-    for (let i = 0; i < startWeek; i++) h += '<span class="cal-day empty"></span>';
-    for (let d = 1; d <= days; d++) {
-        const ds = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
-        let cls = 'cal-day';
-        if (ds === cur) cls += ' sel';
-        if (ds === today) cls += ' today';
-        h += '<span class="' + cls + '" data-date="' + ds + '" onclick="pickDate(this)">' + d + '</span>';
+    const now = new Date();
+    const wds = ['日','一','二','三','四','五','六'];
+    const labels = ['今天','昨天','前天'];
+    let h = '';
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+        const ds = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        const label = i < 3 ? labels[i] : wds[d.getDay()] + ' ' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+        h += '<div class="date-opt' + (ds === cur ? ' sel-active' : '') + '" data-date="' + ds + '" onclick="pickDate(this)">' +
+             '<span class="date-opt-label">' + label + '</span><span class="date-opt-val">' + ds + '</span></div>';
     }
-    h += '</div>';
     panel.innerHTML = h;
-    el.dataset.viewYear = year; el.dataset.viewMonth = month;
-}
-function calNav(btn, delta) {
-    const el = btn.closest('.custom-date');
-    let y = parseInt(el.dataset.viewYear), m = parseInt(el.dataset.viewMonth) + delta;
-    if (m < 0) { m = 11; y--; }
-    if (m > 11) { m = 0; y++; }
-    renderDatePanel(el, y, m);
 }
 function pickDate(span) {
     const el = span.closest('.custom-date');
