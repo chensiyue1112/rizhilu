@@ -554,6 +554,11 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <main>
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn btn-cancel btn-sm" onclick="ovPrevMonth()">◀ 上月</button>
+        <input type="month" id="ovMonth" onchange="ovMonthChange()" style="padding:6px 10px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-layer);font-size:13px;font-family:inherit;outline:none">
+        <button class="btn btn-cancel btn-sm" onclick="ovNextMonth()">下月 ▶</button>
+    </div>
     <div class="overview-cards" id="overviewCards"></div>
     <div class="overview-charts">
         <div class="card">
@@ -584,6 +589,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                 <option>餐饮</option><option>交通</option><option>通讯</option><option>房租</option><option>购物</option><option>医疗</option><option>工具</option><option>鱼缸</option><option>捐款</option><option>电动车</option><option>其他</option>
             </select></div>
             <div class="form-group"><label>描述</label><input type="text" id="exp_desc" style="width:200px" placeholder="比如：午餐"></div>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12.5px;color:var(--text-secondary);cursor:pointer;padding-bottom:10px;white-space:nowrap">
+                <input type="checkbox" id="expLarge" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
+                大额支出
+            </label>
             <div class="form-actions"><button class="btn btn-save" id="expSaveBtn" onclick="saveExpense()">保存</button><button class="btn btn-cancel btn-sm" id="expCancelBtn" onclick="cancelExpense()" style="display:none">取消</button></div>
         </div>
     </div>
@@ -820,7 +829,7 @@ const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOj
 // 表结构常量
 const TABLES_META = {
     income:   { cols: ['date','amount','category','note'], numCols: ['amount'] },
-    expense:  { cols: ['date','amount','category','description'], numCols: ['amount'] },
+    expense:  { cols: ['date','amount','category','description','large'], numCols: ['amount','large'] },
     finance_snapshot: { cols: ['date','liquid_assets','debt','stock','fund','convertible_bond'], numCols: ['liquid_assets','debt','stock','fund','convertible_bond'] },
     electricity: { cols: ['date','reading'], numCols: ['reading'] },
     mood:      { cols: ['date','rating','note'], numCols: ['rating'] },
@@ -959,15 +968,17 @@ async function api(url, opts) {
         const like = month + '%';
 
         if (type === 'overview') {
-            const [incRes, expRes, finRes, elecRes] = await tursoPipeline([
+            const [incRes, expRes, largeRes, finRes, elecRes] = await tursoPipeline([
                 { type: 'execute', stmt: { sql: 'SELECT COALESCE(SUM(amount),0) as total FROM income WHERE date LIKE ?', args: [like] } },
-                { type: 'execute', stmt: { sql: 'SELECT COALESCE(SUM(amount),0) as total FROM expense WHERE date LIKE ?', args: [like] } },
+                { type: 'execute', stmt: { sql: 'SELECT COALESCE(SUM(amount),0) as total FROM expense WHERE date LIKE ? AND large = 0', args: [like] } },
+                { type: 'execute', stmt: { sql: 'SELECT COALESCE(SUM(amount),0) as total FROM expense WHERE date LIKE ? AND large = 1', args: [like] } },
                 { type: 'execute', stmt: { sql: 'SELECT * FROM finance_snapshot ORDER BY date DESC LIMIT 1' } },
                 { type: 'execute', stmt: { sql: 'SELECT * FROM electricity ORDER BY date DESC LIMIT 1' } },
             ]);
             const ti = incRes[0] ? incRes[0].total : 0;
             const te = expRes[0] ? expRes[0].total : 0;
-            return { month, total_income: Math.round(ti * 100) / 100, total_expense: Math.round(te * 100) / 100, balance: Math.round((ti - te) * 100) / 100, latest_finance: finRes[0] || null, latest_electricity: elecRes[0] || null };
+            const tl = largeRes[0] ? largeRes[0].total : 0;
+            return { month, total_income: Math.round(ti * 100) / 100, total_expense: Math.round(te * 100) / 100, large_expense: Math.round(tl * 100) / 100, balance: Math.round((ti - te - tl) * 100) / 100, latest_finance: finRes[0] || null, latest_electricity: elecRes[0] || null };
         }
         if (type === 'expense') {
             const [rows] = await tursoPipeline([{ type: 'execute', stmt: { sql: 'SELECT category, SUM(amount) as total, COUNT(*) as count FROM expense WHERE date LIKE ? GROUP BY category ORDER BY total DESC', args: [like] } }]);
@@ -1142,26 +1153,48 @@ function switchTab(name) {
 }
 
 // ═══════════════ 概览 ═══════════════
+// 概览当前月份（可切换）
+const OV_MONTH = { current: thisMonthStr() };
+
+function ovPrevMonth() {
+    let [y, m] = OV_MONTH.current.split('-').map(Number);
+    m--; if (m < 1) { m = 12; y--; }
+    OV_MONTH.current = y + '-' + String(m).padStart(2, '0');
+    loadOverview();
+}
+function ovNextMonth() {
+    let [y, m] = OV_MONTH.current.split('-').map(Number);
+    m++; if (m > 12) { m = 1; y++; }
+    OV_MONTH.current = y + '-' + String(m).padStart(2, '0');
+    loadOverview();
+}
+function ovMonthChange() {
+    const v = $('ovMonth').value;
+    if (v) { OV_MONTH.current = v; loadOverview(); }
+}
+
 async function loadOverview() {
-    const month = thisMonthStr();
+    const month = OV_MONTH.current;
+    $('ovMonth').value = month;
     const render = (d) => {
         const { data, incomes, expenses } = d;
         $('overviewCards').innerHTML = `
-            <div class="overview-card"><div class="value" >+${data.total_income.toFixed(1)}</div><div class="label">本月收入</div></div>
-            <div class="overview-card"><div class="value" >-${data.total_expense.toFixed(1)}</div><div class="label">本月支出</div></div>
-            <div class="overview-card"><div class="value">${data.balance.toFixed(1)}</div><div class="label">本月结余</div></div>
-            <div class="overview-card"><div class="value">${data.latest_finance ? (data.latest_finance.liquid_assets + data.latest_finance.debt + data.latest_finance.stock + data.latest_finance.fund + data.latest_finance.convertible_bond).toFixed(0) : '—'}</div><div class="label">最新总资产</div></div>
+            <div class="overview-card"><div class="value" >+${data.total_income.toFixed(1)}</div><div class="label">${month} 收入</div></div>
+            <div class="overview-card"><div class="value" >-${data.total_expense.toFixed(1)}</div><div class="label">${month} 支出</div></div>
+            <div class="overview-card"><div class="value" >-${data.large_expense.toFixed(1)}</div><div class="label">${month} 大额支出</div></div>
+            <div class="overview-card"><div class="value">${data.balance.toFixed(1)}</div><div class="label">${month} 结余</div></div>
         `;
 
-        // Aggregate by day for current month
+        // Aggregate by day for selected month（图表剔除大额支出，避免突出）
+        const [yy, mm] = month.split('-').map(Number);
         const days = {};
-        const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+        const daysInMonth = new Date(yy, mm, 0).getDate();
         for (let i = 1; i <= daysInMonth; i++) {
             const key = month + '-' + String(i).padStart(2, '0');
             days[key] = { inc: 0, exp: 0 };
         }
         incomes.forEach(r => { if (days[r.date]) days[r.date].inc += r.amount; });
-        expenses.forEach(r => { if (days[r.date]) days[r.date].exp += r.amount; });
+        expenses.forEach(r => { if (days[r.date] && Number(r.large) !== 1) days[r.date].exp += r.amount; });
 
         const labels = Object.keys(days);
         STATE._ovLabels = labels;
@@ -1171,7 +1204,7 @@ async function loadOverview() {
         drawOverviewChart('overviewChart', labels, [{ label: '收入', data: STATE._ovIncData, color: '#3b82f6' }], '元');
     };
     try {
-        await smartLoad('overview', async () => {
+        await smartLoad('overview_' + month, async () => {
             const [data, incomes, expenses] = await Promise.all([
                 api('/api/stats/overview?month=' + month),
                 api('/api/income?month=' + month),
@@ -1412,7 +1445,7 @@ async function loadExpenses() {
         tbody.innerHTML = data.map((r, i) => `
             <tr>
                 <td>${r.date}</td>
-                <td>${r.category}</td>
+                <td>${Number(r.large) === 1 ? '<span style="color:var(--accent);font-weight:600">大额</span> ' : ''}${r.category}</td>
                 <td class="amount-minus">-${r.amount.toFixed(2)}</td>
                 <td>${r.description || ''}</td>
                 <td>
@@ -1427,7 +1460,7 @@ async function loadExpenses() {
 
 function editExpenseByIdx(idx) {
     const r = _expData[idx];
-    editExpense(r.id, r.date, r.amount, r.category, r.description || '');
+    editExpense(r.id, r.date, r.amount, r.category, r.description || '', r.large);
 }
 
 async function saveExpense() {
@@ -1436,6 +1469,7 @@ async function saveExpense() {
         amount: parseFloat($('exp_amount').value) || 0,
         category: $('exp_category').value,
         description: $('exp_desc').value,
+        large: $('expLarge').checked ? 1 : 0,
     };
     if (!data.amount) { toast('请输入金额', 'error'); return; }
     const isUpdate = $('expSaveBtn').textContent === '更新';
@@ -1454,6 +1488,7 @@ async function saveExpense() {
 
 function cancelExpense() {
     $('exp_amount').value = ''; $('exp_desc').value = '';
+    $('expLarge').checked = false;
     $('expSaveBtn').textContent = '保存';
     $('expCancelBtn').style.display = 'none';
     STATE._expEditId = null;
@@ -1466,6 +1501,7 @@ function editExpense(id, date, amount, category, desc) {
     $('exp_amount').value = amount;
     $('exp_category').value = category;
     $('exp_desc').value = desc;
+    $('expLarge').checked = !!large;
     $('expSaveBtn').textContent = '更新';
     $('expCancelBtn').style.display = '';
     $('exp_amount').focus();
@@ -1850,7 +1886,7 @@ async function loadStats() {
             '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#3b82f6;display:inline-block"></span>收入</span>' +
             '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#ef4444;display:inline-block"></span>支出</span>';
     };
-    await smartLoad('stats', async () => {
+    await smartLoad('stats_' + month, async () => {
         // 当前月统计 + 近 6 个月趋势（一次 pipeline 并行查询）
         const now = new Date();
         const months = [];

@@ -71,6 +71,7 @@ def main():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT NOT NULL, amount REAL NOT NULL,
         category TEXT NOT NULL, description TEXT DEFAULT '',
+        large INTEGER DEFAULT 0,
         created_at TEXT DEFAULT (datetime('now','localtime')))""")
     turso("""CREATE TABLE IF NOT EXISTS finance_snapshot (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
