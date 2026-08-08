@@ -559,7 +559,12 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <input type="month" id="ovMonth" onchange="ovMonthChange()" style="padding:6px 10px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-layer);font-size:13px;font-family:inherit;outline:none">
         <button class="btn btn-cancel btn-sm" onclick="ovNextMonth()">下月 ▶</button>
     </div>
-    <div class="overview-cards" id="overviewCards"></div>
+    <div class="overview-cards" id="overviewCards">
+        <div class="overview-card"><div class="value">—</div><div class="label">收入</div></div>
+        <div class="overview-card"><div class="value">—</div><div class="label">支出</div></div>
+        <div class="overview-card"><div class="value">—</div><div class="label">大额支出</div></div>
+        <div class="overview-card"><div class="value">—</div><div class="label">结余</div></div>
+    </div>
     <div class="overview-charts">
         <div class="card">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
@@ -569,7 +574,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                     <button id="toggleExpense" class="chart-toggle" onclick="switchOvChart('expense')">支出</button>
                 </div>
             </div>
-            <div style="position:relative;overflow:visible"><canvas id="overviewChart" style="width:100%;height:360px"></canvas></div>
+            <div style="position:relative;overflow:visible"><canvas id="overviewChart" style="width:100%;height:360px"></canvas><div id="ovChartLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:13px;background:var(--bg-layer)">加载中...</div></div>
         </div>
     </div>
 </section>
@@ -761,7 +766,11 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="form-row" style="margin-bottom:16px">
         <div class="form-group"><label>月份</label><input type="month" id="statsMonth" onchange="loadStats()" style="width:160px"></div>
     </div>
-    <div class="overview-cards" id="statsCards"></div>
+    <div class="overview-cards" id="statsCards">
+        <div class="overview-card"><div class="value">—</div><div class="label">收入</div></div>
+        <div class="overview-card"><div class="value">—</div><div class="label">支出</div></div>
+        <div class="overview-card"><div class="value">—</div><div class="label">结余</div></div>
+    </div>
     <div class="card">
         <h3>📊 支出分类占比</h3>
         <div style="display:flex;flex-direction:column;align-items:center;width:100%">
@@ -1181,7 +1190,7 @@ async function loadOverview() {
         $('overviewCards').innerHTML = `
             <div class="overview-card"><div class="value" >+${data.total_income.toFixed(1)}</div><div class="label">${month} 收入</div></div>
             <div class="overview-card"><div class="value" >-${data.total_expense.toFixed(1)}</div><div class="label">${month} 支出</div></div>
-            <div class="overview-card"><div class="value" >-${data.large_expense.toFixed(1)}</div><div class="label">${month} 大额支出</div></div>
+            <div class="overview-card"><div class="value" >${data.large_expense.toFixed(1)}</div><div class="label">${month} 大额支出</div></div>
             <div class="overview-card"><div class="value">${data.balance.toFixed(1)}</div><div class="label">${month} 结余</div></div>
         `;
 
@@ -1201,6 +1210,7 @@ async function loadOverview() {
         STATE._ovIncData = labels.map(k => days[k].inc);
         STATE._ovExpData = labels.map(k => days[k].exp);
         STATE._ovChart = 'income';
+        const ovLd = $('ovChartLoading'); if (ovLd) ovLd.style.display = 'none';
         drawOverviewChart('overviewChart', labels, [{ label: '收入', data: STATE._ovIncData, color: '#3b82f6' }], '元');
     };
     try {
