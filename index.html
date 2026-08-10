@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.4.2</title>
+<title>日知录记账 v1.4.3</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -376,8 +376,8 @@ tbody tr:hover td { background: var(--bg-hover); }
 .mood-calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .mood-day {
     aspect-ratio: 1; border-radius: var(--radius-sm); display: flex; flex-direction: column;
-    align-items: center; justify-content: center; font-size: 10px; color: var(--text-primary);
-    border: 1px solid var(--border-l1); background: var(--bg-layer); cursor: pointer;
+    align-items: center; justify-content: center; font-size: 10px; color: var(--text-tertiary);
+    border: 1px solid var(--border-l1); background: var(--bg-hover); cursor: pointer;
 }
 .mood-day.selected { outline: 2px solid var(--accent); outline-offset: -2px; }
 .mood-day .emoji { font-size: 16px; line-height: 1.3; }
@@ -837,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.4.2</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.4.3</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.4.2</div>
+        <div class="sidebar-ver" id="appVersion">v1.4.3</div>
     </div>
 </aside>
 
@@ -2643,7 +2643,7 @@ function renderMoodCalendar(data) {
         const isSel = dateStr === MOOD_SELECT_DATE ? ' selected' : '';
         const note = mood && mood.note ? ' | ' + mood.note : '';
         html += `<div class="mood-day${isToday}${isSel}" onclick="selectMoodDay('${dateStr}')" ${bg ? `style="background:${bg}"` : ''} title="${dateStr}${note}">
-            <span class="emoji">${mood ? MOOD_EMOJI[mood.rating] : ''}</span><span>${d}</span></div>`;
+            <span class="emoji">${mood ? MOOD_EMOJI[mood.rating] : ''}</span><span${bg ? ' style="color:#fff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.35)"' : ''}>${d}</span></div>`;
     }
     $('moodCalendar').innerHTML = html;
     $('moodLegend').innerHTML = [1,2,3,4,5].map(r =>
@@ -2655,6 +2655,9 @@ function selectMoodDay(date) {
     MOOD_SELECT_DATE = date;
     MOOD_EDITING = false;
     MOOD_TEMP_RATING = null;
+    // 若日期不在当前显示的月份，自动切换月历到该月（有心情的格子立刻可见）
+    const dm = date.slice(0, 7);
+    if (MOOD_MONTH.current !== dm) MOOD_MONTH.current = dm;
     loadMoods();
 }
 
