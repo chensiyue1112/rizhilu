@@ -116,6 +116,18 @@ exports.main = async (event) => {
                 });
                 return ok(Object.values(map).sort((a, b) => b.total - a.total));
             }
+            if (type === 'trend') {
+                // 最近 6 个月收入/支出趋势
+                const now = new Date();
+                const months = [];
+                for (let i = 5; i >= 0; i--) {
+                    const dd = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    months.push(dd.getFullYear() + '-' + String(dd.getMonth() + 1).padStart(2, '0'));
+                }
+                const [incRows, expRows] = await Promise.all([getAll('income'), getAll('expense')]);
+                const sum = (rows, m) => rows.filter(r => (r.date || '').indexOf(m) === 0).reduce((s, r) => s + (r.amount || 0), 0);
+                return ok({ months, inc: months.map(m => Math.round(sum(incRows, m) * 100) / 100), exp: months.map(m => Math.round(sum(expRows, m) * 100) / 100) });
+            }
             return fail(404, 'Unknown stats: ' + type);
         }
 
