@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.4.0</title>
+<title>日知录记账 v1.4.1</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -837,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.4.0</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.4.1</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.4.0</div>
+        <div class="sidebar-ver" id="appVersion">v1.4.1</div>
     </div>
 </aside>
 
@@ -1143,6 +1143,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<script src="https://static.cloudbase.net/cloudbase-js-sdk/2.10.0/cloudbase.full.js"></script>
 <script>
 // ═══════════════ 全局状态 ═══════════════
 const STATE = {
@@ -1167,13 +1168,85 @@ function toast(msg, type) {
 }
 // ═══════════════ Turso 配置 ────────────
 // 在 Turso 创建数据库后，填入以下信息：
-//   TURSO_URL: 数据库 URL（形如 https://xxx-yyy.turso.io）
-//   TURSO_TOKEN: 数据库认证 token（Turso Dashboard → Databases → your-db → Generate Token）
-// 注意：token 在前端可见，仅用于个人记账场景。
-const TURSO_URL = 'https://rizhilu-chensiyue1112.aws-us-west-2.turso.io';
-const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU0MjU2MjUsImlkIjoiMDE5ZmIzYTctY2YwMS03ZWJlLWI1YTAtOGE4YWU0YzYxN2Q1Iiwia2lkIjoiVkdJc2xqbDJTQTZ1THRLNmlQWWFOa3lzdnE3TVNLQ25GbVU3WExQYVE3cyIsInJpZCI6IjMxMGU5MzRhLTg3ZWItNDI2Zi04MjU3LWQxNDA3NDJmMmUxZiJ9.CI2vyKIG24u6v5unRMW3vVe6O5qIgqcBp2NtBuq7CVkCMf-TMtuJf-mlLzEZNm1Kd2goUBbFam5KFaKHM6w1Cw';
+//   数据层已迁移到腾讯云 CloudBase（见下方 CB_ENV）
+//   环境 ID: rizhilu-d2g8bc0qg3a96ace6（腾讯云控制台 → 云开发）
+// ═══════════════ 数据层：CloudBase（腾讯云 Web SDK） ═══════════════
+const CB_ENV = 'rizhilu-d2g8bc0qg3a96ace6';
+let cbApp = null, cdb = null, _cmd = null;
+try {
+    cbApp = cloudbase.init({ env: CB_ENV });
+    cdb = cbApp.database();
+    _cmd = cdb.command;
+} catch(e) { console.error('CloudBase init failed:', e); }
 
-// 表结构常量
+// 分页拉取全量文档（按字段排序），并映射 _id -> id 保持前端兼容
+async function cbGetAll(coll, orderField, orderDir) {
+    const col = cdb.collection(coll);
+    let all = [], skip = 0, batch = 100;
+    for (;;) {
+        let q = col;
+        if (orderField) q = q.orderBy(orderField, orderDir || 'asc');
+        const res = await q.skip(skip).limit(batch).get();
+        all = all.concat((res.data || []).map(d => ({ ...d, id: d._id })));
+        if (!res.data || res.data.length < batch) break;
+        skip += batch;
+        if (skip > 20000) break;
+    }
+    return all;
+}
+// 新增
+async function cbAdd(coll, data) {
+    const res = await cdb.collection(coll).add({ data });
+    return { _id: res.id, id: res.id, ...data };
+}
+// 更新
+async function cbUpdate(coll, id, data) {
+    await cdb.collection(coll).doc(id).update({ data });
+    return { _id: id, id, ...data };
+}
+// 删除
+async function cbRemove(coll, id) {
+    await cdb.collection(coll).doc(id).remove();
+}
+// 数字字段清洗（字符串 -> number）
+function cbCleanNum(info, data) {
+    const clean = {};
+    for (const col of info.cols) {
+        if (!(col in data)) continue;
+        clean[col] = info.numCols.includes(col) ? (parseFloat(data[col]) || 0) : (data[col] !== undefined ? data[col] : '');
+    }
+    return clean;
+}
+// 按月求和（聚合）
+async function cbAggSum(coll, regexp, extra) {
+    const $ = cdb.command.aggregate;
+    const matchObj = { date: _cmd.regExp({ regexp, options: '' }) };
+    if (extra) Object.assign(matchObj, extra);
+    const res = await cdb.collection(coll).aggregate()
+        .match(matchObj)
+        .group({ _id: null, total: $.sum('$amount') })
+        .end();
+    const d = res.data && res.data[0];
+    return d && d.total ? d.total : 0;
+}
+// 按分类汇总（环形图数据）
+async function cbGroupCategory(coll, regexp) {
+    const $ = cdb.command.aggregate;
+    const res = await cdb.collection(coll).aggregate()
+        .match({ date: _cmd.regExp({ regexp, options: '' }) })
+        .group({ _id: '$category', total: $.sum('$amount'), count: $.sum(1) })
+        .sort({ total: -1 })
+        .end();
+    return (res.data || []).map(d => ({ category: d._id, total: d.total, count: d.count }));
+}
+// 清空集合（导入 replace 用）
+async function cbClear(coll) {
+    for (;;) {
+        const res = await cdb.collection(coll).where(_cmd.neq('_id', null)).limit(100).remove();
+        if (!res.deleted || res.deleted < 100) break;
+    }
+}
+
 const TABLES_META = {
     income:   { cols: ['date','amount','category','note'], numCols: ['amount'] },
     expense:  { cols: ['date','amount','category','description','large'], numCols: ['amount','large'] },
@@ -1184,74 +1257,11 @@ const TABLES_META = {
     record:    { cols: ['date','content','done','due_date','followup'], numCols: ['done'] },
 };
 
-function toTursoArgs(values) {
-    return (values || []).map(v => {
-        if (v === null || v === undefined) return { type: 'null' };
-        if (typeof v === 'number') return Number.isInteger(v) ? { type: 'integer', value: String(v) } : { type: 'float', value: v };
-        if (typeof v === 'boolean') return { type: 'integer', value: v ? '1' : '0' };
-        return { type: 'text', value: String(v) };
-    });
-}
-
-async function tursoPipeline(requests) {
-
-        // Auto-convert plain args to typed args for Turso
-    const typed = requests.map(r => {
-        if (r.stmt && Array.isArray(r.stmt.args) && r.stmt.args.length > 0 && r.stmt.args[0] !== undefined && r.stmt.args[0] !== null && typeof r.stmt.args[0] !== 'object') {
-            return { ...r, stmt: { ...r.stmt, args: toTursoArgs(r.stmt.args) } };
-        }
-        return r;
-    });
-    const body = { requests: [...typed, { type: 'close' }] };
-    // 自动重试，应对跨洋网络抖动（最多 5 次尝试，逐次加长等待）
-    let data, lastErr;
-    for (let attempt = 0; attempt < 5; attempt++) {
-        try {
-            // 20s 超时控制，防止慢响应卡死页面
-            const ctrl = new AbortController();
-            const timer = setTimeout(() => ctrl.abort(), 20000);
-            const res = await fetch(TURSO_URL.replace(/\/$/, '') + '/v2/pipeline', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + TURSO_TOKEN, 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
-                signal: ctrl.signal
-            });
-            clearTimeout(timer);
-            if (!res.ok) {
-                const txt = await res.text();
-                throw new Error('Turso error: ' + (txt || res.statusText));
-            }
-            data = await res.json();
-            break;
-        } catch (e) {
-            lastErr = e;
-            if (attempt < 4) await new Promise(r => setTimeout(r, 700 * (attempt + 1)));
-        }
-    }
-    if (!data) throw lastErr || new Error('Turso 请求失败');
-    // results 中最后一个是 close 的 ok，前面是 execute 结果
-    return data.results.filter(r => r.type === 'ok' && r.response && r.response.type === 'execute').map(r => {
-        const result = r.response.result;
-        if (!result || !result.cols) return [];
-        const colNames = result.cols.map(c => c.name);
-        return (result.rows || []).map(row => {
-            const obj = {};
-            colNames.forEach((name, i) => {
-                const cell = row[i];
-                // Turso 返回 typed values: {"type":"float","value":123}
-                obj[name] = (cell && typeof cell === 'object' && 'value' in cell) ? cell.value : cell;
-            });
-            return obj;
-        });
-    });
-}
-
 async function api(url, opts) {
     opts = opts || {};
 
     // ---------- 导入 ----------
     if (url.startsWith('/api/import')) {
-        const mode = new URLSearchParams(url.split('?')[1] || '').get('mode') || 'merge';
         let data;
         if (opts.body && typeof opts.body.text === 'function') {
             data = JSON.parse(await opts.body.text());
@@ -1264,51 +1274,35 @@ async function api(url, opts) {
             data = opts.body;
         }
         if (!data || !data.tables) throw new Error('无效的数据格式');
-        const stmts = [];
+        const imported = {};
         for (const [table, rows] of Object.entries(data.tables)) {
             if (!TABLES_META[table]) continue;
-            if (mode === 'replace') {
-                stmts.push({ sql: `DELETE FROM ${table}` });
-                stmts.push({ sql: `DELETE FROM sqlite_sequence WHERE name='${table}'` });
-            }
+            await cbClear(table);   // 导入 = 覆盖式
+            const info = TABLES_META[table];
             for (const row of rows) {
-                const info = TABLES_META[table];
-                const vals = info.cols.map(c => row[c] !== undefined ? row[c] : (info.numCols.includes(c) ? 0 : ''));
-                if (mode === 'replace') {
-                    const allCols = ['id', ...info.cols];
-                    const allVals = [row.id, ...vals];
-                    const ph = allCols.map(() => '?').join(', ');
-                    stmts.push({ sql: `INSERT OR IGNORE INTO ${table} (${allCols.join(',')}) VALUES (${ph})`, args: allVals });
-                } else {
-                    if (row.id) {
-                        const sets = info.cols.map(c => `${c} = ?`).join(', ');
-                        stmts.push({ sql: `UPDATE ${table} SET ${sets} WHERE id = ?`, args: [...vals, row.id] });
-                    } else {
-                        const ph = info.cols.map(() => '?').join(', ');
-                        stmts.push({ sql: `INSERT INTO ${table} (${info.cols.join(',')}) VALUES (${ph})`, args: vals });
-                    }
+                const clean = {};
+                for (const col of info.cols) {
+                    if (!(col in row)) continue;
+                    clean[col] = info.numCols.includes(col) ? (parseFloat(row[col]) || 0) : row[col];
                 }
+                await cdb.collection(table).add({ data: clean });
             }
+            imported[table] = rows.length;
         }
-        // 分批执行（每批最多30条）
-        let imported = {};
-        for (let i = 0; i < stmts.length; i += 30) {
-            await tursoPipeline(stmts.slice(i, i + 30).map(s => ({ type: 'execute', stmt: s })));
-        }
-        // 统计
-        for (const table of Object.keys(data.tables)) {
-            if (TABLES_META[table]) imported[table] = data.tables[table].length;
-        }
-        return { message: `导入完成（模式: ${mode}）`, imported };
+        return { message: '导入完成（覆盖式）', imported };
     }
 
     // ---------- 导出 ----------
     if (url === '/api/export') {
-        const results = await tursoPipeline(
-            Object.keys(TABLES_META).map(t => ({ type: 'execute', stmt: { sql: `SELECT * FROM ${t} ORDER BY id` } }))
-        );
         const pkg = { version: 1, exported_at: nowStr(), tables: {} };
-        Object.keys(TABLES_META).forEach((t, i) => { pkg.tables[t] = results[i] || []; });
+        for (const t of Object.keys(TABLES_META)) {
+            const rows = await cbGetAll(t, 'date', 'desc');
+            pkg.tables[t] = rows.map(r => {
+                const o = { id: r.id };
+                for (const c of TABLES_META[t].cols) if (c in r) o[c] = r[c];
+                return o;
+            });
+        }
         return new Blob([JSON.stringify(pkg, null, 2)], { type: 'application/json' });
     }
 
@@ -1317,91 +1311,72 @@ async function api(url, opts) {
     if (statsMatch) {
         const type = statsMatch[1];
         const month = new URLSearchParams(url.split('?')[1] || '').get('month') || thisMonthStr();
-        const like = month + '%';
+        const reg = '^' + month;
 
         if (type === 'overview') {
-            const [incRes, expRes, largeRes, finRes, elecRes] = await tursoPipeline([
-                { type: 'execute', stmt: { sql: 'SELECT COALESCE(SUM(amount),0) as total FROM income WHERE date LIKE ?', args: [like] } },
-                { type: 'execute', stmt: { sql: 'SELECT COALESCE(SUM(amount),0) as total FROM expense WHERE date LIKE ? AND large = 0', args: [like] } },
-                { type: 'execute', stmt: { sql: 'SELECT COALESCE(SUM(amount),0) as total FROM expense WHERE date LIKE ? AND large = 1', args: [like] } },
-                { type: 'execute', stmt: { sql: 'SELECT * FROM finance_snapshot ORDER BY date DESC LIMIT 1' } },
-                { type: 'execute', stmt: { sql: 'SELECT * FROM electricity ORDER BY date DESC LIMIT 1' } },
+            const [ti, te, tl, finRes, elecRes] = await Promise.all([
+                cbAggSum('income', reg),
+                cbAggSum('expense', reg, { large: 0 }),
+                cbAggSum('expense', reg, { large: 1 }),
+                cdb.collection('finance_snapshot').orderBy('date', 'desc').limit(1).get(),
+                cdb.collection('electricity').orderBy('date', 'desc').limit(1).get(),
             ]);
-            const ti = incRes[0] ? incRes[0].total : 0;
-            const te = expRes[0] ? expRes[0].total : 0;
-            const tl = largeRes[0] ? largeRes[0].total : 0;
-            return { month, total_income: Math.round(ti * 100) / 100, total_expense: Math.round(te * 100) / 100, large_expense: Math.round(tl * 100) / 100, balance: Math.round((ti - te - tl) * 100) / 100, latest_finance: finRes[0] || null, latest_electricity: elecRes[0] || null };
+            const latest_finance = finRes.data && finRes.data[0] ? { ...finRes.data[0], id: finRes.data[0]._id } : null;
+            const latest_electricity = elecRes.data && elecRes.data[0] ? { ...elecRes.data[0], id: elecRes.data[0]._id } : null;
+            return { month, total_income: Math.round(ti * 100) / 100, total_expense: Math.round(te * 100) / 100, large_expense: Math.round(tl * 100) / 100, balance: Math.round((ti - te - tl) * 100) / 100, latest_finance, latest_electricity };
         }
-        if (type === 'expense') {
-            const [rows] = await tursoPipeline([{ type: 'execute', stmt: { sql: 'SELECT category, SUM(amount) as total, COUNT(*) as count FROM expense WHERE date LIKE ? GROUP BY category ORDER BY total DESC', args: [like] } }]);
-            return rows;
-        }
-        if (type === 'income') {
-            const [rows] = await tursoPipeline([{ type: 'execute', stmt: { sql: 'SELECT category, SUM(amount) as total, COUNT(*) as count FROM income WHERE date LIKE ? GROUP BY category ORDER BY total DESC', args: [like] } }]);
-            return rows;
+        if (type === 'expense' || type === 'income') {
+            return await cbGroupCategory(type, reg);
         }
     }
 
     // ---------- CRUD ----------
     const pathOnly = url.split('?')[0];
-    const m = pathOnly.match(/^\/api\/(\w+)(?:\/(\d+))?$/);
+    const m = pathOnly.match(/^\/api\/(\w+)(?:\/([^/]+))?$/);
     if (!m) throw new Error('Unknown API: ' + url);
-    const table = m[1], id = m[2] ? parseInt(m[2]) : null;
+    const table = m[1];
+    const id = m[2];
     if (!TABLES_META[table]) throw new Error('Unknown table: ' + table);
     const info = TABLES_META[table];
     const method = opts.method || 'GET';
 
     if (method === 'DELETE') {
-        const [rows] = await tursoPipeline([{ type: 'execute', stmt: { sql: `SELECT * FROM ${table} WHERE id = ?`, args: [id] } }]);
-        if (!rows || rows.length === 0) throw new Error('not found');
-        await tursoPipeline([{ type: 'execute', stmt: { sql: `DELETE FROM ${table} WHERE id = ?`, args: [id] } }]);
+        await cbRemove(table, id);
         return { deleted: id };
     }
 
     if (method === 'PUT') {
         const data = typeof opts.body === 'string' ? JSON.parse(opts.body) : (opts.body || {});
-        const sets = [], vals = [];
-        for (const col of info.cols) {
-            if (col in data) {
-                sets.push(`${col} = ?`);
-                const v = data[col];
-                vals.push(info.numCols.includes(col) ? (parseFloat(v) || 0) : (v !== undefined ? v : ''));
-            }
-        }
-        if (!sets.length) throw new Error('没有要更新的字段');
-        vals.push(id);
-        await tursoPipeline([{ type: 'execute', stmt: { sql: `UPDATE ${table} SET ${sets.join(', ')} WHERE id = ?`, args: vals } }]);
-        const [rows] = await tursoPipeline([{ type: 'execute', stmt: { sql: `SELECT * FROM ${table} WHERE id = ?`, args: [id] } }]);
-        if (!rows || rows.length === 0) throw new Error('not found');
-        return rows[0];
+        const clean = cbCleanNum(info, data);
+        if (!Object.keys(clean).length) throw new Error('没有要更新的字段');
+        return await cbUpdate(table, id, clean);
     }
 
     if (method === 'POST') {
         const data = typeof opts.body === 'string' ? JSON.parse(opts.body) : (opts.body || {});
-        const vals = [];
+        const clean = {};
         for (const col of info.cols) {
             const v = col in data ? data[col] : (info.numCols.includes(col) ? 0 : '');
-            vals.push(info.numCols.includes(col) ? (parseFloat(v) || 0) : (v !== undefined ? v : ''));
+            clean[col] = info.numCols.includes(col) ? (parseFloat(v) || 0) : (v !== undefined ? v : '');
         }
-        const ph = info.cols.map(() => '?').join(', ');
-        const [rows] = await tursoPipeline([{ type: 'execute', stmt: { sql: `INSERT INTO ${table} (${info.cols.join(',')}) VALUES (${ph}) RETURNING *`, args: vals } }]);
-        return rows[0];
+        return await cbAdd(table, clean);
     }
 
     // GET
     if (id) {
-        const [rows] = await tursoPipeline([{ type: 'execute', stmt: { sql: `SELECT * FROM ${table} WHERE id = ?`, args: [id] } }]);
-        if (!rows || rows.length === 0) throw new Error('not found');
-        return rows[0];
+        const res = await cdb.collection(table).doc(id).get();
+        const d = res.data && res.data[0];
+        if (!d) throw new Error('not found');
+        return { ...d, id: d._id };
     }
     const qMonth = new URLSearchParams(url.split('?')[1] || '').get('month');
-    let sql = `SELECT * FROM ${table}`;
-    const args = [];
-    if (qMonth) { sql += ` WHERE date LIKE ?`; args.push(qMonth + '%'); }
-    sql += ` ORDER BY date DESC, id DESC`;
-    const [rows] = await tursoPipeline([{ type: 'execute', stmt: { sql, args } }]);
-    return rows;
+    if (qMonth) {
+        const rows = await cbGetAll(table, 'date', 'desc');
+        return rows.filter(r => (r.date || '').indexOf(qMonth) === 0);
+    }
+    return await cbGetAll(table, 'date', 'desc');
 }
+
 
 
 // ═══════════════ 数据缓存（先显示缓存，后台刷新） ═══════════════
