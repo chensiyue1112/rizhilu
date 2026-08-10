@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.3.7</title>
+<title>日知录记账 v1.4.0</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -837,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.3.7</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.4.0</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.3.7</div>
+        <div class="sidebar-ver" id="appVersion">v1.4.0</div>
     </div>
 </aside>
 
@@ -1409,7 +1409,9 @@ const CACHE_KEY = 'rizhilu_cache_v1';
 // 只缓存这 6 个核心数据，overview/stats 不区分月份（只保留最近一次）
 const CACHE_ALLOWED = ['expenses','incomes','finances','electricity','overview','stats','moods','weather','records'];
 let apiCache = {};
+let cacheMeta = {};   // key -> 最后更新时间戳，用于 TTL 判断
 try { apiCache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch(e) {}
+try { cacheMeta = JSON.parse(localStorage.getItem(CACHE_KEY + '_meta') || '{}'); } catch(e) {}
 function saveCache() {
     // 只保留允许的 key，丢弃旧月份残留，防止缓存膨胀
     const slim = {};
@@ -1419,8 +1421,34 @@ function saveCache() {
     }
     apiCache = slim;
     try { localStorage.setItem(CACHE_KEY, JSON.stringify(apiCache)); } catch(e) {} // 超出配额则静默忽略
+    try { localStorage.setItem(CACHE_KEY + '_meta', JSON.stringify(cacheMeta)); } catch(e) {}
 }
-function invalidateCache() { apiCache = {}; saveCache(); }
+function invalidateCache() { apiCache = {}; cacheMeta = {}; saveCache(); }
+// 只清某表缓存（mood/weather/record 等低频页保存后）
+function invalidateKey(key) { delete apiCache[key]; delete cacheMeta[key]; saveCache(); }
+// 清概览/统计缓存（月份汇总变了），保留各表数据缓存
+function invalidateDerived() {
+    Object.keys(apiCache).forEach(k => {
+        if (k.indexOf('overview') === 0 || k.indexOf('stats') === 0) { delete apiCache[k]; delete cacheMeta[k]; }
+    });
+    saveCache();
+}
+// 本地更新某表缓存（增/改/删），保存后直接显示，不依赖网络重拉
+function updateTableCache(key, item, id, isDelete) {
+    if (!apiCache[key] || !Array.isArray(apiCache[key])) return;
+    let arr = apiCache[key];
+    if (isDelete) {
+        apiCache[key] = arr.filter(r => String(r.id) !== String(id));
+    } else if (id !== null && id !== undefined) {
+        const i = arr.findIndex(r => String(r.id) === String(id));
+        if (i >= 0) { arr[i] = { ...arr[i], ...item }; apiCache[key] = arr; }
+        else { apiCache[key] = [{ ...item, id }, ...arr]; }
+    } else {
+        apiCache[key] = [{ ...item, id: 'tmp-' + Date.now() }, ...arr];
+    }
+    cacheMeta[key] = Date.now();   // 重置 TTL，短时间内不再请求网络
+    saveCache();
+}
 // 后台预加载低频页面数据，点击时秒开（不阻塞首屏）
 function preloadMoreTabs() {
     const jobs = [
@@ -1436,12 +1464,19 @@ function preloadMoreTabs() {
     });
 }
 
-function smartLoad(key, loader, renderer) {
+function smartLoad(key, loader, renderer, ttlMs) {
+    const ttl = ttlMs === undefined ? 3 * 60 * 1000 : ttlMs;   // 默认 3 分钟 TTL
     // 缓存损坏时删除并忽略，强制后台重新加载（自愈）
-    try { if (apiCache[key]) renderer(apiCache[key]); }
-    catch(e) { delete apiCache[key]; saveCache(); }
+    try {
+        if (apiCache[key]) {
+            renderer(apiCache[key]);
+            const ts = cacheMeta[key] || 0;
+            if (Date.now() - ts < ttl) return Promise.resolve(apiCache[key]);  // TTL 内不请求网络
+        }
+    } catch(e) { delete apiCache[key]; delete cacheMeta[key]; saveCache(); }
     return loader().then(data => {                 // 后台刷新
         apiCache[key] = data;
+        cacheMeta[key] = Date.now();
         saveCache();
         try { renderer(data); } catch(e) { throw e; }
     }).catch(e => { if (!apiCache[key]) throw e; }); // 无缓存才报错
@@ -1906,7 +1941,7 @@ async function saveExpense() {
         $('expCancelBtn').style.display = 'none';
         $('expLargeWrap').style.display = 'none';
         STATE._expEditId = null;
-        invalidateCache(); loadExpenses();
+        updateTableCache('expenses', data, STATE._expEditId, false); invalidateDerived(); loadExpenses();
     } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -1937,7 +1972,7 @@ function editExpense(id, date, amount, category, desc) {
 
 async function deleteExpense(id) {
     if (!confirm('确定删除这条记录？')) return;
-    try { await api('/api/expense/' + id, {method:'DELETE'}); toast('已删除', 'success'); invalidateCache(); loadExpenses(); }
+    try { await api('/api/expense/' + id, {method:'DELETE'}); toast('已删除', 'success'); updateTableCache('expenses', null, id, true); invalidateDerived(); loadExpenses(); }
     catch(e) { toast(e.message, 'error'); }
 }
 
@@ -1996,7 +2031,7 @@ async function saveIncome() {
         $('incSaveBtn').textContent = '保存';
         $('incCancelBtn').style.display = 'none';
         STATE._incEditId = null;
-        invalidateCache(); loadIncomes();
+        updateTableCache('incomes', data, STATE._incEditId, false); invalidateDerived(); loadIncomes();
     } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -2023,7 +2058,7 @@ function editIncome(id, date, amount, category, note) {
 
 async function deleteIncome(id) {
     if (!confirm('确定删除这条记录？')) return;
-    try { await api('/api/income/' + id, {method:'DELETE'}); toast('已删除', 'success'); invalidateCache(); loadIncomes(); }
+    try { await api('/api/income/' + id, {method:'DELETE'}); toast('已删除', 'success'); updateTableCache('incomes', null, id, true); invalidateDerived(); loadIncomes(); }
     catch(e) { toast(e.message, 'error'); }
 }
 
@@ -2201,13 +2236,13 @@ async function saveFinance() {
         await api('/api/finance_snapshot', {method:'POST', body:data});
         toast('已保存', 'success');
         ['fin_liquid','fin_debt','fin_stock','fin_fund','fin_bond'].forEach(id => $(id).value = '');
-        invalidateCache(); loadFinances();
+        updateTableCache('finances', data, null, false); invalidateDerived(); loadFinances();
     } catch(e) { toast(e.message, 'error'); }
 }
 
 async function deleteFinance(id) {
     if (!confirm('确定删除？')) return;
-    try { await api('/api/finance_snapshot/' + id, {method:'DELETE'}); toast('已删除', 'success'); invalidateCache(); loadFinances(); }
+    try { await api('/api/finance_snapshot/' + id, {method:'DELETE'}); toast('已删除', 'success'); updateTableCache('finances', null, id, true); invalidateDerived(); loadFinances(); }
     catch(e) { toast(e.message, 'error'); }
 }
 
@@ -2279,13 +2314,13 @@ async function saveElectricity() {
         await api('/api/electricity', {method:'POST', body:data});
         toast('已保存', 'success');
         $('elec_reading').value = '';
-        invalidateCache(); loadElectricities();
+        updateTableCache('electricity', data, null, false); invalidateDerived(); loadElectricities();
     } catch(e) { toast(e.message, 'error'); }
 }
 
 async function deleteElectricity(id) {
     if (!confirm('确定删除？')) return;
-    try { await api('/api/electricity/' + id, {method:'DELETE'}); toast('已删除', 'success'); invalidateCache(); loadElectricities(); }
+    try { await api('/api/electricity/' + id, {method:'DELETE'}); toast('已删除', 'success'); updateTableCache('electricity', null, id, true); invalidateDerived(); loadElectricities(); }
     catch(e) { toast(e.message, 'error'); }
 }
 
@@ -2593,7 +2628,7 @@ async function saveMood() {
         } else {
             await api('/api/mood', {method:'POST', body:{date, rating, note: $('moodNote').value}});
         }
-        invalidateCache();
+        invalidateKey('moods');
         toast(MOOD_EMOJI[rating] + ' 已保存', 'success');
         MOOD_EDITING = false;
         MOOD_TEMP_RATING = null;
@@ -2606,7 +2641,7 @@ async function saveMoodNow(rating) {
     const date = MOOD_SELECT_DATE;
     try {
         await api('/api/mood', {method:'POST', body:{date, rating, note: $('moodNote').value}});
-        invalidateCache();
+        invalidateKey('moods');
         toast(MOOD_EMOJI[rating] + ' 已记录', 'success');
         loadMoods();
     } catch(e) { toast(e.message, 'error'); }
@@ -2790,7 +2825,7 @@ async function saveWeather() {
         } else {
             await api('/api/weather', {method:'POST', body:{date, weather: key, note: $('weatherNote').value}});
         }
-        invalidateCache();
+        invalidateKey('weather');
         toast(WEATHER_MAP[key].emoji + ' ' + WEATHER_MAP[key].label + ' 已保存', 'success');
         WEATHER_EDITING = false;
         WEATHER_TEMP_KEY = null;
@@ -2803,7 +2838,7 @@ async function saveWeatherNow(key) {
     const date = WEATHER_SELECT_DATE;
     try {
         await api('/api/weather', {method:'POST', body:{date, weather: key, note: $('weatherNote').value}});
-        invalidateCache();
+        invalidateKey('weather');
         toast(WEATHER_MAP[key].emoji + ' ' + WEATHER_MAP[key].label + ' 已记录', 'success');
         loadWeathers();
     } catch(e) { toast(e.message, 'error'); }
@@ -2883,7 +2918,7 @@ async function saveFollowup(id) {
     if (date) updates.date = date;   // 事后补充日期
     try {
         await api('/api/record/' + id, {method:'PUT', body:updates});
-        invalidateCache();
+        invalidateKey('records');
         toast('已补充 🌱', 'success');
         loadRecords().catch(() => {});
     } catch(e) { toast(e.message, 'error'); }
@@ -2906,7 +2941,7 @@ async function saveRecord() {
         $('recordDate').value = todayStr();   // 保存后恢复默认今天
         $('recordNoDate').checked = false;
         $('recordDate').disabled = false;
-        invalidateCache();
+        invalidateKey('records');
         toast('已记下 📌', 'success');
         loadRecords().catch(() => {});
     } catch(e) { toast(e.message, 'error'); }
@@ -2915,7 +2950,7 @@ async function saveRecord() {
 async function markRecordDone(id) {
     try {
         await api('/api/record/' + id, {method:'PUT', body:{done: 1}});
-        invalidateCache();
+        invalidateKey('records');
         toast('这件事过去了 🌤', 'success');
         loadRecords().catch(() => {});
     } catch(e) { toast(e.message, 'error'); }
@@ -2925,7 +2960,7 @@ async function deleteRecord(id) {
     if (!confirm('确定删除这条纪录？')) return;
     try {
         await api('/api/record/' + id, {method:'DELETE'});
-        invalidateCache();
+        invalidateKey('records');
         toast('已删除', 'success');
         loadRecords().catch(() => {});
     } catch(e) { toast(e.message, 'error'); }
