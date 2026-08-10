@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.5.1</title>
+<title>日知录记账 v1.5.2</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -837,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.5.1</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.5.2</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.5.1</div>
+        <div class="sidebar-ver" id="appVersion">v1.5.2</div>
     </div>
 </aside>
 
@@ -1143,7 +1143,33 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<script type="module">
+    // CloudBase Web SDK 3.7.1（ESM，协议与当前后端兼容）
+    import cloudbase from 'https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@3.7.1/+esm';
+    window.__cbSDK = cloudbase;
+</script>
 <script>
+// ═══════════════ 全局状态 ═══════════════
+const STATE = {
+    currentTab: 'overview',
+    importFile: null,
+};
+
+// ═══════════════ 工具函数 ═══════════════
+function $(id) { return document.getElementById(id); }
+// 本地时区日期（避免 toISOString 的 UTC 偏差：北京过了午夜仍是前一天）
+function pad2(v) { return String(v).padStart(2, '0'); }
+function todayStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()); }
+function thisMonthStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1); }
+function nowStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds()); }
+function toast(msg, type) {
+    type = type || '';
+    const t = $('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + type + ' show';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.className = 'toast'; }, 2000);
+}
 // ═══════════════ 数据层：CloudBase 云函数中转 ═══════════════
 // 网页 → CloudBase HTTP 访问服务 → 云函数(rizhilu-api) → 数据库
 const CB_API_BASE = 'https://rizhilu-d2g8bc0qg3a96ace6.service.tcloudbase.com/cloudfunctions/rizhilu-api';
@@ -1153,7 +1179,6 @@ async function api(url, opts) {
     const full = url.replace(/^\/api/, CB_API_BASE);
     let body = opts.body;
     let headers = {};
-    // 处理导入文件（FormData / Blob）
     if (body && typeof body.text === 'function') body = await body.text();
     if (body instanceof FormData) {
         const file = body.get('file');
@@ -1164,7 +1189,6 @@ async function api(url, opts) {
         headers['Content-Type'] = 'application/json';
         body = JSON.stringify(body);
     }
-    // 自动重试（跨洋网络抖动自愈）+ 20s 超时
     let lastErr;
     for (let attempt = 0; attempt < 5; attempt++) {
         try {
@@ -1185,6 +1209,17 @@ async function api(url, opts) {
     }
     throw lastErr || new Error('网络错误');
 }
+
+const TABLES_META = {
+    income:   { cols: ['date','amount','category','note'], numCols: ['amount'] },
+    expense:  { cols: ['date','amount','category','description','large'], numCols: ['amount','large'] },
+    finance_snapshot: { cols: ['date','liquid_assets','debt','stock','fund','convertible_bond'], numCols: ['liquid_assets','debt','stock','fund','convertible_bond'] },
+    electricity: { cols: ['date','reading'], numCols: ['reading'] },
+    mood:      { cols: ['date','rating','note'], numCols: ['rating'] },
+    weather:   { cols: ['date','weather','note'], numCols: [] },
+    record:    { cols: ['date','content','done','due_date','followup'], numCols: ['done'] },
+};
+
 // ═══════════════ 数据缓存（先显示缓存，后台刷新） ═══════════════
 const CACHE_KEY = 'rizhilu_cache_v1';
 // 只缓存这 6 个核心数据，overview/stats 不区分月份（只保留最近一次）
