@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.4.3</title>
+<title>日知录记账 v1.4.4</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -837,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.4.3</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.4.4</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.4.3</div>
+        <div class="sidebar-ver" id="appVersion">v1.4.4</div>
     </div>
 </aside>
 
@@ -1217,27 +1217,31 @@ function cbCleanNum(info, data) {
     }
     return clean;
 }
-// 按月求和（聚合）
+// 按月求和（JS 过滤，数据量小无需数据库聚合）
 async function cbAggSum(coll, regexp, extra) {
-    const $ = cdb.command.aggregate;
-    const matchObj = { date: _cmd.regExp({ regexp, options: '' }) };
-    if (extra) Object.assign(matchObj, extra);
-    const res = await cdb.collection(coll).aggregate()
-        .match(matchObj)
-        .group({ _id: null, total: $.sum('$amount') })
-        .end();
-    const d = res.data && res.data[0];
-    return d && d.total ? d.total : 0;
+    const month = regexp.replace(/^\^/, '');
+    const rows = await cbGetAll(coll);
+    let total = 0;
+    for (const r of rows) {
+        if ((r.date || '').indexOf(month) !== 0) continue;
+        if (extra && r.large !== extra.large) continue;
+        total += parseFloat(r.amount) || 0;
+    }
+    return total;
 }
-// 按分类汇总（环形图数据）
+// 按分类汇总（环形图数据，JS 分组）
 async function cbGroupCategory(coll, regexp) {
-    const $ = cdb.command.aggregate;
-    const res = await cdb.collection(coll).aggregate()
-        .match({ date: _cmd.regExp({ regexp, options: '' }) })
-        .group({ _id: '$category', total: $.sum('$amount'), count: $.sum(1) })
-        .sort({ total: -1 })
-        .end();
-    return (res.data || []).map(d => ({ category: d._id, total: d.total, count: d.count }));
+    const month = regexp.replace(/^\^/, '');
+    const rows = await cbGetAll(coll);
+    const map = {};
+    for (const r of rows) {
+        if ((r.date || '').indexOf(month) !== 0) continue;
+        const cat = r.category || '其他';
+        if (!map[cat]) map[cat] = { category: cat, total: 0, count: 0 };
+        map[cat].total += parseFloat(r.amount) || 0;
+        map[cat].count += 1;
+    }
+    return Object.values(map).sort((a, b) => b.total - a.total);
 }
 // 清空集合（导入 replace 用）
 async function cbClear(coll) {
