@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.5.0</title>
+<title>日知录记账 v1.5.1</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -837,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.5.0</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.5.1</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.5.0</div>
+        <div class="sidebar-ver" id="appVersion">v1.5.1</div>
     </div>
 </aside>
 
@@ -1143,6 +1143,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<script>
 // ═══════════════ 数据层：CloudBase 云函数中转 ═══════════════
 // 网页 → CloudBase HTTP 访问服务 → 云函数(rizhilu-api) → 数据库
 const CB_API_BASE = 'https://rizhilu-d2g8bc0qg3a96ace6.service.tcloudbase.com/cloudfunctions/rizhilu-api';
@@ -1184,111 +1185,6 @@ async function api(url, opts) {
     }
     throw lastErr || new Error('网络错误');
 }
-
-        }
-        if (!data || !data.tables) throw new Error('无效的数据格式');
-        const imported = {};
-        for (const [table, rows] of Object.entries(data.tables)) {
-            if (!TABLES_META[table]) continue;
-            await cbClear(table);   // 导入 = 覆盖式
-            const info = TABLES_META[table];
-            for (const row of rows) {
-                const clean = {};
-                for (const col of info.cols) {
-                    if (!(col in row)) continue;
-                    clean[col] = info.numCols.includes(col) ? (parseFloat(row[col]) || 0) : row[col];
-                }
-                await cdb.collection(table).add({ data: clean });
-            }
-            imported[table] = rows.length;
-        }
-        return { message: '导入完成（覆盖式）', imported };
-    }
-
-    // ---------- 导出 ----------
-    if (url === '/api/export') {
-        const pkg = { version: 1, exported_at: nowStr(), tables: {} };
-        for (const t of Object.keys(TABLES_META)) {
-            const rows = await api('/api/' + t);
-            pkg.tables[t] = rows.map(r => {
-                const o = { id: r.id };
-                for (const c of TABLES_META[t].cols) if (c in r) o[c] = r[c];
-                return o;
-            });
-        }
-        return new Blob([JSON.stringify(pkg, null, 2)], { type: 'application/json' });
-    }
-
-    // ---------- 统计 ----------
-    const statsMatch = url.match(/^\/api\/stats\/(\w+)/);
-    if (statsMatch) {
-        const type = statsMatch[1];
-        const month = new URLSearchParams(url.split('?')[1] || '').get('month') || thisMonthStr();
-        const reg = '^' + month;
-
-        if (type === 'overview') {
-            const [ti, te, tl, finRes, elecRes] = await Promise.all([
-                cbAggSum('income', reg),
-                cbAggSum('expense', reg, { large: 0 }),
-                cbAggSum('expense', reg, { large: 1 }),
-                cdb.collection('finance_snapshot').orderBy('date', 'desc').limit(1).get(),
-                cdb.collection('electricity').orderBy('date', 'desc').limit(1).get(),
-            ]);
-            const latest_finance = finRes.data && finRes.data[0] ? { ...finRes.data[0], id: finRes.data[0]._id } : null;
-            const latest_electricity = elecRes.data && elecRes.data[0] ? { ...elecRes.data[0], id: elecRes.data[0]._id } : null;
-            return { month, total_income: Math.round(ti * 100) / 100, total_expense: Math.round(te * 100) / 100, large_expense: Math.round(tl * 100) / 100, balance: Math.round((ti - te - tl) * 100) / 100, latest_finance, latest_electricity };
-        }
-        if (type === 'expense' || type === 'income') {
-            return await cbGroupCategory(type, reg);
-        }
-    }
-
-    // ---------- CRUD ----------
-    const pathOnly = url.split('?')[0];
-    const m = pathOnly.match(/^\/api\/(\w+)(?:\/([^/]+))?$/);
-    if (!m) throw new Error('Unknown API: ' + url);
-    const table = m[1];
-    const id = m[2];
-    if (!TABLES_META[table]) throw new Error('Unknown table: ' + table);
-    const info = TABLES_META[table];
-    const method = opts.method || 'GET';
-
-    if (method === 'DELETE') {
-        await cbRemove(table, id);
-        return { deleted: id };
-    }
-
-    if (method === 'PUT') {
-        const data = typeof opts.body === 'string' ? JSON.parse(opts.body) : (opts.body || {});
-        const clean = cbCleanNum(info, data);
-        if (!Object.keys(clean).length) throw new Error('没有要更新的字段');
-        return await cbUpdate(table, id, clean);
-    }
-
-    if (method === 'POST') {
-        const data = typeof opts.body === 'string' ? JSON.parse(opts.body) : (opts.body || {});
-        const clean = {};
-        for (const col of info.cols) {
-            const v = col in data ? data[col] : (info.numCols.includes(col) ? 0 : '');
-            clean[col] = info.numCols.includes(col) ? (parseFloat(v) || 0) : (v !== undefined ? v : '');
-        }
-        return await cbAdd(table, clean);
-    }
-
-    // GET
-    if (id) {
-        const res = await cdb.collection(table).doc(id).get();
-        const d = res.data && res.data[0];
-        if (!d) throw new Error('not found');
-        return { ...d, id: d._id };
-    }
-    const qMonth = new URLSearchParams(url.split('?')[1] || '').get('month');
-    if (qMonth) return await api('/api/' + table + '?month=' + encodeURIComponent(qMonth));
-    return await api('/api/' + table);
-}
-
-
-
 // ═══════════════ 数据缓存（先显示缓存，后台刷新） ═══════════════
 const CACHE_KEY = 'rizhilu_cache_v1';
 // 只缓存这 6 个核心数据，overview/stats 不区分月份（只保留最近一次）
