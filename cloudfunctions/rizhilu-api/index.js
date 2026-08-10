@@ -52,6 +52,20 @@ exports.main = async (event) => {
         let body = {};
         try { body = event.body ? JSON.parse(event.body) : {}; } catch (e) { body = {}; }
 
+        // 处理浏览器 CORS 预检（跨域 POST/PUT/DELETE 需要）
+        if (method === 'OPTIONS') {
+            return {
+                statusCode: 204,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-Requested-With',
+                    'Access-Control-Max-Age': '86400'
+                },
+                body: ''
+            };
+        }
+
         // ---------- 导入（覆盖式） ----------
         if (path === '/import') {
             if (!body.tables) return fail(400, '无效的数据格式');
