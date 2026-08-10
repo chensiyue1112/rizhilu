@@ -1,0 +1,14 @@
+{
+  "envId": "rizhilu-d2g8bc0qg3a96ace6",
+  "functions": [
+    {
+      "name": "rizhilu-api",
+      "runtime": "Nodejs20.19",
+      "handler": "index.main",
+      "timeout": 10,
+      "memorySize": 256,
+      "installDependency": false,
+      "path": "/cloudfunctions/rizhilu-api"
+    }
+  ]
+}

@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.4.8</title>
+<title>日知录记账 v1.5.0</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -837,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.4.8</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.5.0</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.4.8</div>
+        <div class="sidebar-ver" id="appVersion">v1.5.0</div>
     </div>
 </aside>
 
@@ -1143,163 +1143,48 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<script type="module">
-    // CloudBase Web SDK 3.7.1（ESM，协议与当前后端兼容）
-    import cloudbase from 'https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@3.7.1/+esm';
-    window.__cbSDK = cloudbase;
-</script>
-<script>
-// ═══════════════ 全局状态 ═══════════════
-const STATE = {
-    currentTab: 'overview',
-    importFile: null,
-};
-
-// ═══════════════ 工具函数 ═══════════════
-function $(id) { return document.getElementById(id); }
-// 本地时区日期（避免 toISOString 的 UTC 偏差：北京过了午夜仍是前一天）
-function pad2(v) { return String(v).padStart(2, '0'); }
-function todayStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()); }
-function thisMonthStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1); }
-function nowStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds()); }
-function toast(msg, type) {
-    type = type || '';
-    const t = $('toast');
-    t.textContent = msg;
-    t.className = 'toast ' + type + ' show';
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => { t.className = 'toast'; }, 2000);
-}
-// ═══════════════ Turso 配置 ────────────
-// 在 Turso 创建数据库后，填入以下信息：
-//   数据层已迁移到腾讯云 CloudBase（见下方 CB_ENV）
-//   环境 ID: rizhilu-d2g8bc0qg3a96ace6（腾讯云控制台 → 云开发）
-// ═══════════════ 数据层：CloudBase（腾讯云 Web SDK） ═══════════════
-const CB_ENV = 'rizhilu-d2g8bc0qg3a96ace6';
-let cbApp = null, cdb = null, _cmd = null;
-let cbAuthPromise = null;
-// 初始化（等 ESM SDK 加载完成） + 匿名登录
-async function cbAuth() {
-    if (!cbAuthPromise) {
-        cbAuthPromise = (async () => {
-            // 等新版 SDK 模块加载完成（ESM 异步加载）
-            let waited = 0;
-            while (!window.__cbSDK) {
-                if (waited > 15000) throw new Error('CloudBase SDK 加载超时');
-                await new Promise(r => setTimeout(r, 50));
-                waited += 50;
-            }
-            cbApp = window.__cbSDK.init({ env: CB_ENV, region: 'ap-shanghai' });
-            cdb = cbApp.database();
-            _cmd = cdb.command;
-            await cbApp.auth({ persistence: 'local' }).signInAnonymously();
-        })();
-    }
-    await cbAuthPromise;
-}
-
-// 分页拉取全量文档（按字段排序），并映射 _id -> id 保持前端兼容
-async function cbGetAll(coll, orderField, orderDir) {
-    const col = cdb.collection(coll);
-    let all = [], skip = 0, batch = 100;
-    for (;;) {
-        let q = col;
-        if (orderField) q = q.orderBy(orderField, orderDir || 'asc');
-        const res = await q.skip(skip).limit(batch).get();
-        all = all.concat((res.data || []).map(d => ({ ...d, id: d._id })));
-        if (!res.data || res.data.length < batch) break;
-        skip += batch;
-        if (skip > 20000) break;
-    }
-    return all;
-}
-// 新增
-async function cbAdd(coll, data) {
-    const res = await cdb.collection(coll).add({ data });
-    return { _id: res.id, id: res.id, ...data };
-}
-// 更新
-async function cbUpdate(coll, id, data) {
-    await cdb.collection(coll).doc(id).update({ data });
-    return { _id: id, id, ...data };
-}
-// 删除
-async function cbRemove(coll, id) {
-    await cdb.collection(coll).doc(id).remove();
-}
-// 数字字段清洗（字符串 -> number）
-function cbCleanNum(info, data) {
-    const clean = {};
-    for (const col of info.cols) {
-        if (!(col in data)) continue;
-        clean[col] = info.numCols.includes(col) ? (parseFloat(data[col]) || 0) : (data[col] !== undefined ? data[col] : '');
-    }
-    return clean;
-}
-// 按月求和（JS 过滤，数据量小无需数据库聚合）
-async function cbAggSum(coll, regexp, extra) {
-    const month = regexp.replace(/^\^/, '');
-    const rows = await cbGetAll(coll);
-    let total = 0;
-    for (const r of rows) {
-        if ((r.date || '').indexOf(month) !== 0) continue;
-        if (extra && r.large !== extra.large) continue;
-        total += parseFloat(r.amount) || 0;
-    }
-    return total;
-}
-// 按分类汇总（环形图数据，JS 分组）
-async function cbGroupCategory(coll, regexp) {
-    const month = regexp.replace(/^\^/, '');
-    const rows = await cbGetAll(coll);
-    const map = {};
-    for (const r of rows) {
-        if ((r.date || '').indexOf(month) !== 0) continue;
-        const cat = r.category || '其他';
-        if (!map[cat]) map[cat] = { category: cat, total: 0, count: 0 };
-        map[cat].total += parseFloat(r.amount) || 0;
-        map[cat].count += 1;
-    }
-    return Object.values(map).sort((a, b) => b.total - a.total);
-}
-// 清空集合（导入 replace 用）
-async function cbClear(coll) {
-    for (;;) {
-        const res = await cdb.collection(coll).where(_cmd.neq('_id', null)).limit(100).remove();
-        if (!res.deleted || res.deleted < 100) break;
-    }
-}
-
-const TABLES_META = {
-    income:   { cols: ['date','amount','category','note'], numCols: ['amount'] },
-    expense:  { cols: ['date','amount','category','description','large'], numCols: ['amount','large'] },
-    finance_snapshot: { cols: ['date','liquid_assets','debt','stock','fund','convertible_bond'], numCols: ['liquid_assets','debt','stock','fund','convertible_bond'] },
-    electricity: { cols: ['date','reading'], numCols: ['reading'] },
-    mood:      { cols: ['date','rating','note'], numCols: ['rating'] },
-    weather:   { cols: ['date','weather','note'], numCols: [] },
-    record:    { cols: ['date','content','done','due_date','followup'], numCols: ['done'] },
-};
+// ═══════════════ 数据层：CloudBase 云函数中转 ═══════════════
+// 网页 → CloudBase HTTP 访问服务 → 云函数(rizhilu-api) → 数据库
+const CB_API_BASE = 'https://rizhilu-d2g8bc0qg3a96ace6.service.tcloudbase.com/cloudfunctions/rizhilu-api';
 
 async function api(url, opts) {
-    try { await cbAuth(); }
-    catch(e) {
-        console.error('CloudBase 登录失败:', e);
-        throw new Error('数据库登录失败: ' + (e && e.message ? e.message : JSON.stringify(e)) + '（请确认 CloudBase 已开启匿名登录）');
-    }
     opts = opts || {};
+    const full = url.replace(/^\/api/, CB_API_BASE);
+    let body = opts.body;
+    let headers = {};
+    // 处理导入文件（FormData / Blob）
+    if (body && typeof body.text === 'function') body = await body.text();
+    if (body instanceof FormData) {
+        const file = body.get('file');
+        body = file ? await file.text() : null;
+    }
+    if (typeof body === 'string' && body) headers['Content-Type'] = 'application/json';
+    if (body && typeof body === 'object' && !(body instanceof Blob)) {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(body);
+    }
+    // 自动重试（跨洋网络抖动自愈）+ 20s 超时
+    let lastErr;
+    for (let attempt = 0; attempt < 5; attempt++) {
+        try {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 20000);
+            const res = await fetch(full, { method: opts.method || 'GET', headers, body, signal: ctrl.signal });
+            clearTimeout(timer);
+            const txt = await res.text();
+            let data;
+            try { data = JSON.parse(txt); } catch (e) { throw new Error('响应解析失败: ' + txt.slice(0, 100)); }
+            if (!res.ok || (data && data.error)) throw new Error((data && data.error) || ('HTTP ' + res.status));
+            if (url === '/api/export') return new Blob([JSON.stringify(data)], { type: 'application/json' });
+            return data;
+        } catch (e) {
+            lastErr = e;
+            if (attempt < 4) await new Promise(r => setTimeout(r, 700 * (attempt + 1)));
+        }
+    }
+    throw lastErr || new Error('网络错误');
+}
 
-    // ---------- 导入 ----------
-    if (url.startsWith('/api/import')) {
-        let data;
-        if (opts.body && typeof opts.body.text === 'function') {
-            data = JSON.parse(await opts.body.text());
-        } else if (opts.body instanceof FormData) {
-            const file = opts.body.get('file');
-            if (file) data = JSON.parse(await file.text());
-        } else if (typeof opts.body === 'string') {
-            data = JSON.parse(opts.body);
-        } else {
-            data = opts.body;
         }
         if (!data || !data.tables) throw new Error('无效的数据格式');
         const imported = {};
@@ -1324,7 +1209,7 @@ async function api(url, opts) {
     if (url === '/api/export') {
         const pkg = { version: 1, exported_at: nowStr(), tables: {} };
         for (const t of Object.keys(TABLES_META)) {
-            const rows = await cbGetAll(t, 'date', 'desc');
+            const rows = await api('/api/' + t);
             pkg.tables[t] = rows.map(r => {
                 const o = { id: r.id };
                 for (const c of TABLES_META[t].cols) if (c in r) o[c] = r[c];
@@ -1398,11 +1283,8 @@ async function api(url, opts) {
         return { ...d, id: d._id };
     }
     const qMonth = new URLSearchParams(url.split('?')[1] || '').get('month');
-    if (qMonth) {
-        const rows = await cbGetAll(table, 'date', 'desc');
-        return rows.filter(r => (r.date || '').indexOf(qMonth) === 0);
-    }
-    return await cbGetAll(table, 'date', 'desc');
+    if (qMonth) return await api('/api/' + table + '?month=' + encodeURIComponent(qMonth));
+    return await api('/api/' + table);
 }
 
 
