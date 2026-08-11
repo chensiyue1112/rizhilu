@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.5.6</title>
+<title>日知录记账 v1.5.7</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -837,7 +837,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.5.6</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.5.7</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +849,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.5.6</div>
+        <div class="sidebar-ver" id="appVersion">v1.5.7</div>
     </div>
 </aside>
 
@@ -1719,7 +1719,7 @@ async function loadExpenses() {
                 <td>${r.description || ''}</td>
                 <td>
                     <button class="btn btn-cancel btn-sm" onclick="editExpenseByIdx(${i})">编辑</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteExpense(${r.id})">删除</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteExpense('${r.id}')">删除</button>
                 </td>
             </tr>`).join('');
         }
@@ -1812,7 +1812,7 @@ async function loadIncomes() {
                 <td>${r.note || ''}</td>
                 <td>
                     <button class="btn btn-cancel btn-sm" onclick="editIncomeByIdx(${i})">编辑</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteIncome(${r.id})">删除</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteIncome('${r.id}')">删除</button>
                 </td>
             </tr>`).join('');
         }
@@ -1912,7 +1912,7 @@ async function loadFinances() {
             <td><strong>${invest.toFixed(0)}</strong></td>
             <td><strong>${total.toFixed(0)}</strong></td>
             <td>
-                <button class="btn btn-danger btn-sm" onclick="deleteFinance(${r.id})">删除</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteFinance('${r.id}')">删除</button>
             </td>
         </tr>`;
     }).join('');
@@ -2101,7 +2101,7 @@ async function loadElectricities() {
                 <td>${r.reading.toFixed(1)}</td>
                 <td>${diff ? diff + ' 度' : '—'}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm" onclick="deleteElectricity(${r.id})">删除</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteElectricity('${r.id}')">删除</button>
                 </td>
             </tr>`;
         }).join('');
@@ -2704,15 +2704,15 @@ function recordItemHTML(r, isDone) {
                 </div>
                 <textarea id="fu-input-${r.id}" placeholder="后来怎么样了？写下来"></textarea>
                 <div style="display:flex;gap:8px;margin-top:6px">
-                    <button class="btn btn-save btn-sm" onclick="saveFollowup(${r.id})">保存</button>
-                    <button class="btn btn-cancel btn-sm" onclick="toggleFollowup(${r.id})">收起</button>
+                    <button class="btn btn-save btn-sm" onclick="saveFollowup('${r.id}')">保存</button>
+                    <button class="btn btn-cancel btn-sm" onclick="toggleFollowup('${r.id}')">收起</button>
                 </div>
             </div>
-            <button class="fu-toggle" onclick="toggleFollowup(${r.id})">✎ 补充感受</button>
+            <button class="fu-toggle" onclick="toggleFollowup('${r.id}')">✎ 补充感受</button>
         </div>
         <div class="record-actions">
-            ${isDone ? '' : `<button class="btn btn-cancel btn-sm" onclick="markRecordDone(${r.id})">✓ 过去了</button>`}
-            <button class="btn btn-danger btn-sm" onclick="deleteRecord(${r.id})">删除</button>
+            ${isDone ? '' : `<button class="btn btn-cancel btn-sm" onclick="markRecordDone('${r.id}')">✓ 过去了</button>`}
+            <button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')">删除</button>
         </div>
     </div>`;
 }
