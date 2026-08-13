@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.6.0</title>
+<title>日知录记账 v1.7.0</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -820,6 +820,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                 <span class="more-arrow" id="moreArrow">▾</span>
             </div>
             <div class="more-sub" id="moreSub">
+                <a class="sidebar-item" data-tab="payday" onclick="switchTab('payday')"><span style="width:18px;display:inline-block"></span>发工资</a>
                 <a class="sidebar-item" data-tab="finance" onclick="switchTab('finance')"><span style="width:18px;display:inline-block"></span>财务</a>
                 <a class="sidebar-item" data-tab="electricity" onclick="switchTab('electricity')"><span style="width:18px;display:inline-block"></span>用电</a>
                 <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')"><span style="width:18px;display:inline-block"></span>心情</a>
@@ -832,12 +833,13 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="more-overlay" id="moreOverlay" onclick="closeMore()"></div>
     <div class="more-drawer" id="moreDrawer">
         <div class="more-drawer-title">更多功能</div>
+        <a class="sidebar-item" data-tab="payday" onclick="switchTab('payday')">发工资</a>
         <a class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">财务</a>
         <a class="sidebar-item" data-tab="electricity" onclick="switchTab('electricity')">用电</a>
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.6.0</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.0</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -849,7 +851,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.6.0</div>
+        <div class="sidebar-ver" id="appVersion">v1.7.0</div>
     </div>
 </aside>
 
@@ -969,6 +971,36 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="card">
         <h3>📋 收入记录 <span style="font-weight:400;font-size:12px;color:var(--muted);margin-left:8px" id="incomeTotal"></span></h3>
         <div class="table-wrap"><table id="incomeTable"><thead><tr><th>日期</th><th>分类</th><th>金额</th><th>备注</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+    </div>
+</section>
+
+<!-- ═══════════════ 发工资 ═══════════════ -->
+<section id="section-payday" class="section">
+    <div class="card">
+        <h3>💰 发工资记账</h3>
+        <div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:14px;line-height:1.8">
+            工资 → 本月<b style="color:var(--accent)">大额收入</b>（分类：生活费）<br>
+            上月伙食费 → 上月<b style="color:var(--accent)">大额支出</b>（分类：餐饮）<br>
+            都不计入概览图，只显示在记录列表里。
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>工资日期</label>
+                <div class="custom-date" data-target="paySalaryDate" onclick="toggleDate(this)">
+                    <span class="date-value">选择日期</span>
+                    <span class="date-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                    <div class="date-panel"></div>
+                </div>
+                <input type="hidden" id="paySalaryDate" value="">
+            </div>
+            <div class="form-group"><label>本月工资</label><input type="number" id="paySalary" step="0.01" style="width:130px" placeholder="0.00"></div>
+        </div>
+        <div class="form-row" style="margin-top:10px">
+            <div class="form-group"><label>伙食费日期</label><input type="date" id="payMealDate"></div>
+            <div class="form-group"><label>上月伙食费</label><input type="number" id="payMeal" step="0.01" style="width:130px" placeholder="0.00"></div>
+        </div>
+        <div class="form-actions" style="margin-top:14px">
+            <button class="btn btn-save" onclick="savePayday()">保存记账</button>
+        </div>
     </div>
 </section>
 
@@ -1403,7 +1435,7 @@ function switchTab(name) {
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.sidebar-item[data-tab="' + name + '"]').forEach(b => b.classList.add('active'));
     // 低频页面：自动展开"更多"分组
-    if (['finance','electricity','mood','weather','stats'].includes(name)) {
+    if (['payday','finance','electricity','mood','weather','stats'].includes(name)) {
         const grp = document.querySelector('.sidebar-group');
         if (grp) grp.classList.add('open');
     }
@@ -1448,6 +1480,7 @@ function switchTab(name) {
     if (name === 'mood') loadMoods();
     if (name === 'weather') loadWeathers();
     if (name === 'stats') loadStats();
+    if (name === 'payday') initPayday();
 }
 
 // ═══════════════ 概览 ═══════════════
@@ -1885,6 +1918,39 @@ async function deleteIncome(id) {
     if (!confirm('确定删除这条记录？')) return;
     try { await api('/api/income/' + id, {method:'DELETE'}); toast('已删除', 'success'); updateTableCache('incomes', null, id, true); invalidateDerived(); loadIncomes(); }
     catch(e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════ 发工资 ═══════════════
+function lastMonthLastDay() {
+    const d = new Date();
+    const last = new Date(d.getFullYear(), d.getMonth(), 0); // 第 0 天 = 上月最后一天
+    return last.getFullYear() + '-' + pad2(last.getMonth() + 1) + '-' + pad2(last.getDate());
+}
+function initPayday() {
+    if (!$('paySalaryDate').value) { $('paySalaryDate').value = todayStr(); syncDateUI('paySalaryDate'); }
+    if (!$('payMealDate').value) $('payMealDate').value = lastMonthLastDay();
+}
+async function savePayday() {
+    const sal = parseFloat($('paySalary').value) || 0;
+    const meal = parseFloat($('payMeal').value) || 0;
+    if (!sal && !meal) { toast('请至少填一项金额', 'error'); return; }
+    const salDate = $('paySalaryDate').value || todayStr();
+    const mealDate = $('payMealDate').value || lastMonthLastDay();
+    try {
+        if (sal > 0) {
+            const inc = { date: salDate, amount: sal, category: '生活费', note: '工资', large: 1 };
+            await api('/api/income', { method: 'POST', body: inc });
+            updateTableCache('incomes', inc, null, false);
+        }
+        if (meal > 0) {
+            const exp = { date: mealDate, amount: meal, category: '餐饮', description: '伙食费', large: 1 };
+            await api('/api/expense', { method: 'POST', body: exp });
+            updateTableCache('expenses', exp, null, false);
+        }
+        invalidateDerived();
+        toast('已记入大额收入/支出', 'success');
+        $('paySalary').value = ''; $('payMeal').value = '';
+    } catch(e) { toast(e.message, 'error'); }
 }
 
 // ═══════════════ 财务快照 CRUD ═══════════════
