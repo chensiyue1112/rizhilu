@@ -7,7 +7,7 @@ const db = app.database();
 
 const TABLES = ['income', 'expense', 'finance_snapshot', 'electricity', 'mood', 'weather', 'record'];
 const NUM_COLS = {
-    income: ['amount'],
+    income: ['amount', 'large'],
     expense: ['amount', 'large'],
     finance_snapshot: ['liquid_assets', 'debt', 'stock', 'fund', 'convertible_bond'],
     electricity: ['reading'],
@@ -108,15 +108,19 @@ exports.main = async (event) => {
                 const [incRows, expRows, finRows, elecRows] = await Promise.all([
                     getAll('income'), getAll('expense'), getAll('finance_snapshot'), getAll('electricity')
                 ]);
-                let ti = 0, te = 0, tl = 0;
-                incRows.forEach(r => { if ((r.date || '').indexOf(month) === 0) ti += r.amount || 0; });
+                let ti = 0, te = 0, tl = 0, li = 0;
+                incRows.forEach(r => {
+                    if ((r.date || '').indexOf(month) !== 0) return;
+                    const a = r.amount || 0; ti += a;
+                    if (r.large === 1) li += a;
+                });
                 expRows.forEach(r => {
                     if ((r.date || '').indexOf(month) !== 0) return;
                     if (r.large === 1) tl += r.amount || 0; else te += r.amount || 0;
                 });
                 const latest_finance = finRows[0] ? { ...finRows[0], id: finRows[0]._id } : null;
                 const latest_electricity = elecRows[0] ? { ...elecRows[0], id: elecRows[0]._id } : null;
-                return ok({ month, total_income: Math.round(ti * 100) / 100, total_expense: Math.round(te * 100) / 100, large_expense: Math.round(tl * 100) / 100, balance: Math.round((ti - te - tl) * 100) / 100, latest_finance, latest_electricity });
+                return ok({ month, total_income: Math.round(ti * 100) / 100, large_income: Math.round(li * 100) / 100, total_expense: Math.round(te * 100) / 100, large_expense: Math.round(tl * 100) / 100, balance: Math.round((ti - te - tl) * 100) / 100, latest_finance, latest_electricity });
             }
             if (type === 'expense' || type === 'income') {
                 const rows = await getAll(type);
