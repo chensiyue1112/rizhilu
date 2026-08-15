@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.6</title>
+<title>日知录记账 v1.7.7</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -802,6 +802,166 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     #expenseForm .custom-select, #incomeForm .custom-select { width: fit-content !important; }
     #expenseForm .custom-date, #incomeForm .custom-date { width: fit-content !important; }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   桌面端 UI 重构（≥769px）—— 全部规则限定在桌面断点内，不影响手机端
+   ════════════════════════════════════════════════════════════════ */
+@media (min-width: 769px) {
+
+    /* ---- 页面底色：卡片白 + 浅灰底，层次更清晰 ---- */
+    body { background: #eef1f5; }
+
+    /* ---- 侧边栏：纯白卡片风 ---- */
+    .sidebar {
+        width: 236px;
+        background: #ffffff;
+        border-right: 1px solid var(--border-l2);
+    }
+    .sidebar-logo { padding: 24px 20px 16px; font-size: 16px; }
+    .sidebar-logo svg { color: var(--accent); }
+    .sidebar-nav { padding: 6px 10px; gap: 2px; }
+    .sidebar-item {
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 13.5px;
+        gap: 10px;
+    }
+    .sidebar-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .sidebar-item.active {
+        background: var(--accent-light);
+        color: var(--accent);
+        font-weight: 600;
+    }
+    .sidebar-item.active svg { opacity: 1; color: var(--accent); }
+    .more-sub .sidebar-item { padding-left: 14px; }
+    .sidebar-footer { padding: 10px; }
+    .sidebar-action { border-radius: 8px; padding: 9px 12px; font-size: 13px; }
+    .sidebar-ver { padding: 8px 0 4px; }
+
+    /* ---- 主区：更宽的呼吸感 ---- */
+    .main-wrap { margin-left: 236px; }
+    main { max-width: 1120px; padding: 24px 36px 72px; }
+
+    /* ---- 页面顶部标题栏：版本号徽章 ---- */
+    .page-title {
+        display: flex; align-items: center; gap: 12px;
+        margin: 0 0 20px; padding-bottom: 14px;
+        border-bottom: 1px solid var(--border-l1);
+    }
+    .page-title .page-title-name { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; }
+    .page-title .page-title-ver {
+        font-size: 12px; font-weight: 600; padding: 3px 10px;
+        border-radius: 20px; background: var(--accent-light); color: var(--accent);
+    }
+
+    /* ---- 卡片：统一圆角 + 柔和阴影 ---- */
+    .card {
+        border-radius: 12px;
+        border: 1px solid var(--border-l1);
+        box-shadow: 0 1px 3px rgba(16,24,40,0.05), 0 1px 2px rgba(16,24,40,0.03);
+        padding: 22px 24px;
+    }
+    .card h3 { font-size: 13px; letter-spacing: 0.3px; }
+
+    /* ---- 表单控件：白底、略大、对齐 ---- */
+    .form-group label { font-size: 12px; }
+    .form-group input, .form-group select, .form-group textarea {
+        background: #ffffff; font-size: 14px; border-radius: 8px;
+    }
+    .custom-select, .custom-date { background: #ffffff; border-radius: 8px; }
+    .btn-save:hover { background: var(--accent-hover); }
+
+    /* ---- 表格：容器描边 + 行间距 ---- */
+    .table-wrap { border: 1px solid var(--border-l1); border-radius: 10px; }
+    th { background: #f8fafc; }
+    th, td { padding: 10px 14px; }
+
+    /* ---- 概览：卡片上色 + 去掉垂直居中 ---- */
+    #section-overview.active { display: block !important; min-height: 0; }
+    .overview-card { border-radius: 12px; padding: 22px 24px; }
+    .overview-card .value { font-size: 32px; }
+    .overview-card .label { font-size: 12px; }
+    #overviewCards .overview-card:nth-child(1) .value { color: #16a34a; }
+    #overviewCards .overview-card:nth-child(2) .value { color: #dc2626; }
+    #overviewCards .overview-card:nth-child(3) .value { color: #84cc16; }
+    #overviewCards .overview-card:nth-child(4) .value { color: #f87171; }
+    #overviewCards .overview-card:nth-child(5) .value { color: var(--accent); }
+
+    /* ---- 支出 / 收入：左侧表单 + 右侧记录（表格区内滚动） ---- */
+    #section-expense.active, #section-income.active {
+        display: grid !important;
+        grid-template-columns: 400px minmax(0, 1fr);
+        gap: 16px; align-items: start;
+    }
+    #section-expense .card, #section-income .card { margin-bottom: 0; }
+    #expenseForm, #incomeForm {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px;
+    }
+    #expenseForm .form-actions, #incomeForm .form-actions { grid-column: 1 / -1; justify-content: flex-end; }
+    #expLargeWrap, #incLargeWrap { grid-column: 1 / -1; padding: 0; }
+    #expenseForm .custom-date, #incomeForm .custom-date,
+    #expenseForm .custom-select, #incomeForm .custom-select { width: 100% !important; }
+    #expenseForm .form-group input, #incomeForm .form-group input { width: 100% !important; }
+    #section-expense .table-wrap, #section-income .table-wrap {
+        max-height: calc(100vh - 280px);
+        overflow-y: auto;
+    }
+    #expenseTable thead th, #incomeTable thead th { position: sticky; top: 0; z-index: 2; background: #f8fafc; }
+
+    /* ---- 财务：表单一行铺开对齐 ---- */
+    #section-finance .form-row {
+        display: grid;
+        grid-template-columns: 150px repeat(5, minmax(0, 1fr)) auto;
+        gap: 12px; align-items: end;
+    }
+    #section-finance .form-group input { width: 100% !important; }
+    #section-finance .align-btn label { display: none; }
+
+    /* ---- 用电：左侧表单 + 右侧记录 ---- */
+    #section-electricity.active {
+        display: grid !important;
+        grid-template-columns: 340px minmax(0, 1fr);
+        gap: 16px; align-items: start;
+    }
+    #section-electricity .card { margin-bottom: 0; }
+    #section-electricity .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
+    #section-electricity .form-group input { width: 100% !important; }
+    #section-electricity .align-btn label { display: none; }
+    #section-electricity .align-btn { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
+
+    /* ---- 发工资：两行两列对齐 ---- */
+    #section-payday .form-row { display: grid; grid-template-columns: 200px 180px; gap: 14px; align-items: end; }
+    #section-payday .form-group input { width: 100% !important; }
+    #section-payday .custom-date { width: 100% !important; }
+
+    /* ---- 纪录：左侧输入 + 右侧列表 ---- */
+    #section-record.active {
+        display: grid !important;
+        grid-template-columns: 360px minmax(0, 1fr);
+        gap: 16px; align-items: start;
+    }
+    #section-record .card { margin-bottom: 0; }
+
+    /* ---- 心情 / 天气：左侧点选 + 右侧月历 ---- */
+    #section-mood.active, #section-weather.active {
+        display: grid !important;
+        grid-template-columns: 380px minmax(0, 1fr);
+        gap: 16px; align-items: start;
+    }
+    #section-mood .card, #section-weather .card { margin-bottom: 0; }
+
+    /* ---- 统计：卡片行 + 环形图/趋势图双栏 + 收入表整行 ---- */
+    #section-stats.active {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px; align-items: start;
+    }
+    #section-stats .form-row { margin-bottom: 0 !important; grid-column: 1 / -1; }
+    #statsLoading { grid-column: 1 / -1; margin-bottom: 0 !important; }
+    #statsCards { grid-column: 1 / -1; margin-bottom: 0; }
+    #section-stats .card { margin-bottom: 0; }
+    #section-stats .card:last-child { grid-column: 1 / -1; }
+}
 </style>
 </head>
 <body>
@@ -856,7 +1016,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
         <button class="sidebar-item" style="width:100%;background:none;border:none;font-family:inherit;text-align:left;justify-content:flex-start" onclick="manualRefresh(); closeMore();">⟳ 刷新数据</button>
-        <div class="more-drawer-ver" id="appVersionM">v1.7.6</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.7</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -872,7 +1032,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>刷新</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.7.6</div>
+        <div class="sidebar-ver" id="appVersion">v1.7.7</div>
     </div>
 </aside>
 
@@ -883,7 +1043,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- 页面顶部标题栏（桌面端显示版本号） -->
 <div class="page-title">
     <span class="page-title-name">日知录记账</span>
-    <span class="page-title-ver" id="pageTitleVer">v1.7.6</span>
+    <span class="page-title-ver" id="pageTitleVer">v1.7.7</span>
 </div>
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
