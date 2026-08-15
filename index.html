@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.3</title>
+<title>日知录记账 v1.7.4</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -839,7 +839,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.7.3</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.4</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -851,7 +851,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.7.3</div>
+        <div class="sidebar-ver" id="appVersion">v1.7.4</div>
     </div>
 </aside>
 
@@ -1141,6 +1141,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="form-row" style="margin-bottom:16px">
         <div class="form-group"><label>月份</label><input type="month" id="statsMonth" onchange="loadStats()" style="width:160px"></div>
     </div>
+    <div id="statsLoading" style="display:none;background:var(--bg-hover);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;font-size:13px;color:var(--text-secondary)">⏳ 统计加载中，请稍候…</div>
     <div class="overview-cards" id="statsCards">
         <div class="overview-card"><div class="value">—</div><div class="label">收入</div></div>
         <div class="overview-card"><div class="value">—</div><div class="label">支出</div></div>
@@ -1308,10 +1309,21 @@ function preloadMoreTabs() {
         ['records',  () => api('/api/record')],
         ['stats_' + thisMonthStr(), () => fetchStatsData(thisMonthStr())],
     ];
+    // 串行预加载：避免手机端 5 个并发请求互相抢连接导致整批失败；
+    // 写入时记时间戳：预加载的数据在 TTL 内点开即秒开，不再重复请求网络
+    let p = Promise.resolve();
     jobs.forEach(([key, loader]) => {
-        if (!apiCache[key]) {
-            loader().then(data => { apiCache[key] = data; saveCache(); }).catch(() => {});
-        }
+        if (apiCache[key]) return;
+        p = p
+            .then(() => loader())
+            .then(data => {
+                if (data !== undefined && data !== null) {
+                    apiCache[key] = data;
+                    cacheMeta[key] = Date.now();
+                    saveCache();
+                }
+            })
+            .catch(() => {});   // 预加载失败静默，点开对应页面时再现场加载
     });
 }
 
@@ -2245,23 +2257,43 @@ async function fetchStatsData(month) {
         const dd = new Date(now.getFullYear(), now.getMonth() - i, 1);
         months.push(dd.getFullYear() + '-' + String(dd.getMonth()+1).padStart(2,'0'));
     }
-    const [ov, expCat, incCat, trend] = await Promise.all([
+    // 统计页有 4 个并行请求，用 allSettled：某个接口失败不影响其余数据展示
+    const results = await Promise.allSettled([
         api('/api/stats/overview?month=' + month),
         api('/api/stats/expense?month=' + month),
         api('/api/stats/income?month=' + month),
         api('/api/stats/trend')
     ]);
+    if (results.every(r => r.status === 'rejected')) {
+        const msgs = results.map(r => (r.reason && r.reason.message) ? r.reason.message : String(r.reason)).join('；');
+        throw new Error('统计接口请求失败: ' + msgs);
+    }
+    const val = (r) => (r.status === 'fulfilled' ? r.value : null);
+    const ov = val(results[0]) || { total_income: 0, total_expense: 0, balance: 0 };
+    const expCat = val(results[1]) || [];
+    const incCat = val(results[2]) || [];
+    const trend = val(results[3]) || {};
     const trendInc = (trend && trend.inc) || [];
     const trendExp = (trend && trend.exp) || [];
     return { ov, expCat, incCat, trendInc, trendExp, trendLabels: months.map(m => m.slice(5)) };
 }
 
+// 统计页加载序号：切月份/重复点击时丢弃过期响应，避免闪动
+let _statsSeq = 0;
+
 async function loadStats() {
+    const seq = ++_statsSeq;
     const month = $('statsMonth').value || thisMonthStr();
     $('statsMonth').value = month;
+    const key = 'stats_' + month;
+    const loading = $('statsLoading');
+    // 无缓存才显示加载提示（有缓存会先秒开，再后台静默刷新）
+    if (!apiCache[key] && loading) loading.style.display = 'block';
     const render = (d) => {
+        if (seq !== _statsSeq) return;   // 过期响应丢弃
         STATE._statsLast = d;
         STATE._statsRender = render;
+        if (loading) loading.style.display = 'none';
         const { ov, expCat, incCat, trendInc, trendExp, trendLabels } = d;
         $('statsCards').innerHTML = `
             <div class="overview-card"><div class="value" >+${Number(ov.total_income || 0).toFixed(1)}</div><div class="label">${month} 收入</div></div>
@@ -2283,7 +2315,12 @@ async function loadStats() {
             '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#3b82f6;display:inline-block"></span>收入</span>' +
             '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#ef4444;display:inline-block"></span>支出</span>';
     };
-    await smartLoad('stats_' + month, () => fetchStatsData(month), render);
+    try {
+        await smartLoad(key, () => fetchStatsData(month), render);
+    } catch(e) {
+        if (seq === _statsSeq && loading) loading.style.display = 'none';
+        if (seq === _statsSeq && !apiCache[key]) toast('统计加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error');
+    }
 }
 
 // ═══ 环形图（支出分类占比）═══
