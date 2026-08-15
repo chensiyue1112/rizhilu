@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.4</title>
+<title>日知录记账 v1.7.5</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -839,7 +839,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.7.4</div>
+        <button class="sidebar-item" style="width:100%;background:none;border:none;font-family:inherit;text-align:left;justify-content:flex-start" onclick="manualRefresh(); closeMore();">⟳ 刷新数据</button>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.5</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -850,8 +851,12 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <span>导入</span>
         </button>
+        <button class="sidebar-action" onclick="manualRefresh()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span>刷新</span>
+        </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.7.4</div>
+        <div class="sidebar-ver" id="appVersion">v1.7.5</div>
     </div>
 </aside>
 
@@ -1256,7 +1261,7 @@ const TABLES_META = {
 };
 
 // ═══════════════ 数据缓存（先显示缓存，后台刷新） ═══════════════
-const CACHE_KEY = 'rizhilu_cache_v1';
+const CACHE_KEY = 'rizhilu_cache_v2';
 // 只缓存这 6 个核心数据，overview/stats 不区分月份（只保留最近一次）
 const CACHE_ALLOWED = ['expenses','incomes','finances','electricity','overview','stats','moods','weather','records'];
 let apiCache = {};
@@ -1327,6 +1332,9 @@ function preloadMoreTabs() {
     });
 }
 
+// 刷新失败提示限频（避免连续失败刷屏）
+let _staleToastAt = 0;
+
 function smartLoad(key, loader, renderer, ttlMs) {
     const ttl = ttlMs === undefined ? 3 * 60 * 1000 : ttlMs;   // 默认 3 分钟 TTL
     // 缓存损坏时删除并忽略，强制后台重新加载（自愈）
@@ -1342,7 +1350,15 @@ function smartLoad(key, loader, renderer, ttlMs) {
         cacheMeta[key] = Date.now();
         saveCache();
         try { renderer(data); } catch(e) { throw e; }
-    }).catch(e => { if (!apiCache[key]) throw e; }); // 无缓存才报错
+    }).catch(e => {
+        if (!apiCache[key]) throw e;               // 无缓存：让调用方报错
+        // 有缓存但刷新失败：明确告知用户当前可能不是最新数据（限频防刷屏）
+        const now = Date.now();
+        if (now - _staleToastAt > 15000) {
+            _staleToastAt = now;
+            toast('数据刷新失败，当前显示的是缓存数据（可能不是最新），可点「刷新」重试', 'error');
+        }
+    });
 }
 
 // ═══════════════ "更多"展开/收起 ═══════════════
@@ -1789,7 +1805,9 @@ async function loadExpenses() {
             </tr>`).join('');
         }
     };
-    await smartLoad('expenses', () => api('/api/expense'), render);
+    try {
+        await smartLoad('expenses', () => api('/api/expense'), render);
+    } catch(e) { if (!apiCache.expenses) toast('支出数据加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error'); }
 }
 
 function editExpenseByIdx(idx) {
@@ -1882,7 +1900,9 @@ async function loadIncomes() {
             </tr>`).join('');
         }
     };
-    await smartLoad('incomes', () => api('/api/income'), render);
+    try {
+        await smartLoad('incomes', () => api('/api/income'), render);
+    } catch(e) { if (!apiCache.incomes) toast('收入数据加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error'); }
 }
 
 function editIncomeByIdx(idx) {
@@ -2028,7 +2048,9 @@ async function loadFinances() {
         tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:28px">📭 还没有财务快照，先记录一条资产数据吧</td></tr>';
     }
     };
-    await smartLoad('finances', () => api('/api/finance_snapshot'), render);
+    try {
+        await smartLoad('finances', () => api('/api/finance_snapshot'), render);
+    } catch(e) { if (!apiCache.finances) toast('财务数据加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error'); }
 }
 
 // ═══════════════ Canvas 折线图（带 tooltip） ═══════════════
@@ -2224,7 +2246,9 @@ async function loadElectricities() {
         const totalCost = totalUsage > 0 ? (totalUsage * 1.2).toFixed(2) : '—';
         $('elecSummary').innerHTML = '月总用电: <strong>' + total + ' 度</strong> | 月电费: <strong>' + totalCost + ' 元</strong> | 日均: <strong>' + avg + ' 度</strong> | 日均电费: <strong>' + dailyCost + ' 元</strong> | 记录天数: ' + filtered.length;
     };
-    await smartLoad('electricity', () => api('/api/electricity'), render);
+    try {
+        await smartLoad('electricity', () => api('/api/electricity'), render);
+    } catch(e) { if (!apiCache.electricity) toast('用电数据加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error'); }
 }
 
 async function saveElectricity() {
@@ -2527,7 +2551,9 @@ async function loadMoods() {
         renderMoodToday();
         renderMoodCalendar(data);
     };
-    await smartLoad('moods', () => api('/api/mood'), render);
+    try {
+        await smartLoad('moods', () => api('/api/mood'), render);
+    } catch(e) { if (!apiCache.moods) toast('心情数据加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error'); }
 }
 
 // 渲染"今日心情"区（根据编辑状态切换只读/可编辑）
@@ -2683,7 +2709,9 @@ async function loadWeathers() {
         renderWeatherToday();
         renderWeatherCalendar(data);
     };
-    await smartLoad('weather', () => api('/api/weather'), render);
+    try {
+        await smartLoad('weather', () => api('/api/weather'), render);
+    } catch(e) { if (!apiCache.weather) toast('天气数据加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error'); }
 }
 
 function renderWeatherToday() {
@@ -3000,6 +3028,45 @@ window.addEventListener('resize', () => {
     clearTimeout(_resizeTimer);
     _resizeTimer = setTimeout(redrawVisibleCharts, 200);
 });
+
+// ═══════════════ 自动刷新 & 手动刷新 ═══════════════
+// 修复：电脑端标签页长时间不刷新/后台刷新失败时，页面一直停留在旧数据
+// 页面回到前台、窗口获得焦点、网络恢复时自动重拉当前页数据（smartLoad 的 TTL 会避免无谓请求）
+let _lastAutoRefresh = 0;
+function autoRefresh() {
+    const now = Date.now();
+    if (now - _lastAutoRefresh < 60000) return;   // 1 分钟内不重复
+    _lastAutoRefresh = now;
+    const t = STATE.currentTab;
+    if (t === 'overview') loadOverview();
+    else if (t === 'expense') loadExpenses();
+    else if (t === 'income') loadIncomes();
+    else if (t === 'record') loadRecords();
+    else if (t === 'finance') loadFinances();
+    else if (t === 'electricity') loadElectricities();
+    else if (t === 'mood') loadMoods();
+    else if (t === 'weather') loadWeathers();
+    else if (t === 'stats') loadStats();
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) autoRefresh(); });
+window.addEventListener('focus', autoRefresh);
+window.addEventListener('online', autoRefresh);
+
+// 手动刷新：清空全部缓存后重拉当前页，强制拿到最新数据
+function manualRefresh() {
+    invalidateCache();
+    const t = STATE.currentTab;
+    if (t === 'overview') { OV_MONTH.current = thisMonthStr(); loadOverview(); }
+    else if (t === 'expense') loadExpenses();
+    else if (t === 'income') loadIncomes();
+    else if (t === 'record') loadRecords();
+    else if (t === 'finance') loadFinances();
+    else if (t === 'electricity') loadElectricities();
+    else if (t === 'mood') loadMoods();
+    else if (t === 'weather') loadWeathers();
+    else if (t === 'stats') loadStats();
+    toast('已刷新为最新数据', 'success');
+}
 
 // ═══════════════ 初始化 ═══════════════
 document.addEventListener('DOMContentLoaded', () => {
