@@ -91,9 +91,45 @@ def init_db():
             reading REAL NOT NULL,
             created_at TEXT DEFAULT (datetime('now','localtime'))
         );
+
+        CREATE TABLE IF NOT EXISTS mood (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            rating INTEGER DEFAULT 3,
+            note TEXT DEFAULT '',
+            created_at TEXT DEFAULT (datetime('now','localtime'))
+        );
+
+        CREATE TABLE IF NOT EXISTS weather (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            weather TEXT DEFAULT '',
+            note TEXT DEFAULT '',
+            created_at TEXT DEFAULT (datetime('now','localtime'))
+        );
+
+        CREATE TABLE IF NOT EXISTS record (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT DEFAULT '',
+            content TEXT NOT NULL,
+            done INTEGER DEFAULT 0,
+            due_date TEXT DEFAULT '',
+            followup TEXT DEFAULT '',
+            created_at TEXT DEFAULT (datetime('now','localtime'))
+        );
     """)
+    # 老库升级：补充大额标记列（CREATE TABLE IF NOT EXISTS 不会改旧表结构）
+    _ensure_column(db, "income", "large", "INTEGER DEFAULT 0")
+    _ensure_column(db, "expense", "large", "INTEGER DEFAULT 0")
     db.commit()
     db.close()
+
+
+def _ensure_column(db, table, col, decl):
+    """为已有表添加缺失的列（幂等）"""
+    cols = [r[1] for r in db.execute(f"PRAGMA table_info({table})").fetchall()]
+    if col not in cols:
+        db.execute(f"ALTER TABLE {table} ADD COLUMN {col} {decl}")
 
 
 # ──────────── 通用 CRUD 帮助函数 ────────────
@@ -103,11 +139,11 @@ TABLES = {
         "required": ["date"],
     },
     "income": {
-        "cols": ["date", "amount", "category", "note"],
+        "cols": ["date", "amount", "category", "note", "large"],
         "required": ["date", "amount"],
     },
     "expense": {
-        "cols": ["date", "amount", "category", "description"],
+        "cols": ["date", "amount", "category", "description", "large"],
         "required": ["date", "amount", "category"],
     },
     "finance_snapshot": {
@@ -118,6 +154,24 @@ TABLES = {
         "cols": ["date", "reading"],
         "required": ["date", "reading"],
     },
+    "mood": {
+        "cols": ["date", "rating", "note"],
+        "required": ["date"],
+    },
+    "weather": {
+        "cols": ["date", "weather", "note"],
+        "required": ["date"],
+    },
+    "record": {
+        "cols": ["date", "content", "done", "due_date", "followup"],
+        "required": ["content"],
+    },
+}
+
+# 数值字段（新增/更新时统一转 float）
+NUM_COLS = {
+    "amount", "reading", "liquid_assets", "debt", "stock", "fund",
+    "convertible_bond", "rating", "done", "large",
 }
 
 
@@ -156,7 +210,7 @@ def _create(table):
     for col in info["cols"]:
         values[col] = data.get(col, "" if col != "amount" and col != "reading" else 0)
         # 数值字段默认 0
-        if col in ("amount", "reading", "liquid_assets", "debt", "stock", "fund", "convertible_bond"):
+        if col in NUM_COLS:
             try:
                 values[col] = float(values[col]) if values[col] != "" else 0
             except (ValueError, TypeError):
@@ -186,7 +240,7 @@ def _update(table, id):
         if col in data:
             set_clauses.append(f"{col} = ?")
             v = data[col]
-            if col in ("amount", "reading", "liquid_assets", "debt", "stock", "fund", "convertible_bond"):
+            if col in NUM_COLS:
                 try:
                     v = float(v) if v != "" else 0
                 except (ValueError, TypeError):
@@ -413,9 +467,44 @@ def stats_income():
     return jsonify([dict(r) for r in rows])
 
 
+@app.route("/api/stats/trend")
+def stats_trend():
+    """近 6 个月收支趋势（与云函数接口保持一致）"""
+    now = datetime.now()
+    months = []
+    for i in range(5, -1, -1):
+        y, m = now.year, now.month - i
+        while m <= 0:
+            m += 12
+            y -= 1
+        months.append(f"{y:04d}-{m:02d}")
+    db = get_db()
+    inc, exp = [], []
+    for mo in months:
+        inc.append(
+            round(
+                db.execute(
+                    "SELECT COALESCE(SUM(amount),0) FROM income WHERE date LIKE ?",
+                    (mo + "%",),
+                ).fetchone()[0],
+                2,
+            )
+        )
+        exp.append(
+            round(
+                db.execute(
+                    "SELECT COALESCE(SUM(amount),0) FROM expense WHERE date LIKE ?",
+                    (mo + "%",),
+                ).fetchone()[0],
+                2,
+            )
+        )
+    return jsonify({"months": months, "inc": inc, "exp": exp})
+
+
 @app.route("/api/stats/overview")
 def stats_overview():
-    """首页概览：本月收支总览"""
+    """首页概览：本月收支总览（含大额拆分，与云函数一致）"""
     month = request.args.get("month", datetime.now().strftime("%Y-%m"))
     db = get_db()
 
@@ -424,8 +513,18 @@ def stats_overview():
         (f"{month}%",),
     ).fetchone()[0]
 
+    large_income = db.execute(
+        "SELECT COALESCE(SUM(amount),0) FROM income WHERE date LIKE ? AND large = 1",
+        (f"{month}%",),
+    ).fetchone()[0]
+
     total_expense = db.execute(
-        "SELECT COALESCE(SUM(amount),0) FROM expense WHERE date LIKE ?",
+        "SELECT COALESCE(SUM(amount),0) FROM expense WHERE date LIKE ? AND (large IS NULL OR large != 1)",
+        (f"{month}%",),
+    ).fetchone()[0]
+
+    large_expense = db.execute(
+        "SELECT COALESCE(SUM(amount),0) FROM expense WHERE date LIKE ? AND large = 1",
         (f"{month}%",),
     ).fetchone()[0]
 
@@ -441,8 +540,10 @@ def stats_overview():
         {
             "month": month,
             "total_income": round(total_income, 2),
+            "large_income": round(large_income, 2),
             "total_expense": round(total_expense, 2),
-            "balance": round(total_income - total_expense, 2),
+            "large_expense": round(large_expense, 2),
+            "balance": round(total_income - total_expense - large_expense, 2),
             "latest_finance": dict(latest_finance) if latest_finance else None,
             "latest_electricity": dict(latest_electricity) if latest_electricity else None,
         }

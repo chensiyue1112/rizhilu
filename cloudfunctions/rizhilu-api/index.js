@@ -15,6 +15,15 @@ const NUM_COLS = {
     weather: [],
     record: ['done'],
 };
+const REQUIRED = {
+    income: ['date', 'amount'],
+    expense: ['date', 'amount', 'category'],
+    finance_snapshot: ['date'],
+    electricity: ['date', 'reading'],
+    mood: ['date'],
+    weather: ['date'],
+    record: ['content'],
+};
 
 function ok(data) {
     return { statusCode: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify(data) };
@@ -66,23 +75,44 @@ exports.main = async (event) => {
             };
         }
 
-        // ---------- 导入（覆盖式） ----------
+        // ---------- 导入（replace 覆盖式 / merge 合并式） ----------
         if (path === '/import') {
             if (!body.tables) return fail(400, '无效的数据格式');
+            const mode = body.mode === 'merge' ? 'merge' : 'replace';
             const imported = {};
             for (const [table, rows] of Object.entries(body.tables)) {
                 if (!TABLES.includes(table)) continue;
-                for (;;) {
-                    const res = await db.collection(table).limit(100).get();
-                    const docs = res.data || [];
-                    if (!docs.length) break;
-                    for (const d of docs) await db.collection(table).doc(d._id).remove();
-                    if (docs.length < 100) break;
+                let count = 0;
+                if (mode === 'replace') {
+                    for (;;) {
+                        const res = await db.collection(table).limit(100).get();
+                        const docs = res.data || [];
+                        if (!docs.length) break;
+                        for (const d of docs) await db.collection(table).doc(d._id).remove();
+                        if (docs.length < 100) break;
+                    }
                 }
-                for (const row of rows) await db.collection(table).add(clean(table, row));
-                imported[table] = rows.length;
+                for (const row of rows) {
+                    const c = clean(table, row);
+                    // 合并模式：id 已存在则更新（导出的 id 即原 _id）；不存在则用原 id 创建，
+                    // 保证跨设备/多次合并时同一记录 id 稳定，不会重复导入
+                    if (mode === 'merge' && row.id) {
+                        const ex = await db.collection(table).doc(String(row.id)).get();
+                        if (ex.data && ex.data[0]) {
+                            await db.collection(table).doc(String(row.id)).update(c);
+                            count++;
+                            continue;
+                        }
+                        await db.collection(table).doc(String(row.id)).set(c);
+                        count++;
+                        continue;
+                    }
+                    await db.collection(table).add(c);
+                    count++;
+                }
+                imported[table] = count;
             }
-            return ok({ message: '导入完成（覆盖式）', imported });
+            return ok({ message: '导入完成（模式: ' + mode + '）', imported });
         }
 
         // ---------- 导出 ----------
@@ -155,16 +185,22 @@ exports.main = async (event) => {
         const table = m[1], id = m[2];
 
         if (method === 'DELETE') {
+            const ex = await db.collection(table).doc(id).get();
+            if (!(ex.data && ex.data[0])) return fail(404, 'not found');
             await db.collection(table).doc(id).remove();
             return ok({ deleted: id });
         }
         if (method === 'PUT') {
             const c = clean(table, body);
             if (!Object.keys(c).length) return fail(400, '没有要更新的字段');
+            const ex = await db.collection(table).doc(id).get();
+            if (!(ex.data && ex.data[0])) return fail(404, 'not found');
             await db.collection(table).doc(id).update(c);
-            return ok({ _id: id, id, ...c });
+            return ok({ id, ...c });
         }
         if (method === 'POST') {
+            const missing = (REQUIRED[table] || []).filter(k => body[k] === undefined || body[k] === null || body[k] === '');
+            if (missing.length) return fail(400, '缺少必填字段: ' + missing.join(', '));
             const c = clean(table, body);
             const res = await db.collection(table).add(c);
             return ok({ _id: res.id, id: res.id, ...c });

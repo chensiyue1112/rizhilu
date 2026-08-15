@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.2</title>
+<title>日知录记账 v1.7.3</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -839,7 +839,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
-        <div class="more-drawer-ver" id="appVersionM">v1.7.2</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.3</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -851,7 +851,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>导入</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.7.2</div>
+        <div class="sidebar-ver" id="appVersion">v1.7.3</div>
     </div>
 </aside>
 
@@ -882,7 +882,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                     <button id="toggleExpense" class="chart-toggle" onclick="switchOvChart('expense')">支出</button>
                 </div>
             </div>
-            <div style="position:relative;overflow:visible"><canvas id="overviewChart" style="width:100%;height:360px"></canvas><div id="ovChartLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:13px;background:var(--bg-layer)">加载中...</div></div>
+            <div style="position:relative;overflow:visible"><canvas id="overviewChart" style="width:100%;height:320px"></canvas><div id="ovChartLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:13px;background:var(--bg-layer)">加载中...</div></div>
         </div>
     </div>
 </section>
@@ -1189,6 +1189,8 @@ const STATE = {
 
 // ═══════════════ 工具函数 ═══════════════
 function $(id) { return document.getElementById(id); }
+// HTML 转义：用户输入渲染进 innerHTML / 属性前必须经过 esc()，防 XSS 与属性破坏
+function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
 // 本地时区日期（避免 toISOString 的 UTC 偏差：北京过了午夜仍是前一天）
 function pad2(v) { return String(v).padStart(2, '0'); }
 function todayStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()); }
@@ -1514,11 +1516,11 @@ async function loadOverview() {
     const render = (d) => {
         const { data, incomes, expenses } = d;
         $('overviewCards').innerHTML = `
-            <div class="overview-card"><div class="value" >+${data.total_income.toFixed(1)}</div><div class="label">${month} 收入</div></div>
-            <div class="overview-card"><div class="value" >-${data.total_expense.toFixed(1)}</div><div class="label">${month} 支出</div></div>
-            <div class="overview-card"><div class="value" >+${data.large_income.toFixed(1)}</div><div class="label">${month} 大额收入</div></div>
-            <div class="overview-card"><div class="value" >${data.large_expense.toFixed(1)}</div><div class="label">${month} 大额支出</div></div>
-            <div class="overview-card"><div class="value">${data.balance.toFixed(1)}</div><div class="label">${month} 结余</div></div>
+            <div class="overview-card"><div class="value" >+${Number(data.total_income || 0).toFixed(1)}</div><div class="label">${month} 收入</div></div>
+            <div class="overview-card"><div class="value" >-${Number(data.total_expense || 0).toFixed(1)}</div><div class="label">${month} 支出</div></div>
+            <div class="overview-card"><div class="value" >+${Number(data.large_income || 0).toFixed(1)}</div><div class="label">${month} 大额收入</div></div>
+            <div class="overview-card"><div class="value" >${Number(data.large_expense || 0).toFixed(1)}</div><div class="label">${month} 大额支出</div></div>
+            <div class="overview-card"><div class="value">${Number(data.balance || 0).toFixed(1)}</div><div class="label">${month} 结余</div></div>
         `;
 
         // Aggregate by day for selected month（图表剔除大额支出，避免突出）
@@ -1529,8 +1531,8 @@ async function loadOverview() {
             const key = month + '-' + String(i).padStart(2, '0');
             days[key] = { inc: 0, exp: 0 };
         }
-        incomes.forEach(r => { if (days[r.date] && Number(r.large) !== 1) days[r.date].inc += r.amount; });
-        expenses.forEach(r => { if (days[r.date] && Number(r.large) !== 1) days[r.date].exp += r.amount; });
+        incomes.forEach(r => { if (days[r.date] && Number(r.large) !== 1) days[r.date].inc += Number(r.amount || 0); });
+        expenses.forEach(r => { if (days[r.date] && Number(r.large) !== 1) days[r.date].exp += Number(r.amount || 0); });
 
         const labels = Object.keys(days);
         STATE._ovLabels = labels;
@@ -1567,9 +1569,10 @@ function switchOvChart(type) {
 function drawOverviewChart(canvasId, labels, series, unit) {
     const canvas = document.getElementById(canvasId);
     if (!canvas || labels.length === 0) return;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.style.width = '100%';
     canvas.style.height = '320px';
+    canvas.style.touchAction = 'pan-y';
     const rect = canvas.getBoundingClientRect();
     const W = rect.width;
     const H = 320;
@@ -1676,8 +1679,8 @@ function drawOverviewChart(canvasId, labels, series, unit) {
     // Initial draw
     draw(null);
 
-    // --- mousemove handler ---
-    canvas._ovHandler && canvas.removeEventListener('mousemove', canvas._ovHandler);
+    // --- pointer/touch + mouse handler（触屏也能悬停看数值） ---
+    canvas._ovHandler && canvas.removeEventListener('pointermove', canvas._ovHandler);
     canvas._ovHandler = function(e) {
         const cr = canvas.getBoundingClientRect();
         const mx = e.clientX - cr.left;
@@ -1721,10 +1724,13 @@ function drawOverviewChart(canvasId, labels, series, unit) {
             tipEl.style.opacity = '0';
         }
     };
-    canvas.addEventListener('mousemove', canvas._ovHandler);
+    canvas.addEventListener('pointermove', canvas._ovHandler);
+    canvas._ovDown && canvas.removeEventListener('pointerdown', canvas._ovDown);
+    canvas._ovDown = function(e) { canvas._ovHandler(e); };
+    canvas.addEventListener('pointerdown', canvas._ovDown);
 
-    // --- mouseleave ---
-    canvas._ovLeave && canvas.removeEventListener('mouseleave', canvas._ovLeave);
+    // --- pointerleave / pointerup（触摸抬起后收起 tooltip） ---
+    canvas._ovLeave && canvas.removeEventListener('pointerleave', canvas._ovLeave);
     canvas._ovLeave = function() {
         if (activeBar !== null) {
             activeBar = null;
@@ -1732,7 +1738,11 @@ function drawOverviewChart(canvasId, labels, series, unit) {
             tipEl.style.opacity = '0';
         }
     };
-    canvas.addEventListener('mouseleave', canvas._ovLeave);
+    canvas.addEventListener('pointerleave', canvas._ovLeave);
+    canvas._ovUp && canvas.removeEventListener('pointerup', canvas._ovUp);
+    canvas._ovUp = function(e) { if (e && e.pointerType && e.pointerType !== 'mouse') canvas._ovLeave(); };
+    canvas.addEventListener('pointerup', canvas._ovUp);
+    canvas.addEventListener('pointercancel', canvas._ovUp);
     canvas.style.cursor = 'default';
 }
 
@@ -1743,12 +1753,12 @@ let _expData = [];
 async function loadExpenses() {
     const render = (data) => {
         _expData = data;
-        const total = data.reduce((s, r) => s + r.amount, 0);
+        const total = data.reduce((s, r) => s + Number(r.amount || 0), 0);
         $('expenseTotal').textContent = '共 ' + data.length + ' 条，合计 ¥' + total.toFixed(2);
         // 本月汇总卡片
         const thisMonth = thisMonthStr();
         const monthData = data.filter(r => r.date.startsWith(thisMonth));
-        const monthTotal = monthData.reduce((s, r) => s + r.amount, 0);
+        const monthTotal = monthData.reduce((s, r) => s + Number(r.amount || 0), 0);
         void monthTotal; void monthData;
         const tbody = document.querySelector('#expenseTable tbody');
         if (data.length === 0) {
@@ -1756,10 +1766,10 @@ async function loadExpenses() {
         } else {
         tbody.innerHTML = data.map((r, i) => `
             <tr>
-                <td>${r.date.slice(5)}</td>
-                <td>${Number(r.large) === 1 ? '<span style="color:var(--accent);font-weight:600">大额</span> ' : ''}${r.category}</td>
-                <td class="amount-minus">-${r.amount.toFixed(2)}</td>
-                <td>${r.description || ''}</td>
+                <td>${(r.date || '').slice(5)}</td>
+                <td>${Number(r.large) === 1 ? '<span style="color:var(--accent);font-weight:600">大额</span> ' : ''}${esc(r.category)}</td>
+                <td class="amount-minus">-${Number(r.amount || 0).toFixed(2)}</td>
+                <td>${esc(r.description)}</td>
                 <td>
                     <button class="btn btn-cancel btn-sm" onclick="editExpenseByIdx(${i})">编辑</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteExpense('${r.id}')">删除</button>
@@ -1788,15 +1798,15 @@ async function saveExpense() {
     const url = isUpdate ? '/api/expense/' + STATE._expEditId : '/api/expense';
     const method = isUpdate ? 'PUT' : 'POST';
     try {
-        await api(url, {method, body:data});
+        const saved = await api(url, {method, body:data});
         toast(isUpdate ? '已更新' : '已保存', 'success');
         $('exp_amount').value = ''; $('exp_desc').value = '';
         $('expSaveBtn').textContent = '保存';
         $('expCancelBtn').style.display = 'none';
         $('expLargeWrap').style.display = 'none';
-        const expEditId = STATE._expEditId;
         STATE._expEditId = null;
-        updateTableCache('expenses', data, expEditId, false); invalidateDerived(); loadExpenses();
+        if (saved && saved._id) delete saved._id;
+        updateTableCache('expenses', saved, saved && saved.id, false); invalidateDerived(); loadExpenses();
     } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -1836,12 +1846,12 @@ let _incData = [];
 async function loadIncomes() {
     const render = (data) => {
         _incData = data;
-        const total = data.reduce((s, r) => s + r.amount, 0);
+        const total = data.reduce((s, r) => s + Number(r.amount || 0), 0);
         $('incomeTotal').textContent = '共 ' + data.length + ' 条，合计 ¥' + total.toFixed(2);
         // 本月汇总卡片
         const thisMonth = thisMonthStr();
         const monthData = data.filter(r => r.date.startsWith(thisMonth));
-        const monthTotal = monthData.reduce((s, r) => s + r.amount, 0);
+        const monthTotal = monthData.reduce((s, r) => s + Number(r.amount || 0), 0);
         void monthTotal; void monthData;
         const tbody = document.querySelector('#incomeTable tbody');
         if (data.length === 0) {
@@ -1849,10 +1859,10 @@ async function loadIncomes() {
         } else {
         tbody.innerHTML = data.map((r, i) => `
             <tr>
-                <td>${r.date.slice(5)}</td>
-                <td>${Number(r.large) === 1 ? '<span style="color:var(--accent);font-weight:600">大额</span> ' : ''}${r.category}</td>
-                <td class="amount-plus">+${r.amount.toFixed(2)}</td>
-                <td>${r.note || ''}</td>
+                <td>${(r.date || '').slice(5)}</td>
+                <td>${Number(r.large) === 1 ? '<span style="color:var(--accent);font-weight:600">大额</span> ' : ''}${esc(r.category)}</td>
+                <td class="amount-plus">+${Number(r.amount || 0).toFixed(2)}</td>
+                <td>${esc(r.note)}</td>
                 <td>
                     <button class="btn btn-cancel btn-sm" onclick="editIncomeByIdx(${i})">编辑</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteIncome('${r.id}')">删除</button>
@@ -1881,15 +1891,15 @@ async function saveIncome() {
     const url = isUpdate ? '/api/income/' + STATE._incEditId : '/api/income';
     const method = isUpdate ? 'PUT' : 'POST';
     try {
-        await api(url, {method, body:data});
+        const saved = await api(url, {method, body:data});
         toast(isUpdate ? '已更新' : '已保存', 'success');
         $('inc_amount').value = ''; $('inc_note').value = '';
         $('incSaveBtn').textContent = '保存';
         $('incCancelBtn').style.display = 'none';
         $('incLargeWrap').style.display = 'none';
-        const incEditId = STATE._incEditId;
         STATE._incEditId = null;
-        updateTableCache('incomes', data, incEditId, false); invalidateDerived(); loadIncomes();
+        if (saved && saved._id) delete saved._id;
+        updateTableCache('incomes', saved, saved && saved.id, false); invalidateDerived(); loadIncomes();
     } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -1943,13 +1953,15 @@ async function savePayday() {
     try {
         if (sal > 0) {
             const inc = { date: salDate, amount: sal, category: '生活费', note: '工资', large: 1 };
-            await api('/api/income', { method: 'POST', body: inc });
-            updateTableCache('incomes', inc, null, false);
+            const savedInc = await api('/api/income', { method: 'POST', body: inc });
+            if (savedInc && savedInc._id) delete savedInc._id;
+            updateTableCache('incomes', savedInc || inc, savedInc && savedInc.id, false);
         }
         if (meal > 0) {
             const exp = { date: mealDate, amount: meal, category: '餐饮', description: '伙食费', large: 1 };
-            await api('/api/expense', { method: 'POST', body: exp });
-            updateTableCache('expenses', exp, null, false);
+            const savedExp = await api('/api/expense', { method: 'POST', body: exp });
+            if (savedExp && savedExp._id) delete savedExp._id;
+            updateTableCache('expenses', savedExp || exp, savedExp && savedExp.id, false);
         }
         invalidateDerived();
         toast('已记入大额收入/支出', 'success');
@@ -1965,32 +1977,34 @@ async function loadFinances() {
 
     // Build series
     const labels = data.map(r => r.date);
-    const dailySeries = data.map(r => r.liquid_assets + r.debt);
-    const investSeries = data.map(r => r.stock + r.fund + r.convertible_bond);
+    const dailySeries = data.map(r => Number(r.liquid_assets || 0) + Number(r.debt || 0));
+    const investSeries = data.map(r => Number(r.stock || 0) + Number(r.fund || 0) + Number(r.convertible_bond || 0));
     const totalSeries = data.map((r, i) => dailySeries[i] + investSeries[i]);
 
-    // Draw chart
-    drawFinanceChart(labels, [
+    // Draw chart（记录数据，供屏幕旋转/resize 时重绘，避免拉伸模糊）
+    STATE._finLabels = labels;
+    STATE._finSeries = [
         { label: '日常资产', data: dailySeries, color: '#3b82f6' },
         { label: '投资资产', data: investSeries, color: '#60a5fa' },
         { label: '总计', data: totalSeries, color: '#1d4ed8', bold: true },
-    ]);
+    ];
+    drawFinanceChart(labels, STATE._finSeries);
 
     // Render table
     const tbody = document.querySelector('#financeTable tbody');
     tbody.innerHTML = data.map(r => {
-        const daily = r.liquid_assets + r.debt;
-        const invest = r.stock + r.fund + r.convertible_bond;
+        const daily = Number(r.liquid_assets || 0) + Number(r.debt || 0);
+        const invest = Number(r.stock || 0) + Number(r.fund || 0) + Number(r.convertible_bond || 0);
         const total = daily + invest;
         return `
         <tr>
-            <td>${r.date}</td>
-            <td>${r.liquid_assets.toFixed(0)}</td>
-            <td>${r.debt.toFixed(0)}</td>
+            <td>${esc(r.date)}</td>
+            <td>${Number(r.liquid_assets || 0).toFixed(0)}</td>
+            <td>${Number(r.debt || 0).toFixed(0)}</td>
             <td><strong>${daily.toFixed(0)}</strong></td>
-            <td>${r.stock.toFixed(0)}</td>
-            <td>${r.fund.toFixed(0)}</td>
-            <td>${r.convertible_bond.toFixed(0)}</td>
+            <td>${Number(r.stock || 0).toFixed(0)}</td>
+            <td>${Number(r.fund || 0).toFixed(0)}</td>
+            <td>${Number(r.convertible_bond || 0).toFixed(0)}</td>
             <td><strong>${invest.toFixed(0)}</strong></td>
             <td><strong>${total.toFixed(0)}</strong></td>
             <td>
@@ -2009,9 +2023,10 @@ async function loadFinances() {
 function drawFinanceChart(labels, series) {
     const canvas = document.getElementById('financeChart');
     if (!canvas || labels.length === 0) return;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.style.width = '100%';
     canvas.style.height = '320px';
+    canvas.style.touchAction = 'pan-y';
     const W = canvas.getBoundingClientRect().width;
     const H = 320;
     canvas.width = W * dpr;
@@ -2110,7 +2125,7 @@ function drawFinanceChart(labels, series) {
         const tip = document.createElement('div');
         tip.style.cssText = 'display:none;position:absolute;left:8px;top:-32px;background:#333;color:#fff;padding:4px 8px;border-radius:4px;font-size:12px;white-space:nowrap;pointer-events:none;';
         const v = h.value >= 10000 ? (h.value/10000).toFixed(2)+'w' : h.value.toFixed(0);
-        tip.innerHTML = '<span style="color:' + h.color + '">●</span> ' + h.label + ' <b>' + v + '</b><br><span style="font-size:10px;opacity:0.7">' + h.date + '</span>';
+        tip.innerHTML = '<span style="color:' + h.color + '">●</span> ' + h.label + ' <b>' + v + '</b><br><span style="font-size:10px;opacity:0.7">' + esc(h.date) + '</span>';
         wrap.appendChild(tip);
         wrap.onmouseenter = function() { tip.style.display = 'block'; };
         wrap.onmouseleave = function() { tip.style.display = 'none'; };
@@ -2128,10 +2143,11 @@ async function saveFinance() {
         convertible_bond: parseFloat($('fin_bond').value) || 0,
     };
     try {
-        await api('/api/finance_snapshot', {method:'POST', body:data});
+        const saved = await api('/api/finance_snapshot', {method:'POST', body:data});
         toast('已保存', 'success');
         ['fin_liquid','fin_debt','fin_stock','fin_fund','fin_bond'].forEach(id => $(id).value = '');
-        updateTableCache('finances', data, null, false); invalidateDerived(); loadFinances();
+        if (saved && saved._id) delete saved._id;
+        updateTableCache('finances', saved, saved && saved.id, false); invalidateDerived(); loadFinances();
     } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -2179,8 +2195,8 @@ async function loadElectricities() {
             }
             return `
             <tr>
-                <td>${r.date}</td>
-                <td>${r.reading.toFixed(1)}</td>
+                <td>${esc(r.date)}</td>
+                <td>${Number(r.reading || 0).toFixed(1)}</td>
                 <td>${diff ? diff + ' 度' : '—'}</td>
                 <td>
                     <button class="btn btn-danger btn-sm" onclick="deleteElectricity('${r.id}')">删除</button>
@@ -2206,10 +2222,11 @@ async function saveElectricity() {
     };
     if (!data.reading) { toast('请输入读数', 'error'); return; }
     try {
-        await api('/api/electricity', {method:'POST', body:data});
+        const saved = await api('/api/electricity', {method:'POST', body:data});
         toast('已保存', 'success');
         $('elec_reading').value = '';
-        updateTableCache('electricity', data, null, false); invalidateDerived(); loadElectricities();
+        if (saved && saved._id) delete saved._id;
+        updateTableCache('electricity', saved, saved && saved.id, false); invalidateDerived(); loadElectricities();
     } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -2243,11 +2260,13 @@ async function loadStats() {
     const month = $('statsMonth').value || thisMonthStr();
     $('statsMonth').value = month;
     const render = (d) => {
+        STATE._statsLast = d;
+        STATE._statsRender = render;
         const { ov, expCat, incCat, trendInc, trendExp, trendLabels } = d;
         $('statsCards').innerHTML = `
-            <div class="overview-card"><div class="value" >+${ov.total_income.toFixed(1)}</div><div class="label">${month} 收入</div></div>
-            <div class="overview-card"><div class="value" >-${ov.total_expense.toFixed(1)}</div><div class="label">${month} 支出</div></div>
-            <div class="overview-card"><div class="value">${ov.balance.toFixed(1)}</div><div class="label">结余</div></div>
+            <div class="overview-card"><div class="value" >+${Number(ov.total_income || 0).toFixed(1)}</div><div class="label">${month} 收入</div></div>
+            <div class="overview-card"><div class="value" >-${Number(ov.total_expense || 0).toFixed(1)}</div><div class="label">${month} 支出</div></div>
+            <div class="overview-card"><div class="value">${Number(ov.balance || 0).toFixed(1)}</div><div class="label">结余</div></div>
         `;
         const grandTotal = expCat.reduce((s, r) => s + r.total, 0);
         $('statsExpenseTable').innerHTML = renderTable(
@@ -2278,10 +2297,10 @@ function drawDonutChart(canvasId, items, total) {
         legend.innerHTML = (!items || items.length === 0 || total <= 0)
             ? ''
             : items.slice(0, 8).map((it, i) =>
-                `<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:${COLORS[i % COLORS.length]};display:inline-block"></span>${it.label} ${((it.value / total) * 100).toFixed(1)}%</span>`
+                `<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:${COLORS[i % COLORS.length]};display:inline-block"></span>${esc(it.label)} ${((it.value / total) * 100).toFixed(1)}%</span>`
               ).join('');
     }
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const W = canvas.getBoundingClientRect().width || 300;
     const H = 220;
     canvas.width = W * dpr; canvas.height = H * dpr;
@@ -2318,8 +2337,9 @@ function drawDonutChart(canvasId, items, total) {
 function drawTrendChart(canvasId, labels, incData, expData) {
     const canvas = document.getElementById(canvasId);
     if (!canvas || labels.length === 0) return;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.style.width = '100%'; canvas.style.height = '260px';
+    canvas.style.touchAction = 'pan-y';
     const W = canvas.getBoundingClientRect().width || 400;
     const H = 260;
     canvas.width = W * dpr; canvas.height = H * dpr;
@@ -2400,7 +2420,7 @@ function drawTrendChart(canvasId, labels, incData, expData) {
 
     draw(null);
 
-    canvas._trHandler && canvas.removeEventListener('mousemove', canvas._trHandler);
+    canvas._trHandler && canvas.removeEventListener('pointermove', canvas._trHandler);
     canvas._trHandler = function(e) {
         const cr = canvas.getBoundingClientRect();
         const mx = e.clientX - cr.left;
@@ -2430,14 +2450,21 @@ function drawTrendChart(canvasId, labels, incData, expData) {
             tipEl.style.opacity = '0';
         }
     };
-    canvas.addEventListener('mousemove', canvas._trHandler);
+    canvas.addEventListener('pointermove', canvas._trHandler);
+    canvas._trDown && canvas.removeEventListener('pointerdown', canvas._trDown);
+    canvas._trDown = function(e) { canvas._trHandler(e); };
+    canvas.addEventListener('pointerdown', canvas._trDown);
 
-    canvas._trLeave && canvas.removeEventListener('mouseleave', canvas._trLeave);
+    canvas._trLeave && canvas.removeEventListener('pointerleave', canvas._trLeave);
     canvas._trLeave = function() {
         if (activeIdx !== null) { activeIdx = null; draw(null); }
         tipEl.style.opacity = '0';
     };
-    canvas.addEventListener('mouseleave', canvas._trLeave);
+    canvas.addEventListener('pointerleave', canvas._trLeave);
+    canvas._trUp && canvas.removeEventListener('pointerup', canvas._trUp);
+    canvas._trUp = function(e) { if (e && e.pointerType && e.pointerType !== 'mouse') canvas._trLeave(); };
+    canvas.addEventListener('pointerup', canvas._trUp);
+    canvas.addEventListener('pointercancel', canvas._trUp);
     canvas.style.cursor = 'crosshair';
 }
 
@@ -2559,7 +2586,7 @@ function renderMoodCalendar(data) {
         const isToday = dateStr === today ? ' today' : '';
         const isSel = MOOD_SELECTED && dateStr === MOOD_SELECT_DATE ? ' selected' : '';
         const note = mood && mood.note ? ' | ' + mood.note : '';
-        html += `<div class="mood-day${isToday}${isSel}" onclick="selectMoodDay('${dateStr}')" ${bg ? `style="background:${bg}"` : ''} title="${dateStr}${note}">
+        html += `<div class="mood-day${isToday}${isSel}" onclick="selectMoodDay('${dateStr}')" ${bg ? `style="background:${bg}"` : ''} title="${esc(dateStr + note)}">
             <span class="emoji">${mood ? MOOD_EMOJI[mood.rating] : ''}</span><span${bg ? ' style="color:#fff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.35)"' : ''}>${d}</span></div>`;
     }
     $('moodCalendar').innerHTML = html;
@@ -2659,7 +2686,7 @@ function renderWeatherCalendar(data) {
         const isToday = dateStr === today ? ' today' : '';
         const isSel = WEATHER_SELECTED && dateStr === WEATHER_SELECT_DATE ? ' selected' : '';
         const note = w && w.note ? ' | ' + w.note : '';
-        html += `<div class="mood-day${isToday}${isSel}" onclick="selectWeatherDay('${dateStr}')" ${bg ? `style="background:${bg}"` : ''} title="${dateStr}${w ? ' ' + (info ? info.label : '') : ''}${note}">
+        html += `<div class="mood-day${isToday}${isSel}" onclick="selectWeatherDay('${dateStr}')" ${bg ? `style="background:${bg}"` : ''} title="${esc(dateStr + (w ? ' ' + (info ? info.label : '') : '') + note)}">
             <span class="emoji">${info ? info.emoji : ''}</span><span>${d}</span></div>`;
     }
     $('weatherCalendar').innerHTML = html;
@@ -2909,12 +2936,33 @@ function renderTable(headers, rows) {
     h += '</tr></thead><tbody>';
     rows.forEach(row => {
         h += '<tr>';
-        row.forEach(cell => h += '<td>' + cell + '</td>');
+        row.forEach(cell => h += '<td>' + esc(cell) + '</td>');
         h += '</tr>';
     });
     h += '</tbody></table>';
     return h;
 }
+
+// ═══════════════ 屏幕旋转/resize 重绘 ═══════════════
+// 手机横竖屏切换后 canvas 宽度变化，直接用缓存数据重绘，避免拉伸模糊、不发网络请求
+function redrawVisibleCharts() {
+    const t = STATE.currentTab;
+    if (t === 'overview' && STATE._ovLabels && STATE._ovLabels.length) {
+        const kind = STATE._ovChart === 'income' ? 'income' : 'expense';
+        const data = kind === 'income' ? STATE._ovIncData : STATE._ovExpData;
+        drawOverviewChart('overviewChart', STATE._ovLabels, [{ label: kind === 'income' ? '收入' : '支出', data: data, color: '#3b82f6' }], '元');
+    } else if (t === 'finance' && STATE._finLabels && STATE._finSeries) {
+        drawFinanceChart(STATE._finLabels, STATE._finSeries);
+    } else if (t === 'stats' && STATE._statsLast) {
+        if (STATE._statsRender) STATE._statsRender(STATE._statsLast);
+        else loadStats();
+    }
+}
+let _resizeTimer = null;
+window.addEventListener('resize', () => {
+    clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(redrawVisibleCharts, 200);
+});
 
 // ═══════════════ 初始化 ═══════════════
 document.addEventListener('DOMContentLoaded', () => {
