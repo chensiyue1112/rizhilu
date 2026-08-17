@@ -518,13 +518,15 @@ def stats_overview():
         (f"{month}%",),
     ).fetchone()[0]
 
+    side_income = total_income - large_income   # 副业收入 = 总收入 - 工资收入
+
     total_expense = db.execute(
-        "SELECT COALESCE(SUM(amount),0) FROM expense WHERE date LIKE ? AND (large IS NULL OR large != 1)",
+        "SELECT COALESCE(SUM(amount),0) FROM expense WHERE date LIKE ? AND amount <= 100",
         (f"{month}%",),
     ).fetchone()[0]
 
     large_expense = db.execute(
-        "SELECT COALESCE(SUM(amount),0) FROM expense WHERE date LIKE ? AND large = 1",
+        "SELECT COALESCE(SUM(amount),0) FROM expense WHERE date LIKE ? AND amount > 100",
         (f"{month}%",),
     ).fetchone()[0]
 
@@ -540,6 +542,7 @@ def stats_overview():
         {
             "month": month,
             "total_income": round(total_income, 2),
+            "side_income": round(side_income, 2),
             "large_income": round(large_income, 2),
             "total_expense": round(total_expense, 2),
             "large_expense": round(large_expense, 2),

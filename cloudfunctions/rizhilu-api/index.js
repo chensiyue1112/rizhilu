@@ -142,15 +142,18 @@ exports.main = async (event) => {
                 incRows.forEach(r => {
                     if ((r.date || '').indexOf(month) !== 0) return;
                     const a = r.amount || 0; ti += a;
-                    if (r.large === 1) li += a;
+                    if (r.large === 1) li += a;          // 工资收入（发工资页标记 large=1）
                 });
                 expRows.forEach(r => {
                     if ((r.date || '').indexOf(month) !== 0) return;
-                    if (r.large === 1) tl += r.amount || 0; else te += r.amount || 0;
+                    const a = r.amount || 0;
+                    // 大额支出 = 单笔支出 > 100（自动判定）
+                    if (a > 100) tl += a; else te += a;
                 });
+                const side = ti - li;                     // 副业收入 = 总收入 - 工资收入
                 const latest_finance = finRows[0] ? { ...finRows[0], id: finRows[0]._id } : null;
                 const latest_electricity = elecRows[0] ? { ...elecRows[0], id: elecRows[0]._id } : null;
-                return ok({ month, total_income: Math.round(ti * 100) / 100, large_income: Math.round(li * 100) / 100, total_expense: Math.round(te * 100) / 100, large_expense: Math.round(tl * 100) / 100, balance: Math.round((ti - te - tl) * 100) / 100, latest_finance, latest_electricity });
+                return ok({ month, total_income: Math.round(ti * 100) / 100, side_income: Math.round(side * 100) / 100, large_income: Math.round(li * 100) / 100, total_expense: Math.round(te * 100) / 100, large_expense: Math.round(tl * 100) / 100, balance: Math.round((ti - te - tl) * 100) / 100, latest_finance, latest_electricity });
             }
             if (type === 'expense' || type === 'income') {
                 const rows = await getAll(type);

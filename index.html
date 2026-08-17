@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.7</title>
+<title>日知录记账 v1.7.8</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -881,11 +881,13 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     .overview-card { border-radius: 12px; padding: 22px 24px; }
     .overview-card .value { font-size: 32px; }
     .overview-card .label { font-size: 12px; }
+    .overview-cards { grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); }
     #overviewCards .overview-card:nth-child(1) .value { color: #16a34a; }
-    #overviewCards .overview-card:nth-child(2) .value { color: #dc2626; }
-    #overviewCards .overview-card:nth-child(3) .value { color: #84cc16; }
-    #overviewCards .overview-card:nth-child(4) .value { color: #f87171; }
-    #overviewCards .overview-card:nth-child(5) .value { color: var(--accent); }
+    #overviewCards .overview-card:nth-child(2) .value { color: #84cc16; }
+    #overviewCards .overview-card:nth-child(3) .value { color: var(--accent); }
+    #overviewCards .overview-card:nth-child(4) .value { color: #dc2626; }
+    #overviewCards .overview-card:nth-child(5) .value { color: #f87171; }
+    #overviewCards .overview-card:nth-child(6) .value { color: #0f1115; }
 
     /* ---- 支出 / 收入：左侧表单 + 右侧记录（表格区内滚动） ---- */
     #section-expense.active, #section-income.active {
@@ -898,7 +900,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px;
     }
     #expenseForm .form-actions, #incomeForm .form-actions { grid-column: 1 / -1; justify-content: flex-end; }
-    #expLargeWrap, #incLargeWrap { grid-column: 1 / -1; padding: 0; }
+    #incLargeWrap { grid-column: 1 / -1; padding: 0; }
     #expenseForm .custom-date, #incomeForm .custom-date,
     #expenseForm .custom-select, #incomeForm .custom-select { width: 100% !important; }
     #expenseForm .form-group input, #incomeForm .form-group input { width: 100% !important; }
@@ -1016,7 +1018,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
         <button class="sidebar-item" style="width:100%;background:none;border:none;font-family:inherit;text-align:left;justify-content:flex-start" onclick="manualRefresh(); closeMore();">⟳ 刷新数据</button>
-        <div class="more-drawer-ver" id="appVersionM">v1.7.7</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.8</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -1032,7 +1034,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>刷新</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.7.7</div>
+        <div class="sidebar-ver" id="appVersion">v1.7.8</div>
     </div>
 </aside>
 
@@ -1043,7 +1045,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- 页面顶部标题栏（桌面端显示版本号） -->
 <div class="page-title">
     <span class="page-title-name">日知录记账</span>
-    <span class="page-title-ver" id="pageTitleVer">v1.7.7</span>
+    <span class="page-title-ver" id="pageTitleVer">v1.7.8</span>
 </div>
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
@@ -1054,8 +1056,9 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     </div>
     <div class="overview-cards" id="overviewCards">
         <div class="overview-card"><div class="value">—</div><div class="label">收入</div></div>
+        <div class="overview-card"><div class="value">—</div><div class="label">副业收入</div></div>
+        <div class="overview-card"><div class="value">—</div><div class="label">工资收入</div></div>
         <div class="overview-card"><div class="value">—</div><div class="label">支出</div></div>
-        <div class="overview-card"><div class="value">—</div><div class="label">大额收入</div></div>
         <div class="overview-card"><div class="value">—</div><div class="label">大额支出</div></div>
         <div class="overview-card"><div class="value">—</div><div class="label">结余</div></div>
     </div>
@@ -1107,10 +1110,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             </div>
             <div class="form-group"><label>金额</label><input type="number" id="exp_amount" step="0.01" style="width:100px" placeholder="0.00"></div>
             <div class="form-group"><label>描述</label><input type="text" id="exp_desc" style="width:200px" placeholder="比如：午餐"></div>
-            <label id="expLargeWrap" style="display:none;align-items:center;gap:4px;font-size:12.5px;color:var(--text-secondary);cursor:pointer;padding-bottom:10px;white-space:nowrap">
-                <input type="checkbox" id="expLarge" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
-                大额支出
-            </label>
             <div class="form-actions"><button class="btn btn-save" id="expSaveBtn" onclick="saveExpense()">保存</button><button class="btn btn-cancel btn-sm" id="expCancelBtn" onclick="cancelExpense()" style="display:none">取消</button></div>
         </div>
     </div>
@@ -1149,7 +1148,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <div class="form-group"><label>备注</label><input type="text" id="inc_note" style="width:200px"></div>
             <label id="incLargeWrap" style="display:none;align-items:center;gap:4px;font-size:12.5px;color:var(--text-secondary);cursor:pointer;padding-bottom:10px;white-space:nowrap">
                 <input type="checkbox" id="incLarge" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
-                大额收入
+                工资收入（大额）
             </label>
             <div class="form-actions"><button class="btn btn-save" id="incSaveBtn" onclick="saveIncome()">保存</button><button class="btn btn-cancel btn-sm" id="incCancelBtn" onclick="cancelIncome()" style="display:none">取消</button></div>
         </div>
@@ -1165,9 +1164,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="card">
         <h3>💰 发工资记账</h3>
         <div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:14px;line-height:1.8">
-            工资 → 本月<b style="color:var(--accent)">大额收入</b>（分类：生活费）<br>
-            上月伙食费 → 上月<b style="color:var(--accent)">大额支出</b>（分类：餐饮）<br>
-            都不计入概览图，只显示在记录列表里。
+            工资 → 本月<b style="color:var(--accent)">工资收入</b>（分类：生活费，不计入概览图）<br>
+            上月伙食费 → 上月支出（分类：餐饮，单笔超过 100 元自动计入大额支出、不计入概览图）<br>
         </div>
         <div class="form-row">
             <div class="form-group"><label>工资日期</label>
@@ -1726,13 +1724,14 @@ async function loadOverview() {
         const { data, incomes, expenses } = d;
         $('overviewCards').innerHTML = `
             <div class="overview-card"><div class="value" >+${Number(data.total_income || 0).toFixed(1)}</div><div class="label">${month} 收入</div></div>
+            <div class="overview-card"><div class="value" >+${Number(data.side_income || 0).toFixed(1)}</div><div class="label">${month} 副业收入</div></div>
+            <div class="overview-card"><div class="value" >+${Number(data.large_income || 0).toFixed(1)}</div><div class="label">${month} 工资收入</div></div>
             <div class="overview-card"><div class="value" >-${Number(data.total_expense || 0).toFixed(1)}</div><div class="label">${month} 支出</div></div>
-            <div class="overview-card"><div class="value" >+${Number(data.large_income || 0).toFixed(1)}</div><div class="label">${month} 大额收入</div></div>
             <div class="overview-card"><div class="value" >${Number(data.large_expense || 0).toFixed(1)}</div><div class="label">${month} 大额支出</div></div>
             <div class="overview-card"><div class="value">${Number(data.balance || 0).toFixed(1)}</div><div class="label">${month} 结余</div></div>
         `;
 
-        // Aggregate by day for selected month（图表剔除大额支出，避免突出）
+        // Aggregate by day for selected month（图表剔除工资收入与大额支出，避免突出）
         const [yy, mm] = month.split('-').map(Number);
         const days = {};
         const daysInMonth = new Date(yy, mm, 0).getDate();
@@ -1741,7 +1740,7 @@ async function loadOverview() {
             days[key] = { inc: 0, exp: 0 };
         }
         incomes.forEach(r => { if (days[r.date] && Number(r.large) !== 1) days[r.date].inc += Number(r.amount || 0); });
-        expenses.forEach(r => { if (days[r.date] && Number(r.large) !== 1) days[r.date].exp += Number(r.amount || 0); });
+        expenses.forEach(r => { if (days[r.date] && Number(r.amount || 0) <= 100) days[r.date].exp += Number(r.amount || 0); });
 
         const labels = Object.keys(days);
         STATE._ovLabels = labels;
@@ -1976,7 +1975,7 @@ async function loadExpenses() {
         tbody.innerHTML = data.map((r, i) => `
             <tr>
                 <td>${(r.date || '').slice(5)}</td>
-                <td>${Number(r.large) === 1 ? '<span style="color:var(--accent);font-weight:600">大额</span> ' : ''}${esc(r.category)}</td>
+                <td>${Number(r.amount || 0) > 100 ? '<span style="color:var(--accent);font-weight:600">大额</span> ' : ''}${esc(r.category)}</td>
                 <td class="amount-minus">-${Number(r.amount || 0).toFixed(2)}</td>
                 <td>${esc(r.description)}</td>
                 <td>
@@ -2002,7 +2001,7 @@ async function saveExpense() {
         amount: parseFloat($('exp_amount').value) || 0,
         category: $('exp_category').value,
         description: $('exp_desc').value,
-        large: $('expLarge').checked ? 1 : 0,
+        // 大额支出按单笔金额 > 100 自动判定，不再手动勾选
     };
     if (!data.amount) { toast('请输入金额', 'error'); return; }
     const isUpdate = $('expSaveBtn').textContent === '更新';
@@ -2014,7 +2013,6 @@ async function saveExpense() {
         $('exp_amount').value = ''; $('exp_desc').value = '';
         $('expSaveBtn').textContent = '保存';
         $('expCancelBtn').style.display = 'none';
-        $('expLargeWrap').style.display = 'none';
         STATE._expEditId = null;
         if (saved && saved._id) delete saved._id;
         updateTableCache('expenses', saved, saved && saved.id, false); invalidateDerived(); loadExpenses();
@@ -2023,8 +2021,6 @@ async function saveExpense() {
 
 function cancelExpense() {
     $('exp_amount').value = ''; $('exp_desc').value = '';
-    $('expLarge').checked = false;
-    $('expLargeWrap').style.display = 'none';
     $('expSaveBtn').textContent = '保存';
     $('expCancelBtn').style.display = 'none';
     STATE._expEditId = null;
@@ -2039,8 +2035,6 @@ function editExpense(id, date, amount, category, desc, large) {
     $('exp_category').value = category;
     syncSelUI('exp_category');
     $('exp_desc').value = desc;
-    $('expLarge').checked = !!large;
-    $('expLargeWrap').style.display = 'flex';
     $('expSaveBtn').textContent = '更新';
     $('expCancelBtn').style.display = '';
     $('exp_amount').focus();
@@ -2171,13 +2165,13 @@ async function savePayday() {
             updateTableCache('incomes', savedInc || inc, savedInc && savedInc.id, false);
         }
         if (meal > 0) {
-            const exp = { date: mealDate, amount: meal, category: '餐饮', description: '伙食费', large: 1 };
+            const exp = { date: mealDate, amount: meal, category: '餐饮', description: '伙食费' };
             const savedExp = await api('/api/expense', { method: 'POST', body: exp });
             if (savedExp && savedExp._id) delete savedExp._id;
             updateTableCache('expenses', savedExp || exp, savedExp && savedExp.id, false);
         }
         invalidateDerived();
-        toast('已记入大额收入/支出', 'success');
+        toast('已记入工资收入和伙食费', 'success');
         $('paySalary').value = ''; $('payMeal').value = '';
     } catch(e) { toast(e.message, 'error'); }
 }
