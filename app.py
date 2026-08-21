@@ -118,9 +118,11 @@ def init_db():
             created_at TEXT DEFAULT (datetime('now','localtime'))
         );
     """)
-    # 老库升级：补充大额标记列（CREATE TABLE IF NOT EXISTS 不会改旧表结构）
+    # 老库升级：补充大额标记列、时间列（CREATE TABLE IF NOT EXISTS 不会改旧表结构）
     _ensure_column(db, "income", "large", "INTEGER DEFAULT 0")
     _ensure_column(db, "expense", "large", "INTEGER DEFAULT 0")
+    _ensure_column(db, "income", "time", "TEXT DEFAULT ''")
+    _ensure_column(db, "expense", "time", "TEXT DEFAULT ''")
     db.commit()
     db.close()
 
@@ -139,11 +141,11 @@ TABLES = {
         "required": ["date"],
     },
     "income": {
-        "cols": ["date", "amount", "category", "note", "large"],
+        "cols": ["date", "time", "amount", "category", "note", "large"],
         "required": ["date", "amount"],
     },
     "expense": {
-        "cols": ["date", "amount", "category", "description", "large"],
+        "cols": ["date", "time", "amount", "category", "description", "large"],
         "required": ["date", "amount", "category"],
     },
     "finance_snapshot": {

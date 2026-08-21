@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.8</title>
+<title>日知录记账 v1.7.9</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -349,6 +349,8 @@ th {
     letter-spacing: 0.2px;
 }
 td { padding: 9px 12px; border-bottom: 1px solid var(--border-l1); color: var(--text-secondary); }
+/* 表格日期下的时间小字 */
+.cell-time { font-size: 10px; color: var(--text-muted); line-height: 1.3; margin-top: 1px; }
 tbody tr { transition: background var(--duration) var(--ease); }
 tbody tr:hover td { background: var(--bg-hover); }
 .amount-plus, .amount-minus { color: var(--text-primary); font-weight: 550; }
@@ -567,12 +569,13 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .date-opt:hover { background: var(--bg-hover); }
 .date-opt.sel-active { color: var(--accent); font-weight: 600; }
 .btn { flex: 1; justify-content: center; padding: 12px; min-height: 44px; }
-    /* 支出/收入表单：日期|分类|金额 一行，描述/备注|保存 一行 */
+    /* 支出/收入表单：日期|分类|金额 一行，时间|描述(备注) 一行，保存一行 */
     #expenseForm, #incomeForm { grid-template-columns: 1fr 1fr 1fr; }
-    #expenseForm .form-group:nth-child(4),
-    #incomeForm .form-group:nth-child(4) { grid-column: 1 / 3; }
+    #expenseForm .form-group:nth-child(5),
+    #incomeForm .form-group:nth-child(5) { grid-column: 2 / 4; }
+    #incLargeWrap { grid-column: 1 / -1; }
     #expenseForm .form-actions,
-    #incomeForm .form-actions { grid-column: 3; justify-content: flex-end; align-self: end; }
+    #incomeForm .form-actions { grid-column: 1 / -1; justify-content: flex-end; align-self: end; margin-top: 4px; }
     #expenseForm label { grid-column: 1 / -1; }
     /* 保存按钮与左侧 input 精确对齐：视觉高度微调 */
     #expenseForm .form-actions .btn, #incomeForm .form-actions .btn { min-height: 40px; margin-bottom: 1px; }
@@ -899,6 +902,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     #expenseForm, #incomeForm {
         display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px;
     }
+    #expenseForm .form-group:nth-child(5),
+    #incomeForm .form-group:nth-child(5) { grid-column: 1 / -1; }
     #expenseForm .form-actions, #incomeForm .form-actions { grid-column: 1 / -1; justify-content: flex-end; }
     #incLargeWrap { grid-column: 1 / -1; padding: 0; }
     #expenseForm .custom-date, #incomeForm .custom-date,
@@ -1018,7 +1023,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
         <button class="sidebar-item" style="width:100%;background:none;border:none;font-family:inherit;text-align:left;justify-content:flex-start" onclick="manualRefresh(); closeMore();">⟳ 刷新数据</button>
-        <div class="more-drawer-ver" id="appVersionM">v1.7.8</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.9</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -1034,7 +1039,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>刷新</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.7.8</div>
+        <div class="sidebar-ver" id="appVersion">v1.7.9</div>
     </div>
 </aside>
 
@@ -1045,7 +1050,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- 页面顶部标题栏（桌面端显示版本号） -->
 <div class="page-title">
     <span class="page-title-name">日知录记账</span>
-    <span class="page-title-ver" id="pageTitleVer">v1.7.8</span>
+    <span class="page-title-ver" id="pageTitleVer">v1.7.9</span>
 </div>
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
@@ -1109,6 +1114,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                 <input type="hidden" id="exp_category" value="餐饮">
             </div>
             <div class="form-group"><label>金额</label><input type="number" id="exp_amount" step="0.01" style="width:100px" placeholder="0.00"></div>
+            <div class="form-group"><label>时间</label><input type="time" id="exp_time" step="60"></div>
             <div class="form-group"><label>描述</label><input type="text" id="exp_desc" style="width:200px" placeholder="比如：午餐"></div>
             <div class="form-actions"><button class="btn btn-save" id="expSaveBtn" onclick="saveExpense()">保存</button><button class="btn btn-cancel btn-sm" id="expCancelBtn" onclick="cancelExpense()" style="display:none">取消</button></div>
         </div>
@@ -1145,6 +1151,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                 <input type="hidden" id="inc_category" value="日常收入">
             </div>
             <div class="form-group"><label>金额</label><input type="number" id="inc_amount" step="0.01" style="width:100px" placeholder="0.00"></div>
+            <div class="form-group"><label>时间</label><input type="time" id="inc_time" step="60"></div>
             <div class="form-group"><label>备注</label><input type="text" id="inc_note" style="width:200px"></div>
             <label id="incLargeWrap" style="display:none;align-items:center;gap:4px;font-size:12.5px;color:var(--text-secondary);cursor:pointer;padding-bottom:10px;white-space:nowrap">
                 <input type="checkbox" id="incLarge" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
@@ -1380,6 +1387,7 @@ function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').repla
 function pad2(v) { return String(v).padStart(2, '0'); }
 function todayStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()); }
 function thisMonthStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1); }
+function nowTimeStr() { const d = new Date(); return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
 function nowStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds()); }
 function toast(msg, type) {
     type = type || '';
@@ -1974,7 +1982,7 @@ async function loadExpenses() {
         } else {
         tbody.innerHTML = data.map((r, i) => `
             <tr>
-                <td>${(r.date || '').slice(5)}</td>
+                <td>${(r.date || '').slice(5)}${r.time ? '<div class="cell-time">' + esc(r.time) + '</div>' : ''}</td>
                 <td>${Number(r.amount || 0) > 100 ? '<span style="color:var(--accent);font-weight:600">大额</span> ' : ''}${esc(r.category)}</td>
                 <td class="amount-minus">-${Number(r.amount || 0).toFixed(2)}</td>
                 <td>${esc(r.description)}</td>
@@ -1992,12 +2000,13 @@ async function loadExpenses() {
 
 function editExpenseByIdx(idx) {
     const r = _expData[idx];
-    editExpense(r.id, r.date, r.amount, r.category, r.description || '', r.large);
+    editExpense(r.id, r.date, r.time || '', r.amount, r.category, r.description || '', r.large);
 }
 
 async function saveExpense() {
     const data = {
         date: $('exp_date').value || todayStr(),
+        time: $('exp_time').value || '',
         amount: parseFloat($('exp_amount').value) || 0,
         category: $('exp_category').value,
         description: $('exp_desc').value,
@@ -2011,6 +2020,7 @@ async function saveExpense() {
         const saved = await api(url, {method, body:data});
         toast(isUpdate ? '已更新' : '已保存', 'success');
         $('exp_amount').value = ''; $('exp_desc').value = '';
+        $('exp_time').value = nowTimeStr();
         $('expSaveBtn').textContent = '保存';
         $('expCancelBtn').style.display = 'none';
         STATE._expEditId = null;
@@ -2026,11 +2036,12 @@ function cancelExpense() {
     STATE._expEditId = null;
 }
 
-function editExpense(id, date, amount, category, desc, large) {
+function editExpense(id, date, time, amount, category, desc, large) {
     STATE._expEditId = id;
     $('expenseForm').style.display = 'flex';
     $('exp_date').value = date;
     syncDateUI('exp_date');
+    $('exp_time').value = time || '';
     $('exp_amount').value = amount;
     $('exp_category').value = category;
     syncSelUI('exp_category');
@@ -2064,7 +2075,7 @@ async function loadIncomes() {
         } else {
         tbody.innerHTML = data.map((r, i) => `
             <tr>
-                <td>${(r.date || '').slice(5)}</td>
+                <td>${(r.date || '').slice(5)}${r.time ? '<div class="cell-time">' + esc(r.time) + '</div>' : ''}</td>
                 <td>${Number(r.large) === 1 ? '<span style="color:var(--accent);font-weight:600">大额</span> ' : ''}${esc(r.category)}</td>
                 <td class="amount-plus">+${Number(r.amount || 0).toFixed(2)}</td>
                 <td>${esc(r.note)}</td>
@@ -2082,12 +2093,13 @@ async function loadIncomes() {
 
 function editIncomeByIdx(idx) {
     const r = _incData[idx];
-    editIncome(r.id, r.date, r.amount, r.category, r.note || '', r.large);
+    editIncome(r.id, r.date, r.time || '', r.amount, r.category, r.note || '', r.large);
 }
 
 async function saveIncome() {
     const data = {
         date: $('inc_date').value || todayStr(),
+        time: $('inc_time').value || '',
         amount: parseFloat($('inc_amount').value) || 0,
         category: $('inc_category').value,
         note: $('inc_note').value,
@@ -2101,6 +2113,7 @@ async function saveIncome() {
         const saved = await api(url, {method, body:data});
         toast(isUpdate ? '已更新' : '已保存', 'success');
         $('inc_amount').value = ''; $('inc_note').value = '';
+        $('inc_time').value = nowTimeStr();
         $('incSaveBtn').textContent = '保存';
         $('incCancelBtn').style.display = 'none';
         $('incLargeWrap').style.display = 'none';
@@ -2119,11 +2132,12 @@ function cancelIncome() {
     STATE._incEditId = null;
 }
 
-function editIncome(id, date, amount, category, note, large) {
+function editIncome(id, date, time, amount, category, note, large) {
     STATE._incEditId = id;
     $('incomeForm').style.display = 'flex';
     $('inc_date').value = date;
     syncDateUI('inc_date');
+    $('inc_time').value = time || '';
     $('inc_amount').value = amount;
     $('inc_category').value = category;
     syncSelUI('inc_category');
@@ -3255,6 +3269,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const today = todayStr();
     ['exp_date','inc_date','fin_date','elec_date','recordDate'].forEach(id => {
         const el = $(id); if (el) el.value = today;
+    });
+    ['exp_time','inc_time'].forEach(id => {
+        const el = $(id); if (el) el.value = nowTimeStr();
     });
     syncDateUI('exp_date'); syncDateUI('inc_date');
     $('statsMonth').value = today.slice(0,7);
