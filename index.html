@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.9</title>
+<title>日知录记账 v1.7.10</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -1023,7 +1023,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
         <button class="sidebar-item" style="width:100%;background:none;border:none;font-family:inherit;text-align:left;justify-content:flex-start" onclick="manualRefresh(); closeMore();">⟳ 刷新数据</button>
-        <div class="more-drawer-ver" id="appVersionM">v1.7.9</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.10</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -1039,7 +1039,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>刷新</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.7.9</div>
+        <div class="sidebar-ver" id="appVersion">v1.7.10</div>
     </div>
 </aside>
 
@@ -1050,7 +1050,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- 页面顶部标题栏（桌面端显示版本号） -->
 <div class="page-title">
     <span class="page-title-name">日知录记账</span>
-    <span class="page-title-ver" id="pageTitleVer">v1.7.9</span>
+    <span class="page-title-ver" id="pageTitleVer">v1.7.10</span>
 </div>
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
@@ -1388,6 +1388,16 @@ function pad2(v) { return String(v).padStart(2, '0'); }
 function todayStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()); }
 function thisMonthStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1); }
 function nowTimeStr() { const d = new Date(); return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+// 按 日期+时间 倒序排列：新的在前；同日内时间新的在前（无 time 的旧记录排在同日末尾）
+function sortByDateDesc(arr) {
+    return arr.slice().sort((a, b) => {
+        const da = a.date || '', db2 = b.date || '';
+        if (da !== db2) return da > db2 ? -1 : 1;
+        const ta = a.time || '', tb = b.time || '';
+        if (ta !== tb) return ta > tb ? -1 : 1;
+        return 0;
+    });
+}
 function nowStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds()); }
 function toast(msg, type) {
     type = type || '';
@@ -1968,6 +1978,7 @@ function drawOverviewChart(canvasId, labels, series, unit) {
 let _expData = [];
 async function loadExpenses() {
     const render = (data) => {
+        data = sortByDateDesc(data);   // 日期+时间倒序，保证同日内时间新的在前
         _expData = data;
         const total = data.reduce((s, r) => s + Number(r.amount || 0), 0);
         $('expenseTotal').textContent = '共 ' + data.length + ' 条，合计 ¥' + total.toFixed(2);
@@ -2061,6 +2072,7 @@ async function deleteExpense(id) {
 let _incData = [];
 async function loadIncomes() {
     const render = (data) => {
+        data = sortByDateDesc(data);   // 日期+时间倒序，保证同日内时间新的在前
         _incData = data;
         const total = data.reduce((s, r) => s + Number(r.amount || 0), 0);
         $('incomeTotal').textContent = '共 ' + data.length + ' 条，合计 ¥' + total.toFixed(2);

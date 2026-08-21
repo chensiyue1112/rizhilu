@@ -181,9 +181,10 @@ def _list(table):
     """GET 列表"""
     db = get_db()
     order = "DESC"
-    # 财务快照按日期倒序看最新的
+    # 收支表按 日期+时间 倒序（同日内时间新的在前）；其余表无 time 列
+    time_clause = ", time DESC" if table in ("income", "expense") else ""
     rows = db.execute(
-        f"SELECT * FROM {table} ORDER BY date {order}, id {order}"
+        f"SELECT * FROM {table} ORDER BY date {order}{time_clause}, id {order}"
     ).fetchall()
     return jsonify([dict(r) for r in rows])
 

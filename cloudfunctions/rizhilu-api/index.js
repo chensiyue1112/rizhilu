@@ -43,7 +43,10 @@ async function getAll(table) {
     const col = db.collection(table);
     let all = [], skip = 0, batch = 100;
     for (;;) {
-        const res = await col.orderBy('date', 'desc').skip(skip).limit(batch).get();
+        // 日期倒序；同日期内按时间倒序（新的在前），收支表才有 time 字段
+        let q = col.orderBy('date', 'desc');
+        if (table === 'income' || table === 'expense') q = q.orderBy('time', 'desc');
+        const res = await q.skip(skip).limit(batch).get();
         const docs = res.data || [];
         all = all.concat(docs.map(d => ({ ...d, id: d._id })));
         if (docs.length < batch) break;
