@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.12</title>
+<title>日知录记账 v1.7.13</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -427,13 +427,6 @@ tbody tr:hover td { background: var(--bg-hover); }
     letter-spacing: 0.1px; line-height: 1.9;
 }
 #elecSummary strong { color: var(--text-primary); }
-.elec-hint {
-    margin-top: 14px; padding: 9px 12px;
-    background: var(--bg-hover); border-radius: var(--radius);
-    font-size: 12px; line-height: 1.75; color: var(--text-secondary);
-}
-.elec-hint strong { color: var(--accent); }
-.elec-sub { color: var(--text-muted); font-size: 12px; }
 
 /* === Toast === */
 .toast {
@@ -1031,7 +1024,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
         <button class="sidebar-item" style="width:100%;background:none;border:none;font-family:inherit;text-align:left;justify-content:flex-start" onclick="manualRefresh(); closeMore();">⟳ 刷新数据</button>
-        <div class="more-drawer-ver" id="appVersionM">v1.7.12</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.13</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -1047,7 +1040,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>刷新</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.7.12</div>
+        <div class="sidebar-ver" id="appVersion">v1.7.13</div>
     </div>
 </aside>
 
@@ -1058,7 +1051,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- 页面顶部标题栏（桌面端显示版本号） -->
 <div class="page-title">
     <span class="page-title-name">日知录记账</span>
-    <span class="page-title-ver" id="pageTitleVer">v1.7.12</span>
+    <span class="page-title-ver" id="pageTitleVer">v1.7.13</span>
 </div>
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
@@ -1258,15 +1251,11 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <div class="form-group"><label>电表读数</label><input type="number" id="elec_reading" step="0.1" style="width:120px" placeholder="0.0"></div>
             <div class="form-group align-btn"><label>&nbsp;</label><button class="btn btn-save" onclick="saveElectricity()">保存</button></div>
         </div>
-        <div class="elec-hint">
-            📅 统计周期：每月 <strong>16 日</strong>起算 → 次月 <strong>15 日</strong>止（15 日晚交租）<br>
-            🔁 电表 4 位：跑满 9999 回零后自动按 <strong>+10000</strong> 累计，直接输入表盘上看到的数字即可
-        </div>
     </div>
     <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
             <button class="btn btn-cancel btn-sm" onclick="elecPrevCycle()">◀ 上个周期</button>
-            <h3 style="margin:0;padding:0;border:none" id="elecMonthLabel">📋 用电记录</h3>
+            <h3 style="margin:0;padding:0;border:none" id="elecMonthLabel"></h3>
             <button class="btn btn-cancel btn-sm" onclick="elecNextCycle()">下个周期 ▶</button>
         </div>
         <div id="elecSummary"></div>
@@ -2465,12 +2454,11 @@ function elecShiftCycle(delta) {
 
 function elecPrevCycle() { elecShiftCycle(-1); }
 function elecNextCycle() { elecShiftCycle(1); }
-function elecIsCurrentCycle() { return ELEC_CYCLE.current === elecCycleKeyOf(todayStr()); }
 
 async function loadElectricities() {
     const range = elecCycleRange(ELEC_CYCLE.current);
     const render = (data) => {
-        $('elecMonthLabel').textContent = '📋 用电周期 ' + range.title + (elecIsCurrentCycle() ? '（进行中）' : '');
+        $('elecMonthLabel').textContent = range.title;
         const all = elecUnwrap(data);
         // 周期内记录：首条记录若存在更早的抄表，其耗电算在本周期（上周期末 → 本周期首次抄表）
         const rows = all.filter(r => r.date >= range.start && r.date <= range.end);
@@ -2500,9 +2488,7 @@ async function loadElectricities() {
         // （即 15 日晚交租那次抄表 → 次月 15 日晚交租那次抄表，就是这一期要交的电费）
         const diffs = rows.filter(r => r.diff !== null && r.diff !== undefined);
         const totalUsage = diffs.reduce((s, r) => s + r.diff, 0);
-        const fromReading = diffs.length ? diffs[0].reading - diffs[0].diff : null;
         const fromDate = diffs.length ? diffs[0].prevDate : '';
-        const toReading = rows.length ? rows[rows.length - 1].reading : null;
         const toDate = rows.length ? rows[rows.length - 1].date : '';
         // 日均按真实经过天数算（缺记录的日子也算进去，电费不会被算高）
         const spanDays = (fromDate && toDate) ? Math.max(1, Math.round((new Date(toDate) - new Date(fromDate)) / 86400000)) : 0;
@@ -2512,10 +2498,7 @@ async function loadElectricities() {
         const avgCostTxt = spanDays ? (totalUsage / spanDays * ELEC_RATE).toFixed(2) : '—';
         $('elecSummary').innerHTML =
             '周期总用电: <strong>' + totalTxt + ' 度</strong> ｜ 周期电费: <strong>' + costTxt + ' 元</strong>（' + ELEC_RATE + ' 元/度）<br>' +
-            '日均: <strong>' + avgTxt + ' 度</strong> ｜ 日均电费: <strong>' + avgCostTxt + ' 元</strong> ｜ 周期内记录: <strong>' + rows.length + '</strong> 天' +
-            (fromReading !== null
-                ? '<br><span class="elec-sub">累计读数 ' + fromReading.toFixed(1) + ' 度（' + fromDate + '）→ ' + toReading.toFixed(1) + ' 度（' + toDate + '），共 ' + spanDays + ' 天</span>'
-                : '');
+            '日均: <strong>' + avgTxt + ' 度</strong> ｜ 日均电费: <strong>' + avgCostTxt + ' 元</strong> ｜ 周期内记录: <strong>' + rows.length + '</strong> 天';
     };
     try {
         await smartLoad('electricity', () => api('/api/electricity'), render);
