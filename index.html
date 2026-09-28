@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.10</title>
+<title>日知录记账 v1.7.11</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -424,8 +424,22 @@ tbody tr:hover td { background: var(--bg-hover); }
     background: var(--bg-hover);
     padding: 10px 14px; border-radius: var(--radius);
     margin-bottom: 10px; font-size: 13px; color: var(--text-secondary);
-    letter-spacing: 0.1px;
+    letter-spacing: 0.1px; line-height: 1.9;
 }
+#elecSummary strong { color: var(--text-primary); }
+.elec-hint {
+    margin-top: 14px; padding: 9px 12px;
+    background: var(--bg-hover); border-radius: var(--radius);
+    font-size: 12px; line-height: 1.75; color: var(--text-secondary);
+}
+.elec-hint strong { color: var(--accent); }
+.elec-wrap-tag {
+    display: inline-block; margin-left: 6px; padding: 0 5px;
+    border-radius: 4px; font-size: 10px; line-height: 16px;
+    background: var(--accent-light); color: var(--accent);
+    vertical-align: middle; white-space: nowrap;
+}
+.elec-sub { color: var(--text-muted); font-size: 12px; }
 
 /* === Toast === */
 .toast {
@@ -1023,7 +1037,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
         <button class="sidebar-item" style="width:100%;background:none;border:none;font-family:inherit;text-align:left;justify-content:flex-start" onclick="manualRefresh(); closeMore();">⟳ 刷新数据</button>
-        <div class="more-drawer-ver" id="appVersionM">v1.7.10</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.11</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -1039,7 +1053,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>刷新</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.7.10</div>
+        <div class="sidebar-ver" id="appVersion">v1.7.11</div>
     </div>
 </aside>
 
@@ -1050,7 +1064,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- 页面顶部标题栏（桌面端显示版本号） -->
 <div class="page-title">
     <span class="page-title-name">日知录记账</span>
-    <span class="page-title-ver" id="pageTitleVer">v1.7.10</span>
+    <span class="page-title-ver" id="pageTitleVer">v1.7.11</span>
 </div>
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
@@ -1250,15 +1264,19 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <div class="form-group"><label>电表读数</label><input type="number" id="elec_reading" step="0.1" style="width:120px" placeholder="0.0"></div>
             <div class="form-group align-btn"><label>&nbsp;</label><button class="btn btn-save" onclick="saveElectricity()">保存</button></div>
         </div>
+        <div class="elec-hint">
+            📅 统计周期：每月 <strong>16 日</strong>起算 → 次月 <strong>15 日</strong>止（15 日晚交租）<br>
+            🔁 电表 4 位：跑满 9999 回零后自动按 <strong>+10000</strong> 累计，直接输入表盘上看到的数字即可
+        </div>
     </div>
     <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-            <button class="btn btn-cancel btn-sm" onclick="elecPrevMonth()">◀ 上月</button>
+            <button class="btn btn-cancel btn-sm" onclick="elecPrevCycle()">◀ 上个周期</button>
             <h3 style="margin:0;padding:0;border:none" id="elecMonthLabel">📋 用电记录</h3>
-            <button class="btn btn-cancel btn-sm" onclick="elecNextMonth()">下月 ▶</button>
+            <button class="btn btn-cancel btn-sm" onclick="elecNextCycle()">下个周期 ▶</button>
         </div>
-        <div id="elecSummary" style="margin-bottom:12px;font-size:13px;color:var(--muted)"></div>
-        <div class="table-wrap"><table id="elecTable"><thead><tr><th>日期</th><th>读数</th><th>日耗电</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+        <div id="elecSummary"></div>
+        <div class="table-wrap"><table id="elecTable"><thead><tr><th>日期</th><th>表盘读数</th><th>累计读数</th><th>当日耗电</th><th>操作</th></tr></thead><tbody></tbody></table></div>
     </div>
 </section>
 
@@ -2393,59 +2411,117 @@ async function deleteFinance(id) {
 }
 
 // ═══════════════ 用电 CRUD ═══════════════
-const ELEC_MONTH = { current: thisMonthStr() };  // '2026-07'
+// 统计周期：每月 16 日起算 → 次月 15 日止（每月 15 日晚交租，故不以 1 号分月）
+// 电表只有 4 位：跑满 9999 后回零重新计数，回零后的读数按 +10000 累计
+const ELEC_CYCLE_START_DAY = 16;        // 周期起始日
+const ELEC_METER_MOD = 10000;           // 4 位表满量程
+const ELEC_ROLLOVER_MIN_DROP = 5000;    // 读数骤降超过此值才判定"跑满一圈回零"（防输错数字误判）
+const ELEC_RATE = 1.2;                  // 电价 元/度
 
-function elecPrevMonth() {
-    let [y, m] = ELEC_MONTH.current.split('-').map(Number);
-    m--;
-    if (m < 1) { m = 12; y--; }
-    ELEC_MONTH.current = y + '-' + String(m).padStart(2, '0');
+function dateStrOf(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+
+// 某天属于哪个用电周期：返回周期起始月份 'YYYY-MM'（2026-09-15 → '2026-08'，2026-09-16 → '2026-09'）
+function elecCycleKeyOf(dateStr) {
+    const p = String(dateStr || todayStr()).split('-').map(Number);
+    let y = p[0], m = p[1];
+    if (!(p[2] >= ELEC_CYCLE_START_DAY)) { m--; if (m < 1) { m = 12; y--; } }
+    return y + '-' + pad2(m);
+}
+
+// 周期键 → 起止日期（start = 该月 16 日，end = 次月 15 日）
+function elecCycleRange(key) {
+    const [y, m] = key.split('-').map(Number);
+    const start = new Date(y, m - 1, ELEC_CYCLE_START_DAY);
+    const end = new Date(y, m, ELEC_CYCLE_START_DAY - 1);
+    return { start: dateStrOf(start), end: dateStrOf(end), title: dateStrOf(start) + ' ~ ' + dateStrOf(end) };
+}
+
+// 全部记录按日期升序换算成"连续不回零"的累计读数
+// 表盘值 raw（0~9999.9）+ 回零圈数×10000 = reading；diff 为相邻两次抄表的耗电
+function elecUnwrap(rows) {
+    const sorted = rows.slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    let wraps = 0, prevRaw = null, prevReading = null, prevDate = '';
+    return sorted.map(r => {
+        // 输入值统一折算成 4 位表盘显示值：填"表盘数字"或填"已加过 10000 的数"结果一致
+        // 保留 1 位小数（与录入精度一致），避免取模后的浮点尾数
+        const raw = Math.round((((Number(r.reading) || 0) % ELEC_METER_MOD + ELEC_METER_MOD) % ELEC_METER_MOD) * 10) / 10;
+        let justWrapped = false;
+        if (prevRaw !== null && raw < prevRaw && (prevRaw - raw) > ELEC_ROLLOVER_MIN_DROP) { wraps++; justWrapped = true; }
+        const reading = raw + wraps * ELEC_METER_MOD;
+        const out = {
+            ...r, raw: raw, wraps: wraps, reading: reading, justWrapped: justWrapped,
+            diff: prevReading === null ? null : reading - prevReading,
+            prevDate: prevDate,
+        };
+        prevRaw = raw; prevReading = reading; prevDate = r.date;
+        return out;
+    });
+}
+
+const ELEC_CYCLE = { current: elecCycleKeyOf(todayStr()) };   // 当前查看的周期
+
+function elecShiftCycle(delta) {
+    let [y, m] = ELEC_CYCLE.current.split('-').map(Number);
+    m += delta;
+    while (m < 1) { m += 12; y--; }
+    while (m > 12) { m -= 12; y++; }
+    ELEC_CYCLE.current = y + '-' + pad2(m);
     loadElectricities();
 }
 
-function elecNextMonth() {
-    let [y, m] = ELEC_MONTH.current.split('-').map(Number);
-    m++;
-    if (m > 12) { m = 1; y++; }
-    ELEC_MONTH.current = y + '-' + String(m).padStart(2, '0');
-    loadElectricities();
-}
+function elecPrevCycle() { elecShiftCycle(-1); }
+function elecNextCycle() { elecShiftCycle(1); }
+function elecIsCurrentCycle() { return ELEC_CYCLE.current === elecCycleKeyOf(todayStr()); }
 
 async function loadElectricities() {
-    const month = ELEC_MONTH.current;
+    const range = elecCycleRange(ELEC_CYCLE.current);
     const render = (data) => {
-        $('elecMonthLabel').textContent = '📋 用电记录 — ' + month;
-        const filtered = data.filter(r => r.date.startsWith(month));
-        filtered.sort((a, b) => a.date.localeCompare(b.date));
+        $('elecMonthLabel').textContent = '📋 用电周期 ' + range.title + (elecIsCurrentCycle() ? '（进行中）' : '');
+        const all = elecUnwrap(data);
+        // 周期内记录：首条记录若存在更早的抄表，其耗电算在本周期（上周期末 → 本周期首次抄表）
+        const rows = all.filter(r => r.date >= range.start && r.date <= range.end);
         const tbody = document.querySelector('#elecTable tbody');
-        let totalUsage = 0;
-        let usageDays = 0;
-        tbody.innerHTML = filtered.map((r, i) => {
-            let diff = '';
-            if (i > 0) {
-                const d = (r.reading - filtered[i-1].reading);
-                diff = d.toFixed(1);
-                totalUsage += d;
-                usageDays++;
-            }
+
+        tbody.innerHTML = rows.map(r => {
+            const wrapTag = r.justWrapped ? '<span class="elec-wrap-tag">回零 +' + ELEC_METER_MOD + '</span>' : '';
+            const hasDiff = r.diff !== null && r.diff !== undefined;
+            const prevReading = hasDiff ? r.reading - r.diff : null;
+            const title = hasDiff ? '上次抄表 ' + esc(r.prevDate) + '：' + prevReading.toFixed(1) + ' 度' : '';
             return `
             <tr>
                 <td>${esc(r.date)}</td>
-                <td>${Number(r.reading || 0).toFixed(1)}</td>
-                <td>${diff ? diff + ' 度' : '—'}</td>
+                <td>${r.raw.toFixed(1)}</td>
+                <td title="${title}">${r.reading.toFixed(1)}${wrapTag}</td>
+                <td>${hasDiff ? r.diff.toFixed(1) + ' 度' : '—'}</td>
                 <td>
                     <button class="btn btn-danger btn-sm" onclick="deleteElectricity('${r.id}')">删除</button>
                 </td>
             </tr>`;
         }).join('');
-        if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px">📭 该月还没有用电记录</td></tr>';
+        if (rows.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px">📭 该周期（' + range.title + '）还没有用电记录</td></tr>';
         }
-        const avg = usageDays > 0 ? (totalUsage / usageDays).toFixed(1) : '—';
-        const total = totalUsage > 0 ? totalUsage.toFixed(1) : '—';
-        const dailyCost = usageDays > 0 ? (totalUsage / usageDays * 1.2).toFixed(2) : '—';
-        const totalCost = totalUsage > 0 ? (totalUsage * 1.2).toFixed(2) : '—';
-        $('elecSummary').innerHTML = '月总用电: <strong>' + total + ' 度</strong> | 月电费: <strong>' + totalCost + ' 元</strong> | 日均: <strong>' + avg + ' 度</strong> | 日均电费: <strong>' + dailyCost + ' 元</strong> | 记录天数: ' + filtered.length;
+
+        // 周期总用电 = 周期内各次抄表耗电之和 = 上周期末次抄表 → 本周期末次抄表
+        // （即 15 日晚交租那次抄表 → 次月 15 日晚交租那次抄表，就是这一期要交的电费）
+        const diffs = rows.filter(r => r.diff !== null && r.diff !== undefined);
+        const totalUsage = diffs.reduce((s, r) => s + r.diff, 0);
+        const fromReading = diffs.length ? diffs[0].reading - diffs[0].diff : null;
+        const fromDate = diffs.length ? diffs[0].prevDate : '';
+        const toReading = rows.length ? rows[rows.length - 1].reading : null;
+        const toDate = rows.length ? rows[rows.length - 1].date : '';
+        // 日均按真实经过天数算（缺记录的日子也算进去，电费不会被算高）
+        const spanDays = (fromDate && toDate) ? Math.max(1, Math.round((new Date(toDate) - new Date(fromDate)) / 86400000)) : 0;
+        const totalTxt = diffs.length ? totalUsage.toFixed(1) : '—';
+        const costTxt = diffs.length ? (totalUsage * ELEC_RATE).toFixed(2) : '—';
+        const avgTxt = spanDays ? (totalUsage / spanDays).toFixed(1) : '—';
+        const avgCostTxt = spanDays ? (totalUsage / spanDays * ELEC_RATE).toFixed(2) : '—';
+        $('elecSummary').innerHTML =
+            '周期总用电: <strong>' + totalTxt + ' 度</strong> ｜ 周期电费: <strong>' + costTxt + ' 元</strong>（' + ELEC_RATE + ' 元/度）<br>' +
+            '日均: <strong>' + avgTxt + ' 度</strong> ｜ 日均电费: <strong>' + avgCostTxt + ' 元</strong> ｜ 周期内记录: <strong>' + rows.length + '</strong> 天' +
+            (fromReading !== null
+                ? '<br><span class="elec-sub">累计读数 ' + fromReading.toFixed(1) + ' 度（' + fromDate + '）→ ' + toReading.toFixed(1) + ' 度（' + toDate + '），共 ' + spanDays + ' 天</span>'
+                : '');
     };
     try {
         await smartLoad('electricity', () => api('/api/electricity'), render);
@@ -2453,17 +2529,19 @@ async function loadElectricities() {
 }
 
 async function saveElectricity() {
-    const data = {
-        date: $('elec_date').value || todayStr(),
-        reading: parseFloat($('elec_reading').value) || 0,
-    };
-    if (!data.reading) { toast('请输入读数', 'error'); return; }
+    const dateStr = $('elec_date').value || todayStr();
+    const reading = parseFloat($('elec_reading').value);
+    if (isNaN(reading)) { toast('请输入电表读数', 'error'); return; }   // 回零当天可能是 0，0 也要能存
+    const data = { date: dateStr, reading: reading };
     try {
         const saved = await api('/api/electricity', {method:'POST', body:data});
-        toast('已保存', 'success');
+        toast('已保存到周期 ' + elecCycleRange(elecCycleKeyOf(dateStr)).title, 'success');
         $('elec_reading').value = '';
         if (saved && saved._id) delete saved._id;
-        updateTableCache('electricity', saved, saved && saved.id, false); invalidateDerived(); loadElectricities();
+        updateTableCache('electricity', saved, saved && saved.id, false);
+        invalidateDerived();
+        ELEC_CYCLE.current = elecCycleKeyOf(dateStr);   // 自动跳到该记录所属周期，方便补录
+        loadElectricities();
     } catch(e) { toast(e.message, 'error'); }
 }
 
