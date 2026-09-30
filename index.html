@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.14</title>
+<title>日知录记账 v1.7.15</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -916,10 +916,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     }
     #expenseTable thead th, #incomeTable thead th { position: sticky; top: 0; z-index: 2; background: #f8fafc; }
 
-    /* ---- 财务：表单一行铺开对齐 ---- */
+    /* ---- 财务：表单一行铺开对齐（日期 + 流动资产/借出款/股票/逆回购 4 项 + 保存） ---- */
     #section-finance .form-row {
         display: grid;
-        grid-template-columns: 150px repeat(5, minmax(0, 1fr)) auto;
+        grid-template-columns: 150px repeat(4, minmax(0, 1fr)) auto;
         gap: 12px; align-items: end;
     }
     #section-finance .form-group input { width: 100% !important; }
@@ -1024,7 +1024,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
         <button class="sidebar-item" style="width:100%;background:none;border:none;font-family:inherit;text-align:left;justify-content:flex-start" onclick="manualRefresh(); closeMore();">⟳ 刷新数据</button>
-        <div class="more-drawer-ver" id="appVersionM">v1.7.14</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.15</div>
     </div>
     <div class="sidebar-footer">
         <button class="sidebar-action" onclick="exportData()">
@@ -1040,7 +1040,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <span>刷新</span>
         </button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="sidebar-ver" id="appVersion">v1.7.14</div>
+        <div class="sidebar-ver" id="appVersion">v1.7.15</div>
     </div>
 </aside>
 
@@ -1051,7 +1051,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- 页面顶部标题栏（桌面端显示版本号） -->
 <div class="page-title">
     <span class="page-title-name">日知录记账</span>
-    <span class="page-title-ver" id="pageTitleVer">v1.7.14</span>
+    <span class="page-title-ver" id="pageTitleVer">v1.7.15</span>
 </div>
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
@@ -1225,10 +1225,9 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <div class="form-row">
             <div class="form-group"><label>日期</label><input type="date" id="fin_date" style="width:140px"></div>
             <div class="form-group"><label>流动资产</label><input type="number" id="fin_liquid" step="0.01" style="width:100px"></div>
-            <div class="form-group"><label>外债</label><input type="number" id="fin_debt" step="0.01" style="width:100px"></div>
+            <div class="form-group"><label>借出款</label><input type="number" id="fin_lend" step="0.01" style="width:100px"></div>
             <div class="form-group"><label>股票</label><input type="number" id="fin_stock" step="0.01" style="width:100px"></div>
-            <div class="form-group"><label>基金</label><input type="number" id="fin_fund" step="0.01" style="width:100px"></div>
-            <div class="form-group"><label>可转债</label><input type="number" id="fin_bond" step="0.01" style="width:100px"></div>
+            <div class="form-group"><label>逆回购</label><input type="number" id="fin_repo" step="0.01" style="width:100px"></div>
             <div class="form-group align-btn"><label>&nbsp;</label><button class="btn btn-save" onclick="saveFinance()">保存</button></div>
         </div>
     </div>
@@ -1238,7 +1237,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     </div>
     <div class="card">
         <h3>📋 财务快照</h3>
-        <div class="table-wrap"><table id="financeTable"><thead><tr><th>日期</th><th>流动资产</th><th>外债</th><th>日常资产</th><th>股票</th><th>基金</th><th>可转债</th><th>投资资产</th><th>总计</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+        <div class="table-wrap"><table id="financeTable"><thead><tr><th>日期</th><th>流动资产</th><th>借出款</th><th>股票</th><th>逆回购</th><th>总资产</th><th>操作</th></tr></thead><tbody></tbody></table></div>
     </div>
 </section>
 
@@ -2204,50 +2203,48 @@ async function savePayday() {
 }
 
 // ═══════════════ 财务快照 CRUD ═══════════════
+// v1.7.15 精简为 4 项 + 总资产，底层存储字段沿用旧名（不改数据结构、老数据无需迁移）：
+//   借出款   → debt            （旧界面叫"外债"，其实是别人欠我的钱，属资产）
+//   股票     → stock + fund    （旧界面的"基金"并入股票）
+//   逆回购   → convertible_bond（旧界面叫"可转债"，其实记的是逆回购）
+//   总资产   → 流动资产 + 借出款 + 股票 + 逆回购
+function finStock(r) { return Number(r.stock || 0) + Number(r.fund || 0); }
+function finTotal(r) {
+    return Number(r.liquid_assets || 0) + Number(r.debt || 0) + finStock(r) + Number(r.convertible_bond || 0);
+}
+function finNum(v) { return Number(v || 0).toFixed(0); }
+
 async function loadFinances() {
     const render = (data) => {
     // Sort by date ascending
     data.sort((a, b) => a.date.localeCompare(b.date));
 
-    // Build series
+    // 趋势图：只画一条总资产线
     const labels = data.map(r => r.date);
-    const dailySeries = data.map(r => Number(r.liquid_assets || 0) + Number(r.debt || 0));
-    const investSeries = data.map(r => Number(r.stock || 0) + Number(r.fund || 0) + Number(r.convertible_bond || 0));
-    const totalSeries = data.map((r, i) => dailySeries[i] + investSeries[i]);
-
-    // Draw chart（记录数据，供屏幕旋转/resize 时重绘，避免拉伸模糊）
     STATE._finLabels = labels;
     STATE._finSeries = [
-        { label: '日常资产', data: dailySeries, color: '#3b82f6' },
-        { label: '投资资产', data: investSeries, color: '#60a5fa' },
-        { label: '总计', data: totalSeries, color: '#1d4ed8', bold: true },
+        { label: '总资产', data: data.map(finTotal), color: '#1d4ed8', bold: true },
     ];
     drawFinanceChart(labels, STATE._finSeries);
 
     // Render table
     const tbody = document.querySelector('#financeTable tbody');
     tbody.innerHTML = data.map(r => {
-        const daily = Number(r.liquid_assets || 0) + Number(r.debt || 0);
-        const invest = Number(r.stock || 0) + Number(r.fund || 0) + Number(r.convertible_bond || 0);
-        const total = daily + invest;
         return `
         <tr>
             <td>${esc(r.date)}</td>
-            <td>${Number(r.liquid_assets || 0).toFixed(0)}</td>
-            <td>${Number(r.debt || 0).toFixed(0)}</td>
-            <td><strong>${daily.toFixed(0)}</strong></td>
-            <td>${Number(r.stock || 0).toFixed(0)}</td>
-            <td>${Number(r.fund || 0).toFixed(0)}</td>
-            <td>${Number(r.convertible_bond || 0).toFixed(0)}</td>
-            <td><strong>${invest.toFixed(0)}</strong></td>
-            <td><strong>${total.toFixed(0)}</strong></td>
+            <td>${finNum(r.liquid_assets)}</td>
+            <td>${finNum(r.debt)}</td>
+            <td>${finNum(finStock(r))}</td>
+            <td>${finNum(r.convertible_bond)}</td>
+            <td><strong>${finNum(finTotal(r))}</strong></td>
             <td>
                 <button class="btn btn-danger btn-sm" onclick="deleteFinance('${r.id}')">删除</button>
             </td>
         </tr>`;
     }).join('');
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:28px">📭 还没有财务快照，先记录一条资产数据吧</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">📭 还没有财务快照，先记录一条资产数据吧</td></tr>';
     }
     };
     try {
@@ -2373,15 +2370,15 @@ async function saveFinance() {
     const data = {
         date: $('fin_date').value || todayStr(),
         liquid_assets: parseFloat($('fin_liquid').value) || 0,
-        debt: parseFloat($('fin_debt').value) || 0,
+        debt: parseFloat($('fin_lend').value) || 0,                  // 存储字段 debt = 界面"借出款"
         stock: parseFloat($('fin_stock').value) || 0,
-        fund: parseFloat($('fin_fund').value) || 0,
-        convertible_bond: parseFloat($('fin_bond').value) || 0,
+        fund: 0,                                                     // 基金已并入股票，存储恒为 0
+        convertible_bond: parseFloat($('fin_repo').value) || 0,       // 存储字段 convertible_bond = 界面"逆回购"
     };
     try {
         const saved = await api('/api/finance_snapshot', {method:'POST', body:data});
         toast('已保存', 'success');
-        ['fin_liquid','fin_debt','fin_stock','fin_fund','fin_bond'].forEach(id => $(id).value = '');
+        ['fin_liquid','fin_lend','fin_stock','fin_repo'].forEach(id => $(id).value = '');
         if (saved && saved._id) delete saved._id;
         updateTableCache('finances', saved, saved && saved.id, false); invalidateDerived(); loadFinances();
     } catch(e) { toast(e.message, 'error'); }
