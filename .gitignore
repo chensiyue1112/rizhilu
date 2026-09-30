@@ -1,15 +1,7 @@
-# Python
-__pycache__/
-*.pyc
-venv/
-*.db
-
-# Node
+# Node（云函数部署依赖）
 node_modules/
 package-lock.json
 
-# 迁移临时文件
-turso_dump.json
-migrate_turso_to_cb.js
-migrate_cb_fix.js
-verify_cb.js
+# 临时文件
+*.log
+*.tmp
