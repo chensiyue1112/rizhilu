@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.19</title>
+<title>日知录记账 v1.8.0</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -436,6 +436,38 @@ tbody tr:hover td { background: var(--bg-hover); }
 .cat-detail-item .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cat-detail-item .a { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text-primary); }
 
+/* === 每日页（心情+天气+描述，v1.8.0） === */
+.day-label { font-size: 11.5px; color: var(--text-secondary); font-weight: 550; margin-bottom: 6px; letter-spacing: 0.1px; }
+#dayNote {
+    width: 100%; padding: 9px 12px; min-height: 68px; resize: vertical;
+    border: 1px solid var(--border-l3); border-radius: var(--radius);
+    background: var(--bg-base); font-size: 13.5px; font-family: inherit;
+    color: var(--text-primary); line-height: 1.6; outline: none;
+}
+#dayNote:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
+.day-hint { font-size: 12px; color: var(--text-muted); }
+.mood-day { position: relative; }
+.mood-day .w-emoji { position: absolute; top: 1px; right: 2px; font-size: 9px; line-height: 1; opacity: 0.9; }
+/* 底部导航红点：今天还没记心情/天气 */
+.sidebar-item.has-dot { position: relative; }
+.sidebar-item.has-dot::after {
+    content: ''; position: absolute; top: 5px; right: 26%;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #ef4444; box-shadow: 0 0 0 2px var(--bg-layer);
+}
+/* 概览顶部「今日」提示条 */
+.today-strip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; margin-bottom: 12px;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius-md); cursor: pointer;
+    font-size: 13px; color: var(--text-secondary);
+}
+.today-strip .ts-emoji { font-size: 17px; line-height: 1; }
+.today-strip .ts-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.today-strip .ts-go { color: var(--accent); font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.today-strip:active { background: var(--bg-hover); }
+
 /* === Toast === */
 .toast {
     position: fixed; top: 16px; right: 16px;
@@ -832,9 +864,9 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
             <span>收入</span>
         </a>
-        <a class="sidebar-item" data-tab="record" onclick="switchTab('record')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            <span>纪录</span>
+        <a class="sidebar-item" data-tab="mood" id="navMood" onclick="switchTab('mood')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            <span>心情</span>
         </a>
         <div class="sidebar-item" id="moreToggle" onclick="toggleMore()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
@@ -849,14 +881,12 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="payday" onclick="switchTab('payday')">发工资</a>
         <a class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">财务</a>
         <a class="sidebar-item" data-tab="electricity" onclick="switchTab('electricity')">用电</a>
-        <a class="sidebar-item" data-tab="mood" onclick="switchTab('mood')">心情</a>
-        <a class="sidebar-item" data-tab="weather" onclick="switchTab('weather')">天气</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
         <button class="sidebar-item drawer-btn" onclick="manualRefresh(); closeMore();">⟳ 刷新数据</button>
         <button class="sidebar-item drawer-btn" onclick="exportData(); closeMore();">⬇ 导出备份</button>
         <button class="sidebar-item drawer-btn" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="more-drawer-ver" id="appVersionM">v1.7.19</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.8.0</div>
     </div>
 </nav>
 
@@ -866,6 +896,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <main>
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
+    <div class="today-strip" id="todayStrip" onclick="switchTab('mood')"></div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
         <button class="btn btn-cancel btn-sm" onclick="ovPrevMonth()">◀ 上月</button>
         <input type="month" id="ovMonth" onchange="ovMonthChange()" style="padding:6px 10px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-layer);font-size:13px;font-family:inherit;outline:none">
@@ -1024,27 +1055,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 </section>
 
 <!-- ═══════════════ 纪录 ═══════════════ -->
-<section id="section-record" class="section">
-    <div class="card">
-        <h3>📌 纪录</h3>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input type="date" id="recordDate" style="padding:7px 11px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
-            <label style="display:flex;align-items:center;gap:4px;font-size:12.5px;color:var(--text-secondary);cursor:pointer;white-space:nowrap">
-                <input type="checkbox" id="recordNoDate" onchange="toggleRecordNoDate()" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
-                不需要日期
-            </label>
-            <input type="text" id="recordContent" placeholder="想记下来的，先放在这里" style="flex:1;min-width:150px;padding:8px 12px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
-            <button class="btn btn-save" onclick="saveRecord()">记下来</button>
-        </div>
-    </div>
-    <div class="card">
-        <h3>⏳ 还没发生 <span style="font-weight:400;font-size:12px;color:var(--muted)" id="recordActiveCount"></span></h3>
-        <div id="recordActiveList"></div>
-        <h3 style="margin-top:22px">🌤 已经过去了 <span style="font-weight:400;font-size:12px;color:var(--muted)" id="recordDoneCount"></span></h3>
-        <div id="recordDoneList"></div>
-    </div>
-</section>
-
 <!-- ═══════════════ 财务 ═══════════════ -->
 <section id="section-finance" class="section">
     <div class="card">
@@ -1089,68 +1099,43 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     </div>
 </section>
 
-<!-- ═══════════════ 心情 ═══════════════ -->
+<!-- ═══════════════ 心情（合并天气 + 每日描述，v1.8.0） ═══════════════ -->
 <section id="section-mood" class="section">
     <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <h3 style="margin:0" id="moodTitleLabel">😊 今日心情</h3>
-            <button class="btn btn-cancel btn-sm" id="moodEditBtn" onclick="editMood()" style="display:none">✎ 编辑</button>
+            <h3 style="margin:0;padding:0;border:none" id="dayTitleLabel">😊 今天</h3>
+            <button class="btn btn-cancel btn-sm" id="dayTodayBtn" onclick="selectDayToday()" style="display:none">回到今天</button>
         </div>
+        <div class="day-label">心情</div>
         <div class="mood-picker" id="moodPicker">
-            <button class="mood-btn" data-rating="1" onclick="pickMood(1)">😞</button>
-            <button class="mood-btn" data-rating="2" onclick="pickMood(2)">🙁</button>
-            <button class="mood-btn" data-rating="3" onclick="pickMood(3)">😐</button>
-            <button class="mood-btn" data-rating="4" onclick="pickMood(4)">🙂</button>
-            <button class="mood-btn" data-rating="5" onclick="pickMood(5)">😄</button>
+            <button class="mood-btn" data-rating="1" onclick="pickDayMood(1)">😞</button>
+            <button class="mood-btn" data-rating="2" onclick="pickDayMood(2)">🙁</button>
+            <button class="mood-btn" data-rating="3" onclick="pickDayMood(3)">😐</button>
+            <button class="mood-btn" data-rating="4" onclick="pickDayMood(4)">🙂</button>
+            <button class="mood-btn" data-rating="5" onclick="pickDayMood(5)">😄</button>
         </div>
-        <div style="margin-top:14px">
-            <input type="text" id="moodNote" placeholder="今天心情如何？写一句话..." style="width:100%;padding:8px 12px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
-        </div>
-        <div id="moodActions" style="display:none;gap:8px;margin-top:12px">
-            <button class="btn btn-save" onclick="saveMood()">保存</button>
-            <button class="btn btn-cancel" onclick="cancelMoodEdit()">取消</button>
-        </div>
-    </div>
-    <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <button class="btn btn-cancel btn-sm" onclick="moodPrevMonth()">◀ 上月</button>
-            <h3 style="margin:0" id="moodMonthLabel">🗓 当月心情</h3>
-            <button class="btn btn-cancel btn-sm" onclick="moodNextMonth()">下月 ▶</button>
-        </div>
-        <div class="mood-calendar" id="moodCalendar"></div>
-        <div class="mood-legend" id="moodLegend"></div>
-    </div>
-</section>
-
-<!-- ═══════════════ 天气 ═══════════════ -->
-<section id="section-weather" class="section">
-    <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <h3 style="margin:0" id="weatherTitleLabel">🌤 今日天气</h3>
-            <button class="btn btn-cancel btn-sm" id="weatherEditBtn" onclick="editWeather()" style="display:none">✎ 编辑</button>
-        </div>
+        <div class="day-label" style="margin-top:14px">天气</div>
         <div class="weather-picker" id="weatherPicker">
-            <button class="weather-btn" data-key="sunny" onclick="pickWeather('sunny')">☀️<br><span>晴天</span></button>
-            <button class="weather-btn" data-key="cloudy" onclick="pickWeather('cloudy')">⛅<br><span>多云</span></button>
-            <button class="weather-btn" data-key="overcast" onclick="pickWeather('overcast')">☁️<br><span>阴天</span></button>
-            <button class="weather-btn" data-key="rain" onclick="pickWeather('rain')">🌧️<br><span>雨天</span></button>
+            <button class="weather-btn" data-key="sunny" onclick="pickDayWeather('sunny')">☀️<br><span>晴天</span></button>
+            <button class="weather-btn" data-key="cloudy" onclick="pickDayWeather('cloudy')">⛅<br><span>多云</span></button>
+            <button class="weather-btn" data-key="overcast" onclick="pickDayWeather('overcast')">☁️<br><span>阴天</span></button>
+            <button class="weather-btn" data-key="rain" onclick="pickDayWeather('rain')">🌧️<br><span>雨天</span></button>
         </div>
-        <div style="margin-top:14px">
-            <input type="text" id="weatherNote" placeholder="今天天气怎样？写一句话..." style="width:100%;padding:8px 12px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-base);font-size:13.5px;font-family:inherit;outline:none">
-        </div>
-        <div id="weatherActions" style="display:none;gap:8px;margin-top:12px">
-            <button class="btn btn-save" onclick="saveWeather()">保存</button>
-            <button class="btn btn-cancel" onclick="cancelWeatherEdit()">取消</button>
+        <div class="day-label" style="margin-top:14px">描述</div>
+        <textarea id="dayNote" rows="3" placeholder="今天做了什么、感觉怎么样…（可留空）"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+            <button class="btn btn-save" onclick="saveDayNote()">保存描述</button>
+            <span class="day-hint" id="dayState"></span>
         </div>
     </div>
     <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <button class="btn btn-cancel btn-sm" onclick="weatherPrevMonth()">◀ 上月</button>
-            <h3 style="margin:0" id="weatherMonthLabel">🗓 当月天气</h3>
-            <button class="btn btn-cancel btn-sm" onclick="weatherNextMonth()">下月 ▶</button>
+            <button class="btn btn-cancel btn-sm" onclick="dayPrevMonth()">◀</button>
+            <h3 style="margin:0;padding:0;border:none" id="dayMonthLabel"></h3>
+            <button class="btn btn-cancel btn-sm" onclick="dayNextMonth()">▶</button>
         </div>
-        <div class="mood-calendar" id="weatherCalendar"></div>
-        <div class="mood-legend" id="weatherLegend"></div>
+        <div class="mood-calendar" id="dayCalendar"></div>
+        <div class="mood-legend" id="dayLegend"></div>
     </div>
 </section>
 
@@ -1331,7 +1316,6 @@ function preloadMoreTabs() {
         ['finances', () => api('/api/finance_snapshot')],
         ['moods',    () => api('/api/mood')],
         ['weather',  () => api('/api/weather')],
-        ['records',  () => api('/api/record')],
         ['stats_' + thisMonthStr(), () => fetchStatsData(thisMonthStr())],
     ];
     // 串行预加载：避免手机端 5 个并发请求互相抢连接导致整批失败；
@@ -1513,7 +1497,6 @@ function switchTab(name) {
         // 手机点开支出页自动聚焦金额框，直接弹键盘输入
         setTimeout(() => { const el = $('exp_amount'); if (el) el.focus(); }, 350);
     }
-    if (name === 'record') loadRecords();
     if (name === 'income') {
         loadIncomes();
         // 手机点开收入页自动聚焦金额框，直接弹键盘输入
@@ -1521,8 +1504,7 @@ function switchTab(name) {
     }
     if (name === 'finance') loadFinances();
     if (name === 'electricity') loadElectricities();
-    if (name === 'mood') loadMoods();
-    if (name === 'weather') loadWeathers();
+    if (name === 'mood') loadDay();
     if (name === 'stats') loadStats();
     if (name === 'payday') initPayday();
 }
@@ -1560,6 +1542,8 @@ function ovMonthChange() { const v = $('ovMonth').value; if (v) setViewMonth(v);
 async function loadOverview() {
     const month = VIEW_MONTH.current;
     $('ovMonth').value = month;
+    ensureDayData();          // 顺带刷新"今日"提示条和导航红点（有缓存时不会重复请求）
+    renderTodayStrip();
     const render = (d) => {
         const { data, incomes, expenses } = d;
         $('overviewCards').innerHTML = `
@@ -2781,432 +2765,194 @@ function drawTrendChart(canvasId, labels, incData, expData) {
 }
 
 
-// ═══════════════ 心情 CRUD ═══════════════
+// ═══════════════ 每日：心情 + 天气 + 描述（v1.8.0 合并三页） ═══════════════
+// 原来「心情」「天气」是两个页面、还都折在"更多"抽屉里，导致经常忘记填；
+// 「纪录」几乎没在用。现在合并成底部导航上的一个「心情」页：心情 + 天气 + 多行描述。
 const MOOD_EMOJI = {1:'😞', 2:'🙁', 3:'😐', 4:'🙂', 5:'😄'};
 const MOOD_COLORS = {1:'#e05d5d', 2:'#f0a35e', 3:'#e6d35c', 4:'#8bc34a', 5:'#2e9e44'};
-const MOOD_MONTH = { current: thisMonthStr() };
-
-// 心情编辑状态：false = 只读显示；true = 编辑中
-let MOOD_EDITING = false;
-let MOOD_TEMP_RATING = null;
-// 当前选中的日期（默认今天，可通过月历点击切换）
-let MOOD_SELECT_DATE = todayStr();
-let MOOD_SELECTED = false;   // 是否手动点击过日期（初始不显示选中框）
-
-function getSelMood() {
-    return (apiCache.moods || []).find(r => r.date === MOOD_SELECT_DATE) || null;
-}
-
-async function loadMoods() {
-    const render = (data) => {
-        renderMoodToday();
-        renderMoodCalendar(data);
-    };
-    try {
-        await smartLoad('moods', () => api('/api/mood'), render);
-    } catch(e) { if (!apiCache.moods) toast('心情数据加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error'); }
-}
-
-// 渲染"今日心情"区（根据编辑状态切换只读/可编辑）
-function renderMoodToday() {
-    const todayMood = getSelMood();
-    const hasMood = !!todayMood;
-    $('moodTitleLabel').textContent = MOOD_SELECT_DATE === todayStr()
-        ? '😊 今日心情'
-        : '😊 ' + MOOD_SELECT_DATE.slice(5) + ' 心情';
-    document.querySelectorAll('.mood-btn').forEach(b => {
-        const r = parseInt(b.dataset.rating);
-        const isSel = MOOD_EDITING ? (r === MOOD_TEMP_RATING) : (hasMood && r === todayMood.rating);
-        b.classList.toggle('active', isSel);
-        b.classList.toggle('locked', hasMood && !MOOD_EDITING);
-    });
-    $('moodNote').value = hasMood ? (todayMood.note || '') : '';
-    $('moodNote').readOnly = hasMood && !MOOD_EDITING;
-    $('moodEditBtn').style.display = hasMood && !MOOD_EDITING ? '' : 'none';
-    $('moodActions').style.display = MOOD_EDITING ? 'flex' : 'none';
-}
-
-// 点击表情：未设置→直接保存；已设置→需先点编辑
-function pickMood(rating) {
-    const hasMood = !!getSelMood();
-    if (!MOOD_EDITING) {
-        if (hasMood) { toast('请先点击「编辑」再修改', 'error'); return; }
-        // 当天还没记录：点选即保存
-        return saveMoodNow(rating);
-    }
-    MOOD_TEMP_RATING = rating;
-    document.querySelectorAll('.mood-btn').forEach(b =>
-        b.classList.toggle('active', parseInt(b.dataset.rating) === rating));
-}
-
-function editMood() {
-    MOOD_EDITING = true;
-    MOOD_TEMP_RATING = getSelMood() ? getSelMood().rating : null;
-    renderMoodToday();
-    $('moodNote').focus();
-}
-
-function cancelMoodEdit() {
-    MOOD_EDITING = false;
-    MOOD_TEMP_RATING = null;
-    renderMoodToday();
-}
-
-// 保存按钮（编辑态）：提交暂存的选择
-async function saveMood() {
-    const date = MOOD_SELECT_DATE;
-    const existing = getSelMood();
-    const rating = MOOD_TEMP_RATING !== null ? MOOD_TEMP_RATING : (existing ? existing.rating : 3);
-    try {
-        if (existing) {
-            await api('/api/mood/' + existing.id, {method:'PUT', body:{rating, note: $('moodNote').value}});
-        } else {
-            await api('/api/mood', {method:'POST', body:{date, rating, note: $('moodNote').value}});
-        }
-        invalidateKey('moods');
-        toast(MOOD_EMOJI[rating] + ' 已保存', 'success');
-        MOOD_EDITING = false;
-        MOOD_TEMP_RATING = null;
-        loadMoods();
-    } catch(e) { toast(e.message, 'error'); }
-}
-
-// 未设置时点表情直接保存
-async function saveMoodNow(rating) {
-    const date = MOOD_SELECT_DATE;
-    try {
-        await api('/api/mood', {method:'POST', body:{date, rating, note: $('moodNote').value}});
-        invalidateKey('moods');
-        toast(MOOD_EMOJI[rating] + ' 已记录', 'success');
-        loadMoods();
-    } catch(e) { toast(e.message, 'error'); }
-}
-
-function renderMoodCalendar(data) {
-    const month = MOOD_MONTH.current;
-    const [y, m] = month.split('-').map(Number);
-    const daysInMonth = new Date(y, m, 0).getDate();
-    const startOffset = new Date(y, m-1, 1).getDay();
-    const today = todayStr();
-    const byDate = {};
-    data.forEach(r => { if (r.date.startsWith(month)) byDate[r.date] = r; });
-    $('moodMonthLabel').textContent = '🗓 当月心情 — ' + month;
-    let html = '';
-    for (let i = 0; i < startOffset; i++) html += '<div class="mood-day empty"></div>';
-    for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = month + '-' + String(d).padStart(2,'0');
-        const mood = byDate[dateStr];
-        const bg = mood ? MOOD_COLORS[mood.rating] : '';
-        const isToday = dateStr === today ? ' today' : '';
-        const isSel = MOOD_SELECTED && dateStr === MOOD_SELECT_DATE ? ' selected' : '';
-        const note = mood && mood.note ? ' | ' + mood.note : '';
-        html += `<div class="mood-day${isToday}${isSel}" onclick="selectMoodDay('${dateStr}')" ${bg ? `style="background:${bg}"` : ''} title="${esc(dateStr + note)}">
-            <span class="emoji">${mood ? MOOD_EMOJI[mood.rating] : ''}</span><span${bg ? ' style="color:#fff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.35)"' : ''}>${d}</span></div>`;
-    }
-    $('moodCalendar').innerHTML = html;
-    $('moodLegend').innerHTML = [1,2,3,4,5].map(r =>
-        `<span style="display:inline-flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:3px;background:${MOOD_COLORS[r]};display:inline-block"></span>${MOOD_EMOJI[r]}</span>`
-    ).join('');
-}
-
-function selectMoodDay(date) {
-    MOOD_SELECT_DATE = date;
-    MOOD_SELECTED = true;
-    MOOD_EDITING = false;
-    MOOD_TEMP_RATING = null;
-    // 若日期不在当前显示的月份，自动切换月历到该月（有心情的格子立刻可见）
-    const dm = date.slice(0, 7);
-    if (MOOD_MONTH.current !== dm) MOOD_MONTH.current = dm;
-    loadMoods();
-}
-
-function moodPrevMonth() {
-    let [y, m] = MOOD_MONTH.current.split('-').map(Number);
-    m--; if (m < 1) { m = 12; y--; }
-    MOOD_MONTH.current = y + '-' + String(m).padStart(2, '0');
-    loadMoods();
-}
-function moodNextMonth() {
-    let [y, m] = MOOD_MONTH.current.split('-').map(Number);
-    m++; if (m > 12) { m = 1; y++; }
-    MOOD_MONTH.current = y + '-' + String(m).padStart(2, '0');
-    loadMoods();
-}
-
-
-// ═══════════════ 天气 CRUD ═══════════════
 const WEATHER_OPTIONS = [
-    { key: 'sunny',    emoji: '☀️', label: '晴天', color: '#f6c945' },
-    { key: 'cloudy',   emoji: '⛅', label: '多云', color: '#90a4ae' },
-    { key: 'overcast', emoji: '☁️', label: '阴天', color: '#78909c' },
-    { key: 'rain',     emoji: '🌧️', label: '雨天', color: '#4a90d9' },
+    { key:'sunny',    emoji:'☀️', label:'晴天', color:'#f6d365' },
+    { key:'cloudy',   emoji:'⛅',  label:'多云', color:'#b8d4f0' },
+    { key:'overcast', emoji:'☁️', label:'阴天', color:'#c9cdd4' },
+    { key:'rain',     emoji:'🌧️', label:'雨天', color:'#8aa8c8' },
 ];
 const WEATHER_MAP = {};
-WEATHER_OPTIONS.forEach(o => WEATHER_MAP[o.key] = o);
-const WEATHER_MONTH = { current: thisMonthStr() };
+WEATHER_OPTIONS.forEach(o => { WEATHER_MAP[o.key] = o; });
 
-let WEATHER_EDITING = false;
-let WEATHER_TEMP_KEY = null;
-// 当前选中的日期（默认今天，可通过月历点击切换）
-let WEATHER_SELECT_DATE = todayStr();
-let WEATHER_SELECTED = false;   // 是否手动点击过日期（初始不显示选中框）
+// 当前正在看的日期 / 月份（点月历可切换，用于补记前几天）
+const DAY = { date: todayStr(), month: thisMonthStr() };
+let _moods = [], _weathers = [];
 
-function getSelWeather() {
-    return (apiCache.weather || []).find(r => r.date === WEATHER_SELECT_DATE) || null;
-}
+function dayMood(date) { const d = date || DAY.date; return _moods.find(r => r.date === d) || null; }
+function dayWeather(date) { const d = date || DAY.date; return _weathers.find(r => r.date === d) || null; }
 
-async function loadWeathers() {
-    const render = (data) => {
-        renderWeatherToday();
-        renderWeatherCalendar(data);
-    };
+async function loadDay() {
     try {
-        await smartLoad('weather', () => api('/api/weather'), render);
-    } catch(e) { if (!apiCache.weather) toast('天气数据加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error'); }
+        await Promise.all([
+            smartLoad('moods', () => api('/api/mood'), d => { _moods = d || []; renderDay(); }),
+            smartLoad('weather', () => api('/api/weather'), d => { _weathers = d || []; renderDay(); }),
+        ]);
+    } catch (e) {
+        if (!apiCache.moods && !apiCache.weather) {
+            toast('心情/天气加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error');
+        }
+    }
 }
 
-function renderWeatherToday() {
-    const todayW = getSelWeather();
-    const hasW = !!todayW;
-    $('weatherTitleLabel').textContent = WEATHER_SELECT_DATE === todayStr()
-        ? '🌤 今日天气'
-        : '🌤 ' + WEATHER_SELECT_DATE.slice(5) + ' 天气';
-    document.querySelectorAll('.weather-btn').forEach(b => {
-        const k = b.dataset.key;
-        const isSel = WEATHER_EDITING ? (k === WEATHER_TEMP_KEY) : (hasW && k === todayW.weather);
-        b.classList.toggle('active', isSel);
-        b.classList.toggle('locked', hasW && !WEATHER_EDITING);
-    });
-    $('weatherNote').value = hasW ? (todayW.note || '') : '';
-    $('weatherNote').readOnly = hasW && !WEATHER_EDITING;
-    $('weatherEditBtn').style.display = hasW && !WEATHER_EDITING ? '' : 'none';
-    $('weatherActions').style.display = WEATHER_EDITING ? 'flex' : 'none';
+function renderDay() {
+    const m = dayMood(), w = dayWeather();
+    const isToday = DAY.date === todayStr();
+    $('dayTitleLabel').textContent = isToday ? '😊 今天' : '📅 ' + DAY.date.slice(5) + '（补记）';
+    $('dayTodayBtn').style.display = isToday ? 'none' : '';
+    document.querySelectorAll('.mood-btn').forEach(b =>
+        b.classList.toggle('active', !!m && parseInt(b.dataset.rating) === m.rating));
+    document.querySelectorAll('.weather-btn').forEach(b =>
+        b.classList.toggle('active', !!w && b.dataset.key === w.weather));
+    // 描述：正在输入时不要覆盖，避免打断
+    const noteEl = $('dayNote');
+    if (noteEl && document.activeElement !== noteEl) noteEl.value = m ? (m.note || '') : '';
+    const wi = w ? WEATHER_MAP[w.weather] : null;
+    $('dayState').textContent = (m || w)
+        ? '已记录 ' + (m ? MOOD_EMOJI[m.rating] : '') + (wi ? ' ' + wi.emoji : '')
+        : '';
+    renderDayCalendar();
+    updateDayBadge();
 }
 
-function renderWeatherCalendar(data) {
-    const month = WEATHER_MONTH.current;
-    const [y, m] = month.split('-').map(Number);
-    const daysInMonth = new Date(y, m, 0).getDate();
-    const startOffset = new Date(y, m-1, 1).getDay();
+// 月历：一格里同时显示心情（底色+表情）和天气（右上角小图标）
+function renderDayCalendar() {
+    const month = DAY.month;
+    const [y, mm] = month.split('-').map(Number);
+    const daysInMonth = new Date(y, mm, 0).getDate();
+    const startOffset = new Date(y, mm - 1, 1).getDay();
     const today = todayStr();
-    const byDate = {};
-    data.forEach(r => { if (r.date.startsWith(month)) byDate[r.date] = r; });
-    $('weatherMonthLabel').textContent = '🗓 当月天气 — ' + month;
+    const mByDate = {}, wByDate = {};
+    _moods.forEach(r => { if (String(r.date).startsWith(month)) mByDate[r.date] = r; });
+    _weathers.forEach(r => { if (String(r.date).startsWith(month)) wByDate[r.date] = r; });
+    $('dayMonthLabel').textContent = '🗓 ' + month;
     let html = '';
     for (let i = 0; i < startOffset; i++) html += '<div class="mood-day empty"></div>';
     for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = month + '-' + String(d).padStart(2,'0');
-        const w = byDate[dateStr];
-        const info = w ? WEATHER_MAP[w.weather] : null;
-        const bg = info ? info.color : '';
-        const isToday = dateStr === today ? ' today' : '';
-        const isSel = WEATHER_SELECTED && dateStr === WEATHER_SELECT_DATE ? ' selected' : '';
-        const note = w && w.note ? ' | ' + w.note : '';
-        html += `<div class="mood-day${isToday}${isSel}" onclick="selectWeatherDay('${dateStr}')" ${bg ? `style="background:${bg}"` : ''} title="${esc(dateStr + (w ? ' ' + (info ? info.label : '') : '') + note)}">
-            <span class="emoji">${info ? info.emoji : ''}</span><span>${d}</span></div>`;
+        const ds = month + '-' + pad2(d);
+        const mo = mByDate[ds], we = wByDate[ds];
+        const bg = mo ? MOOD_COLORS[mo.rating] : '';
+        const wInfo = we ? WEATHER_MAP[we.weather] : null;
+        const cls = 'mood-day' + (ds === today ? ' today' : '') + (ds === DAY.date ? ' selected' : '');
+        const tip = ds + (mo ? ' ' + MOOD_EMOJI[mo.rating] : '') + (wInfo ? ' ' + wInfo.label : '')
+            + (mo && mo.note ? ' | ' + mo.note : '');
+        html += '<div class="' + cls + '" onclick="selectDay(\'' + ds + '\')"'
+            + (bg ? ' style="background:' + bg + '"' : '') + ' title="' + esc(tip) + '">'
+            + '<span class="emoji">' + (mo ? MOOD_EMOJI[mo.rating] : '') + '</span>'
+            + '<span' + (bg ? ' style="color:#fff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.35)"' : '') + '>' + d + '</span>'
+            + (wInfo ? '<span class="w-emoji">' + wInfo.emoji + '</span>' : '')
+            + '</div>';
     }
-    $('weatherCalendar').innerHTML = html;
-    $('weatherLegend').innerHTML = WEATHER_OPTIONS.map(o =>
-        `<span style="display:inline-flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:3px;background:${o.color};display:inline-block"></span>${o.emoji} ${o.label}</span>`
+    $('dayCalendar').innerHTML = html;
+    $('dayLegend').innerHTML = [1,2,3,4,5].map(r =>
+        '<span style="display:inline-flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:3px;background:'
+        + MOOD_COLORS[r] + ';display:inline-block"></span>' + MOOD_EMOJI[r] + '</span>'
     ).join('');
 }
 
-function selectWeatherDay(date) {
-    WEATHER_SELECT_DATE = date;
-    WEATHER_SELECTED = true;
-    WEATHER_EDITING = false;
-    WEATHER_TEMP_KEY = null;
-    loadWeathers();
+function selectDay(ds) {
+    DAY.date = ds;
+    if (DAY.month !== ds.slice(0, 7)) DAY.month = ds.slice(0, 7);
+    renderDay();
 }
 
-function weatherPrevMonth() {
-    let [y, m] = WEATHER_MONTH.current.split('-').map(Number);
-    m--; if (m < 1) { m = 12; y--; }
-    WEATHER_MONTH.current = y + '-' + String(m).padStart(2, '0');
-    loadWeathers();
-}
-function weatherNextMonth() {
-    let [y, m] = WEATHER_MONTH.current.split('-').map(Number);
-    m++; if (m > 12) { m = 1; y++; }
-    WEATHER_MONTH.current = y + '-' + String(m).padStart(2, '0');
-    loadWeathers();
+function selectDayToday() { DAY.date = todayStr(); DAY.month = thisMonthStr(); renderDay(); }
+
+function dayPrevMonth() { shiftDayMonth(-1); }
+function dayNextMonth() { shiftDayMonth(1); }
+
+function shiftDayMonth(delta) {
+    let [y, m] = DAY.month.split('-').map(Number);
+    m += delta;
+    while (m < 1) { m += 12; y--; }
+    while (m > 12) { m -= 12; y++; }
+    DAY.month = y + '-' + pad2(m);
+    renderDayCalendar();
 }
 
-// 点击天气选项：未设置→直接保存；已设置→需先点编辑
-function pickWeather(key) {
-    const hasW = !!getSelWeather();
-    if (!WEATHER_EDITING) {
-        if (hasW) { toast('请先点击「编辑」再修改', 'error'); return; }
-        return saveWeatherNow(key);
-    }
-    WEATHER_TEMP_KEY = key;
-    document.querySelectorAll('.weather-btn').forEach(b =>
-        b.classList.toggle('active', b.dataset.key === key));
-}
-
-function editWeather() {
-    WEATHER_EDITING = true;
-    WEATHER_TEMP_KEY = getSelWeather() ? getSelWeather().weather : null;
-    renderWeatherToday();
-    $('weatherNote').focus();
-}
-
-function cancelWeatherEdit() {
-    WEATHER_EDITING = false;
-    WEATHER_TEMP_KEY = null;
-    renderWeatherToday();
-}
-
-// 保存按钮（编辑态）
-async function saveWeather() {
-    const date = WEATHER_SELECT_DATE;
-    const existing = getSelWeather();
-    const key = WEATHER_TEMP_KEY !== null ? WEATHER_TEMP_KEY : (existing ? existing.weather : 'sunny');
+// 点心情：立刻保存（不再需要"先点编辑再保存"），正在写的描述会一起提交
+async function pickDayMood(rating) {
+    const date = DAY.date;
+    const cur = dayMood();
+    const note = $('dayNote') ? $('dayNote').value : '';
     try {
-        if (existing) {
-            await api('/api/weather/' + existing.id, {method:'PUT', body:{weather: key, note: $('weatherNote').value}});
-        } else {
-            await api('/api/weather', {method:'POST', body:{date, weather: key, note: $('weatherNote').value}});
-        }
+        if (cur) await api('/api/mood/' + cur.id, { method: 'PUT', body: { rating: rating, note: note } });
+        else await api('/api/mood', { method: 'POST', body: { date: date, rating: rating, note: note } });
+        invalidateKey('moods');
+        toast(MOOD_EMOJI[rating] + ' 已记录', 'success');
+        loadDay();
+    } catch (e) { toast(e.message, 'error'); }
+}
+
+// 点天气：立刻保存
+async function pickDayWeather(key) {
+    const date = DAY.date;
+    const cur = dayWeather();
+    try {
+        if (cur) await api('/api/weather/' + cur.id, { method: 'PUT', body: { weather: key } });
+        else await api('/api/weather', { method: 'POST', body: { date: date, weather: key } });
         invalidateKey('weather');
-        toast(WEATHER_MAP[key].emoji + ' ' + WEATHER_MAP[key].label + ' 已保存', 'success');
-        WEATHER_EDITING = false;
-        WEATHER_TEMP_KEY = null;
-        loadWeathers();
-    } catch(e) { toast(e.message, 'error'); }
+        const info = WEATHER_MAP[key];
+        toast((info ? info.emoji + ' ' + info.label : '') + ' 已记录', 'success');
+        loadDay();
+    } catch (e) { toast(e.message, 'error'); }
 }
 
-// 未设置时点选直接保存
-async function saveWeatherNow(key) {
-    const date = WEATHER_SELECT_DATE;
+// 描述存在心情记录里（mood.note），所以要先选一个心情
+async function saveDayNote() {
+    const cur = dayMood();
+    const note = ($('dayNote') ? $('dayNote').value : '').trim();
+    if (!cur) { toast('先点一个心情表情，描述才能存下来', 'error'); return; }
+    if ((cur.note || '') === note) { toast('描述没变化', 'error'); return; }
     try {
-        await api('/api/weather', {method:'POST', body:{date, weather: key, note: $('weatherNote').value}});
-        invalidateKey('weather');
-        toast(WEATHER_MAP[key].emoji + ' ' + WEATHER_MAP[key].label + ' 已记录', 'success');
-        loadWeathers();
-    } catch(e) { toast(e.message, 'error'); }
+        await api('/api/mood/' + cur.id, { method: 'PUT', body: { note: note } });
+        invalidateKey('moods');
+        toast('描述已保存', 'success');
+        loadDay();
+    } catch (e) { toast(e.message, 'error'); }
 }
 
+// 底部导航「心情」红点：今天还有心情或天气没记
+function updateDayBadge() {
+    const today = todayStr();
+    const missing = !dayMood(today) || !dayWeather(today);
+    const el = $('navMood');
+    if (el) el.classList.toggle('has-dot', missing);
+}
 
-// ═══════════════ 纪录 CRUD ═══════════════
-async function loadRecords() {
-    const render = (data) => {
-        const active = data.filter(r => Number(r.done) !== 1);
-        const done = data.filter(r => Number(r.done) === 1);
-        $('recordActiveCount').textContent = active.length ? '(' + active.length + ')' : '';
-        $('recordDoneCount').textContent = done.length ? '(' + done.length + ')' : '';
-        $('recordActiveList').innerHTML = active.length === 0
-            ? '<div style="color:var(--text-muted);padding:20px;text-align:center;font-size:13px">这里还没有纪录</div>'
-            : active.map(r => recordItemHTML(r)).join('');
-        if (done.length === 0) {
-            $('recordDoneList').innerHTML = '<div style="color:var(--text-muted);padding:14px;text-align:center;font-size:12px">还没有放下的，会有的</div>';
-        } else {
-            $('recordDoneList').innerHTML = '<div style="color:var(--accent);font-size:12px;padding:8px 4px;font-weight:500">回头看，这 ' + done.length + ' 件都已经过去了</div>' +
-                done.map(r => recordItemHTML(r, true)).join('');
-        }
-    };
-    try {
-        await smartLoad('records', () => api('/api/record'), render);
-    } catch(e) {
-        if (!apiCache.records) { toast('加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error'); }
+// 概览顶部「今日」提示条：点一下直达心情页（不记录时最容易忘的就是这一步）
+function renderTodayStrip() {
+    const box = $('todayStrip');
+    if (!box) return;
+    const m = dayMood(todayStr()), w = dayWeather(todayStr());
+    const wi = w ? WEATHER_MAP[w.weather] : null;
+    if (!m && !w) {
+        box.innerHTML = '<span class="ts-emoji">📝</span><span class="ts-text">今天还没记心情和天气</span><span class="ts-go">去记录 ›</span>';
+    } else {
+        const parts = [];
+        if (m) parts.push(MOOD_EMOJI[m.rating]);
+        if (wi) parts.push(wi.emoji);
+        const note = m && m.note ? m.note : '';
+        box.innerHTML = '<span class="ts-emoji">' + (parts.join(' ') || '📝') + '</span>'
+            + '<span class="ts-text">' + (note ? esc(note) : '今天已记录') + '</span>'
+            + '<span class="ts-go">›</span>';
     }
 }
 
-function recordItemHTML(r, isDone) {
-    const safe = String(r.content).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const fuSafe = r.followup ? String(r.followup).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
-    const fuView = fuSafe
-        ? `<div class="record-followup" id="fu-view-${r.id}">后来：${fuSafe}</div>`
-        : '';
-    const dateLabel = r.date ? r.date.slice(5) : '··';
-    return `<div class="record-item${isDone ? ' done' : ''}">
-        <div class="record-date">${dateLabel}</div>
-        <div class="record-main">
-            <div class="record-content" title="${safe}">${safe}</div>
-            ${fuView}
-            <div class="record-followup-edit" id="fu-edit-${r.id}" style="display:none">
-                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px">
-                    <input type="date" id="fu-date-${r.id}" value="${r.date || ''}" style="padding:6px 10px;border:1px solid var(--border-l3);border-radius:var(--radius-sm);background:var(--bg-base);font-size:12.5px;font-family:inherit;outline:none">
-                    <span style="font-size:11px;color:var(--text-muted)">日期可留空</span>
-                </div>
-                <textarea id="fu-input-${r.id}" placeholder="后来怎么样了？写下来"></textarea>
-                <div style="display:flex;gap:8px;margin-top:6px">
-                    <button class="btn btn-save btn-sm" onclick="saveFollowup('${r.id}')">保存</button>
-                    <button class="btn btn-cancel btn-sm" onclick="toggleFollowup('${r.id}')">收起</button>
-                </div>
-            </div>
-            <button class="fu-toggle" onclick="toggleFollowup('${r.id}')">✎ 补充感受</button>
-        </div>
-        <div class="record-actions">
-            ${isDone ? '' : `<button class="btn btn-cancel btn-sm" onclick="markRecordDone('${r.id}')">✓ 过去了</button>`}
-            <button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')">删除</button>
-        </div>
-    </div>`;
-}
-
-function toggleFollowup(id) {
-    const edit = $('fu-edit-' + id);
-    if (!edit) return;
-    const isHidden = edit.style.display === 'none' || !edit.style.display;
-    edit.style.display = isHidden ? 'block' : 'none';
-    if (isHidden) { const ta = $('fu-input-' + id); if (ta) ta.focus(); }
-}
-
-async function saveFollowup(id) {
-    const text = $('fu-input-' + id).value.trim();
-    const date = $('fu-date-' + id).value || '';
-    if (!text && !date) { toast('写点什么吧', 'error'); return; }
-    const updates = {};
-    if (text) updates.followup = text;
-    if (date) updates.date = date;   // 事后补充日期
+// 启动 / 回到概览时确保有数据（红点和提示条不依赖进过心情页）
+async function ensureDayData(force) {
     try {
-        await api('/api/record/' + id, {method:'PUT', body:updates});
-        invalidateKey('records');
-        toast('已补充 🌱', 'success');
-        loadRecords().catch(() => {});
-    } catch(e) { toast(e.message, 'error'); }
-}
-
-function toggleRecordNoDate() {
-    const noDate = $('recordNoDate').checked;
-    $('recordDate').disabled = noDate;
-    if (noDate) { $('recordDate').value = ''; }
-    else { $('recordDate').value = todayStr(); }   // 取消勾选：恢复默认今天
-}
-
-async function saveRecord() {
-    const content = $('recordContent').value.trim();
-    if (!content) { toast('写点什么吧', 'error'); return; }
-    const date = $('recordDate').value || '';   // 勾选"不需要日期"时为空
-    try {
-        await api('/api/record', {method:'POST', body:{date, content, done: 0, due_date: '', followup: ''}});
-        $('recordContent').value = '';
-        $('recordDate').value = todayStr();   // 保存后恢复默认今天
-        $('recordNoDate').checked = false;
-        $('recordDate').disabled = false;
-        invalidateKey('records');
-        toast('已记下 📌', 'success');
-        loadRecords().catch(() => {});
-    } catch(e) { toast(e.message, 'error'); }
-}
-
-async function markRecordDone(id) {
-    try {
-        await api('/api/record/' + id, {method:'PUT', body:{done: 1}});
-        invalidateKey('records');
-        toast('这件事过去了 🌤', 'success');
-        loadRecords().catch(() => {});
-    } catch(e) { toast(e.message, 'error'); }
-}
-
-async function deleteRecord(id) {
-    if (!confirm('确定删除这条纪录？')) return;
-    try {
-        await api('/api/record/' + id, {method:'DELETE'});
-        invalidateKey('records');
-        toast('已删除', 'success');
-        loadRecords().catch(() => {});
-    } catch(e) { toast(e.message, 'error'); }
+        if (force || !apiCache.moods) apiCache.moods = await api('/api/mood');
+        if (force || !apiCache.weather) apiCache.weather = await api('/api/weather');
+        _moods = apiCache.moods || [];
+        _weathers = apiCache.weather || [];
+        updateDayBadge();
+        renderTodayStrip();
+    } catch (e) { /* 静默，不打断主流程 */ }
 }
 
 // ═══════════════ 导入导出 ═══════════════
@@ -3292,11 +3038,9 @@ function autoRefresh() {
     if (t === 'overview') loadOverview();
     else if (t === 'expense') loadExpenses();
     else if (t === 'income') loadIncomes();
-    else if (t === 'record') loadRecords();
     else if (t === 'finance') loadFinances();
     else if (t === 'electricity') loadElectricities();
-    else if (t === 'mood') loadMoods();
-    else if (t === 'weather') loadWeathers();
+    else if (t === 'mood') loadDay();
     else if (t === 'stats') loadStats();
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) autoRefresh(); });
@@ -3310,12 +3054,11 @@ function manualRefresh() {
     if (t === 'overview') { VIEW_MONTH.current = thisMonthStr(); loadOverview(); }
     else if (t === 'expense') loadExpenses();
     else if (t === 'income') loadIncomes();
-    else if (t === 'record') loadRecords();
     else if (t === 'finance') loadFinances();
     else if (t === 'electricity') loadElectricities();
-    else if (t === 'mood') loadMoods();
-    else if (t === 'weather') loadWeathers();
+    else if (t === 'mood') loadDay();
     else if (t === 'stats') loadStats();
+    ensureDayData(true);
     toast('已刷新为最新数据', 'success');
 }
 
@@ -3329,7 +3072,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 设置默认日期
     const today = todayStr();
-    ['exp_date','inc_date','fin_date','elec_date','recordDate'].forEach(id => {
+    ['exp_date','inc_date','fin_date','elec_date'].forEach(id => {
         const el = $(id); if (el) el.value = today;
     });
     ['exp_time','inc_time'].forEach(id => {
@@ -3343,16 +3086,20 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(e) {}
     // 后台预加载"更多"分支数据（首屏渲染完再执行，不抢带宽）
     setTimeout(preloadMoreTabs, 1200);
-    // 刷新后停留在当前页面（从 URL hash 恢复）
-    const savedTab = (location.hash || '').replace('#', '');
-    if (['overview','expense','income','record','finance','electricity','mood','weather','stats'].includes(savedTab)) {
+    // 拉一次心情/天气，用于底部导航红点和概览"今日"提示条
+    setTimeout(() => ensureDayData(), 1500);
+    // 刷新后停留在当前页面（从 URL hash 恢复）；老的 #weather / #record 已合并进 #mood
+    let savedTab = (location.hash || '').replace('#', '');
+    if (savedTab === 'weather' || savedTab === 'record') savedTab = 'mood';
+    if (['overview','expense','income','finance','electricity','mood','stats','payday'].includes(savedTab)) {
         switchTab(savedTab);
     } else {
         loadOverview();
     }
     // 浏览器前进/后退时跟随 hash
     window.addEventListener('hashchange', () => {
-        const t = (location.hash || '').replace('#', '');
+        let t = (location.hash || '').replace('#', '');
+        if (t === 'weather' || t === 'record') t = 'mood';
         if (t && t !== STATE.currentTab) switchTab(t);
     });
 });
