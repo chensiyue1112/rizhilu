@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.7.16</title>
+<title>日知录记账 v1.7.17</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -792,7 +792,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <button class="sidebar-item drawer-btn" onclick="exportData(); closeMore();">⬇ 导出备份</button>
         <button class="sidebar-item drawer-btn" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="more-drawer-ver" id="appVersionM">v1.7.16</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.7.17</div>
     </div>
 </nav>
 
@@ -847,15 +847,15 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                     <span class="sel-value">餐饮</span><span class="sel-arrow"><svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                     <div class="sel-options">
                         <div class="sel-option" data-value="餐饮">餐饮</div>
+                        <div class="sel-option" data-value="日用">日用</div>
                         <div class="sel-option" data-value="交通">交通</div>
+                        <div class="sel-option" data-value="订阅">订阅</div>
                         <div class="sel-option" data-value="通讯">通讯</div>
-                        <div class="sel-option" data-value="房租">房租</div>
-                        <div class="sel-option" data-value="购物">购物</div>
                         <div class="sel-option" data-value="医疗">医疗</div>
-                        <div class="sel-option" data-value="工具">工具</div>
                         <div class="sel-option" data-value="鱼缸">鱼缸</div>
-                        <div class="sel-option" data-value="捐款">捐款</div>
                         <div class="sel-option" data-value="电动车">电动车</div>
+                        <div class="sel-option" data-value="房租">房租</div>
+                        <div class="sel-option" data-value="人情">人情</div>
                         <div class="sel-option" data-value="其他">其他</div>
                     </div>
                 </div>
