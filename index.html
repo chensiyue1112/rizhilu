@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.8.1</title>
+<title>日知录记账 v1.8.2</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -436,7 +436,7 @@ tbody tr:hover td { background: var(--bg-hover); }
 .cat-detail-item .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cat-detail-item .a { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text-primary); }
 
-/* === 每日页（心情+天气+描述，v1.8.1） === */
+/* === 每日页（心情+天气+描述，v1.8.2） === */
 .day-label { font-size: 11.5px; color: var(--text-secondary); font-weight: 550; margin-bottom: 6px; letter-spacing: 0.1px; }
 #dayNote {
     width: 100%; padding: 9px 12px; min-height: 68px; resize: vertical;
@@ -886,7 +886,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <button class="sidebar-item drawer-btn" onclick="exportData(); closeMore();">⬇ 导出备份</button>
         <button class="sidebar-item drawer-btn" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="more-drawer-ver" id="appVersionM">v1.8.1</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.8.2</div>
     </div>
 </nav>
 
@@ -981,6 +981,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <section id="section-income" class="section">
     <div class="card">
         <h3>➕ 新增收入</h3>
+        <div class="quick-chips" id="incQuickChips"></div>
         <div class="form-row" id="incomeForm">
             <div class="form-group"><label>日期</label>
                 <div class="custom-date" data-target="inc_date" onclick="toggleDate(this)">
@@ -1100,7 +1101,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     </div>
 </section>
 
-<!-- ═══════════════ 心情（合并天气 + 每日描述，v1.8.1） ═══════════════ -->
+<!-- ═══════════════ 心情（合并天气 + 每日描述，v1.8.2） ═══════════════ -->
 <section id="section-mood" class="section">
     <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
@@ -1500,6 +1501,7 @@ function switchTab(name) {
     }
     if (name === 'income') {
         loadIncomes();
+        renderIncQuickChips();
         // 手机点开收入页自动聚焦金额框，直接弹键盘输入
         setTimeout(() => { const el = $('inc_amount'); if (el) el.focus(); }, 350);
     }
@@ -1796,6 +1798,7 @@ async function loadExpenses() {
 
 // ═══════════ 常用记账快捷条：近 60 天最常记的「分类+描述」，点一下预填 ═══════════
 // 你实际有 29 次 deepseekapi、26 次早餐、18 次充电，这类重复劳动应该一次点击完成
+// v1.8.2 起只填分类+描述，不再带金额（金额每次都不一样，带着反而要改）
 function buildQuickChips(data) {
     const d = new Date(Date.now() - 60 * 86400000);
     const cut = d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
@@ -1808,8 +1811,7 @@ function buildQuickChips(data) {
             const key = r.category + '|' + desc;
             const it = seen.get(key);
             if (it) { it.count++; return; }
-            // 同组合只记第一次（最近的）金额，反映当前价格
-            seen.set(key, { category: r.category, description: desc, amount: Number(r.amount || 0), count: 1 });
+            seen.set(key, { category: r.category, description: desc, count: 1 });
         });
     return [...seen.values()].sort((a, b) => b.count - a.count).slice(0, 5);
 }
@@ -1818,23 +1820,49 @@ function renderQuickChips(data) {
     const box = $('quickChips');
     if (!box) return;
     STATE._quick = buildQuickChips(data || []);
-    box.innerHTML = STATE._quick.map((q, i) => {
-        const amt = Number(q.amount) % 1 === 0 ? Number(q.amount).toFixed(0) : Number(q.amount).toFixed(2);
-        return '<button class="quick-chip" onclick="useQuickChip(' + i + ')">' + esc(q.description) + ' <b>¥' + amt + '</b></button>';
-    }).join('');
+    box.innerHTML = STATE._quick.map((q, i) =>
+        '<button class="quick-chip" onclick="useQuickChip(' + i + ')">' + esc(q.description) + '</button>'
+    ).join('');
 }
 
-// 点快捷条：预填分类/描述/金额，光标停在金额上直接改
+// 点支出快捷条：只预填分类 + 描述，光标停在金额框等着输金额
 function useQuickChip(i) {
     const q = (STATE._quick || [])[i];
     if (!q) return;
     $('exp_category').value = q.category;
     syncSelUI('exp_category');
     $('exp_desc').value = q.description;
-    $('exp_amount').value = q.amount;
+    $('exp_amount').value = '';
     $('exp_date').value = todayStr();
     syncDateUI('exp_date');
     const el = $('exp_amount');
+    el.focus();
+    if (el.select) el.select();
+}
+
+// ═══════════ 收入快捷条：分类一键选中（收入 685 笔里 667 笔是「日常收入」且没写备注） ═══════════
+// 分类清单直接从下拉里读，避免两处维护
+function incomeCats() {
+    const sel = document.querySelector('.custom-select[data-target="inc_category"]');
+    if (!sel) return ['日常收入', '立减金', '羊毛', '生活费', '其他'];
+    return [...sel.querySelectorAll('.sel-option')].map(el => el.getAttribute('data-value')).filter(Boolean);
+}
+
+function renderIncQuickChips() {
+    const box = $('incQuickChips');
+    if (!box) return;
+    box.innerHTML = incomeCats().map(c =>
+        '<button class="quick-chip" onclick="useIncQuickChip(\'' + esc(c) + '\')">' + esc(c) + '</button>'
+    ).join('');
+}
+
+// 点收入快捷条：只选分类，光标停在金额框；备注留给你自己写
+function useIncQuickChip(cat) {
+    $('inc_category').value = cat;
+    syncSelUI('inc_category');
+    $('inc_date').value = todayStr();
+    syncDateUI('inc_date');
+    const el = $('inc_amount');
     el.focus();
     if (el.select) el.select();
 }
@@ -2766,7 +2794,7 @@ function drawTrendChart(canvasId, labels, incData, expData) {
 }
 
 
-// ═══════════════ 每日：心情 + 天气 + 描述（v1.8.1 合并三页） ═══════════════
+// ═══════════════ 每日：心情 + 天气 + 描述（v1.8.2 合并三页） ═══════════════
 // 原来「心情」「天气」是两个页面、还都折在"更多"抽屉里，导致经常忘记填；
 // 「纪录」几乎没在用。现在合并成底部导航上的一个「心情」页：心情 + 天气 + 多行描述。
 const MOOD_EMOJI = {1:'😞', 2:'🙁', 3:'😐', 4:'🙂', 5:'😄'};
@@ -3080,6 +3108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const el = $(id); if (el) el.value = nowTimeStr();
     });
     syncDateUI('exp_date'); syncDateUI('inc_date');
+    renderIncQuickChips();          // 收入快捷条（分类一键选中）
     $('statsMonth').value = today.slice(0,7);
     // 版本号同步到浏览器标签标题（页面内版本号看"更多"抽屉底部）
     try {
