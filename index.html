@@ -7,7 +7,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.8.2</title>
+<title>日知录记账 v1.8.3</title>
 <style>
 /* === 日知录 Design System — inspired by modern platform UI === */
 :root {
@@ -436,7 +436,7 @@ tbody tr:hover td { background: var(--bg-hover); }
 .cat-detail-item .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cat-detail-item .a { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text-primary); }
 
-/* === 每日页（心情+天气+描述，v1.8.2） === */
+/* === 每日页（心情+天气+描述，v1.8.3） === */
 .day-label { font-size: 11.5px; color: var(--text-secondary); font-weight: 550; margin-bottom: 6px; letter-spacing: 0.1px; }
 #dayNote {
     width: 100%; padding: 9px 12px; min-height: 68px; resize: vertical;
@@ -886,7 +886,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <button class="sidebar-item drawer-btn" onclick="exportData(); closeMore();">⬇ 导出备份</button>
         <button class="sidebar-item drawer-btn" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="more-drawer-ver" id="appVersionM">v1.8.2</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.8.3</div>
     </div>
 </nav>
 
@@ -996,10 +996,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
                     <span class="sel-value">日常收入</span><span class="sel-arrow"><svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                     <div class="sel-options">
                         <div class="sel-option" data-value="日常收入">日常收入</div>
-                        <div class="sel-option" data-value="立减金">立减金</div>
                         <div class="sel-option" data-value="羊毛">羊毛</div>
-                        <div class="sel-option" data-value="生活费">生活费</div>
-                        <div class="sel-option" data-value="其他">其他</div>
+                        <div class="sel-option" data-value="工资">工资</div>
                     </div>
                 </div>
                 <input type="hidden" id="inc_category" value="日常收入">
@@ -1032,7 +1030,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <div class="card">
         <h3>💰 发工资记账</h3>
         <div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:14px;line-height:1.8">
-            工资 → 本月<b style="color:var(--accent)">工资收入</b>（分类：生活费，不计入概览图）<br>
+            工资 → 本月<b style="color:var(--accent)">工资收入</b>（分类：工资，不计入概览图）<br>
             上月伙食费 → 上月支出（分类：餐饮，单笔超过 100 元自动计入大额支出、不计入概览图）<br>
         </div>
         <div class="form-row">
@@ -1101,7 +1099,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     </div>
 </section>
 
-<!-- ═══════════════ 心情（合并天气 + 每日描述，v1.8.2） ═══════════════ -->
+<!-- ═══════════════ 心情（合并天气 + 每日描述，v1.8.3） ═══════════════ -->
 <section id="section-mood" class="section">
     <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
@@ -1798,7 +1796,7 @@ async function loadExpenses() {
 
 // ═══════════ 常用记账快捷条：近 60 天最常记的「分类+描述」，点一下预填 ═══════════
 // 你实际有 29 次 deepseekapi、26 次早餐、18 次充电，这类重复劳动应该一次点击完成
-// v1.8.2 起只填分类+描述，不再带金额（金额每次都不一样，带着反而要改）
+// v1.8.3 起只填分类+描述，不再带金额（金额每次都不一样，带着反而要改）
 function buildQuickChips(data) {
     const d = new Date(Date.now() - 60 * 86400000);
     const cut = d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
@@ -1844,7 +1842,7 @@ function useQuickChip(i) {
 // 分类清单直接从下拉里读，避免两处维护
 function incomeCats() {
     const sel = document.querySelector('.custom-select[data-target="inc_category"]');
-    if (!sel) return ['日常收入', '立减金', '羊毛', '生活费', '其他'];
+    if (!sel) return ['日常收入', '羊毛', '工资'];
     return [...sel.querySelectorAll('.sel-option')].map(el => el.getAttribute('data-value')).filter(Boolean);
 }
 
@@ -2145,7 +2143,7 @@ async function savePayday() {
     const mealDate = $('payMealDate').value || lastMonthLastDay();
     try {
         if (sal > 0) {
-            const inc = { date: salDate, amount: sal, category: '生活费', note: '工资', large: 1 };
+            const inc = { date: salDate, amount: sal, category: '工资', note: '工资', large: 1 };
             const savedInc = await api('/api/income', { method: 'POST', body: inc });
             if (savedInc && savedInc._id) delete savedInc._id;
             updateTableCache('incomes', savedInc || inc, savedInc && savedInc.id, false);
@@ -2794,7 +2792,7 @@ function drawTrendChart(canvasId, labels, incData, expData) {
 }
 
 
-// ═══════════════ 每日：心情 + 天气 + 描述（v1.8.2 合并三页） ═══════════════
+// ═══════════════ 每日：心情 + 天气 + 描述（v1.8.3 合并三页） ═══════════════
 // 原来「心情」「天气」是两个页面、还都折在"更多"抽屉里，导致经常忘记填；
 // 「纪录」几乎没在用。现在合并成底部导航上的一个「心情」页：心情 + 天气 + 多行描述。
 const MOOD_EMOJI = {1:'😞', 2:'🙁', 3:'😐', 4:'🙂', 5:'😄'};
