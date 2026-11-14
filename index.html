@@ -7,9 +7,9 @@
 <link rel="manifest" href="assets/manifest.json">
 <link rel="icon" type="image/png" sizes="64x64" href="assets/sheep-64.png">
 <link rel="apple-touch-icon" href="assets/sheep-192.png">
-<title>日知录记账 v1.10.0</title>
+<title>日知录记账 v1.10.1</title>
 <style>
-/* === 日知录 Design System v1.10.0 — 白 + 淡蓝（小羊主题） === */
+/* === 日知录 Design System v1.10.1 — 白 + 淡蓝（小羊主题） === */
 :root {
     /* 底色：白 + 极淡天空蓝 */
     --bg-base: #F2F8FF;
@@ -626,7 +626,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <!-- "更多"抽屉：低频页面 + 备份操作 -->
     <div class="more-overlay" id="moreOverlay" onclick="closeMore()"></div>
     <div class="more-drawer" id="moreDrawer">
-        <div class="more-drawer-title"><img class="sheep sheep-drawer" src="assets/sheep.png" alt="">更多功能</div>
+        <div class="more-drawer-title"><img class="sheep sheep-drawer" src="assets/sheep.svg" alt="">更多功能</div>
         <a class="sidebar-item" data-tab="payday" onclick="switchTab('payday')">发工资</a>
         <a class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">财务</a>
         <a class="sidebar-item" data-tab="electricity" onclick="switchTab('electricity')">用电</a>
@@ -635,7 +635,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <button class="sidebar-item drawer-btn" onclick="exportData(); closeMore();">⬇ 导出备份</button>
         <button class="sidebar-item drawer-btn" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="more-drawer-ver" id="appVersionM">v1.10.0</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.10.1</div>
     </div>
 </nav>
 
@@ -646,7 +646,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
     <div class="ov-hello">
-        <img class="sheep sheep-hero" src="assets/sheep.png" alt="小羊" width="58" height="58">
+        <img class="sheep sheep-hero" src="assets/sheep.svg" alt="小羊" width="58" height="58">
         <div class="oh-text">
             <div class="oh-date" id="ohDate">今天</div>
             <div class="oh-sub" id="ohSub"></div>
@@ -1592,7 +1592,7 @@ async function loadExpenses() {
 // 空状态：小羊 + 一句话（比一行灰字有温度）
 function sheepEmpty(colspan, text) {
     return '<tr><td colspan="' + colspan + '" style="text-align:center;padding:22px 12px;color:var(--text-tertiary)">'
-        + '<img class="sheep sheep-empty" src="assets/sheep.png" alt="" width="46" height="46">'
+        + '<img class="sheep sheep-empty" src="assets/sheep.svg" alt="" width="46" height="46">'
         + '<div style="font-size:13px">' + esc(text) + '</div></td></tr>';
 }
 
