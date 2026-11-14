@@ -3,53 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#3b82f6">
-<link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#f9fafb","theme_color":"#3b82f6","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%233b82f6%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.8.3</title>
+<meta name="theme-color" content="#2F6B4F">
+<link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#F7F4EC","theme_color":"#2F6B4F","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%232F6B4F%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232F6B4F'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232F6B4F'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
+<title>日知录记账 v1.9.0</title>
 <style>
-/* === 日知录 Design System — inspired by modern platform UI === */
+/* === 日知录 Design System v1.9.0 — 墨绿 + 米白（手账纸感） === */
 :root {
-    /* Background layers */
-    --bg-base: #f9fafb;
-    --bg-layer: #ffffff;
-    --bg-hover: #f5f6f7;
-    --bg-active: #f1f3f5;
-    --bg-sidebar: #f9fafb;
+    /* 底色：米白纸 */
+    --bg-base: #F7F4EC;
+    --bg-layer: #FFFFFF;
+    --bg-hover: #F1EDE3;
+    --bg-active: #E8E2D4;
+    --bg-sidebar: #FFFDF8;
 
-    /* Text */
-    --text-primary: #0f1115;
-    --text-secondary: #61666b;
-    --text-tertiary: #81858c;
-    --text-muted: #adb2b8;
+    /* 文字：墨绿灰阶（对比度都够手机看清） */
+    --text-primary: #1B2A22;
+    --text-secondary: #55625B;
+    --text-tertiary: #7D8A83;
+    --text-muted: #9BA7A0;
 
-    /* Border */
-    --border-l1: rgba(0,0,0,0.04);
-    --border-l2: rgba(0,0,0,0.08);
-    --border-l3: rgba(0,0,0,0.12);
+    /* 描边 */
+    --border-l1: rgba(27,42,34,0.06);
+    --border-l2: rgba(27,42,34,0.10);
+    --border-l3: rgba(27,42,34,0.16);
 
-    /* Accent */
-    --accent: #3b82f6;
-    --accent-hover: #2563eb;
-    --accent-light: #eff6ff;
-    --accent-ring: rgba(59,130,246,0.15);
+    /* 主色：墨绿 */
+    --accent: #2F6B4F;
+    --accent-hover: #24563F;
+    --accent-light: #E6F0EA;
+    --accent-ring: rgba(47,107,79,0.16);
 
-    /* Radius */
-    --radius-sm: 6px;
-    --radius: 8px;
-    --radius-md: 10px;
-    --radius-lg: 12px;
-    --radius-full: 4096px;
+    /* 语义色：收入 / 支出 / 提醒 */
+    --pos: #2F855A;
+    --pos-light: #E7F3EC;
+    --neg: #B4611F;
+    --neg-light: #FBEEE2;
+    --warn: #C99A2E;
 
-    /* Shadow */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
-    --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
-    --shadow-overlay: 0 8px 32px rgba(0,0,0,0.08);
+    /* 圆角（比原来更圆，卡片更像纸片） */
+    --radius-sm: 8px;
+    --radius: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-full: 999px;
 
-    /* Transition */
+    /* 阴影：暖调，不用纯黑 */
+    --shadow-sm: 0 1px 2px rgba(60,48,28,0.05), 0 2px 8px rgba(60,48,28,0.04);
+    --shadow-md: 0 4px 16px rgba(60,48,28,0.07);
+    --shadow-overlay: 0 12px 40px rgba(60,48,28,0.14);
+
     --ease: cubic-bezier(0.4, 0, 0.2, 1);
-    --duration: 0.15s;
+    --duration: 0.16s;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -57,163 +63,159 @@ canvas { display: block; }
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     background: var(--bg-base);
+    background-image: radial-gradient(120% 60% at 50% 0%, #FCFAF4 0%, var(--bg-base) 60%);
+    background-attachment: fixed;
     color: var(--text-primary);
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 14.5px;
+    line-height: 1.55;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* === Sidebar === */
+/* === 底部导航（唯一布局，PC 上同样生效） === */
 .sidebar {
-    position: fixed; left: 0; top: 0; bottom: 0;
-    width: 240px;
+    position: fixed; left: 0; right: 0; bottom: 0; top: auto;
+    width: 100%; height: 62px;
+    display: flex; flex-direction: row; align-items: center;
     background: var(--bg-sidebar);
-    display: flex; flex-direction: column;
+    border-top: 1px solid var(--border-l2);
+    box-shadow: 0 -2px 12px rgba(60,48,28,0.05);
     z-index: 200;
-    border-right: 1px solid var(--border-l1);
+    padding: 0 4px env(safe-area-inset-bottom, 0);
 }
 .sidebar-nav {
-    flex: 1; overflow-y: auto;
-    padding: 4px 8px;
-    display: flex; flex-direction: column; gap: 1px;
+    flex: 1; display: flex; flex-direction: row; align-items: center;
+    justify-content: space-around; gap: 2px;
+    overflow-x: auto; overflow-y: hidden; padding: 0 4px;
 }
 .sidebar-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 9px 12px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-size: 14px; font-weight: 450;
-    color: var(--text-secondary);
-    transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    min-width: 56px; padding: 7px 10px;
+    border-radius: 14px; cursor: pointer;
+    font-size: 10.5px; font-weight: 500;
+    color: var(--text-tertiary);
+    transition: background var(--duration) var(--ease), color var(--duration) var(--ease), transform var(--duration) var(--ease);
     text-decoration: none; user-select: none;
 }
-.sidebar-item:hover { color: var(--text-primary); background: var(--bg-hover); }
-.sidebar-item.active { color: var(--accent); background: var(--bg-active); font-weight: 500; }
-.sidebar-item svg { flex-shrink: 0; opacity: 0.55; color: var(--text-tertiary); transition: opacity var(--duration) var(--ease), color var(--duration) var(--ease); }
+.sidebar-item:active { transform: scale(0.94); }
+.sidebar-item.active { color: var(--accent); background: var(--accent-light); font-weight: 700; }
+.sidebar-item svg { width: 21px; height: 21px; flex-shrink: 0; opacity: 0.75; color: currentColor; transition: opacity var(--duration) var(--ease), transform var(--duration) var(--ease); }
+.sidebar-item.active svg { opacity: 1; }
 /* 移动端更多抽屉 */
-.more-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.3); z-index: 230; }
+.more-overlay { display: none; position: fixed; inset: 0; background: rgba(27,42,34,0.32); z-index: 230; backdrop-filter: blur(2px); }
 .more-overlay.show { display: block; }
 .more-drawer {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 240;
-    background: var(--bg-layer); border-radius: 14px 14px 0 0;
-    box-shadow: 0 -8px 32px rgba(0,0,0,0.12); padding: 8px 8px 16px;
-    transform: translateY(100%); transition: transform 0.2s var(--ease);
+    background: var(--bg-layer); border-radius: 20px 20px 0 0;
+    box-shadow: 0 -12px 40px rgba(60,48,28,0.16); padding: 8px 10px calc(16px + env(safe-area-inset-bottom, 0));
+    transform: translateY(100%); transition: transform 0.24s var(--ease);
     max-height: 82vh; overflow-y: auto;
 }
 .more-drawer.open { transform: translateY(0); }
-.more-drawer-title { font-size: 12px; color: var(--text-tertiary); font-weight: 600; padding: 10px 12px 6px; letter-spacing: 0.5px; }
-.more-drawer .sidebar-item { padding: 12px 12px; }
+.more-drawer-title { font-size: 12px; color: var(--text-tertiary); font-weight: 650; padding: 12px 12px 8px; letter-spacing: 0.5px; }
+/* 抽屉里的项一律横向排列（底部导航那套是竖向图标+文字，别混用） */
+.more-drawer .sidebar-item { flex-direction: row; justify-content: flex-start; gap: 10px; min-width: 0; padding: 13px 14px; border-radius: 12px; font-size: 14.5px; font-weight: 550; color: var(--text-secondary); }
+.more-drawer .sidebar-item.active { color: var(--accent); background: var(--accent-light); }
 /* 抽屉里的操作项（刷新/导出/导入）用 <button>，抹平按钮默认样式 */
-.drawer-btn { width: 100%; background: none; border: none; font-family: inherit; text-align: left; justify-content: flex-start; }
-.more-drawer-ver { font-size: 11px; color: var(--text-tertiary); text-align: center; padding: 10px 0 14px; }
-.sidebar-item:hover svg { opacity: 0.75; }
-.sidebar-item.active svg { opacity: 1; color: var(--accent); }
+.drawer-btn { width: 100%; background: none; border: none; font-family: inherit; text-align: left; }
+.more-drawer-ver { font-size: 11px; color: var(--text-muted); text-align: center; padding: 12px 0 8px; }
 
 /* === Main === */
-.main-wrap { margin-left: 240px; min-height: 100vh; }
-main { max-width: 1080px; margin: 0 auto; padding: 28px 32px 60px; }
+.main-wrap { margin-left: 0; min-height: 100vh; padding-bottom: 74px; }
+main { max-width: 640px; margin: 0 auto; padding: 14px 12px 24px; }
 .section { display: none; }
 .section.active { display: block; }
-#section-overview.active { display: flex; flex-direction: column; justify-content: center; min-height: calc(100vh - 60px); }
+#section-overview.active { display: flex; flex-direction: column; justify-content: flex-start; min-height: calc(100vh - 120px); }
 
 /* === Card === */
 .card {
     background: var(--bg-layer);
     border-radius: var(--radius-md);
     border: 1px solid var(--border-l2);
-    padding: 20px 24px;
+    box-shadow: var(--shadow-sm);
+    padding: 16px;
     margin-bottom: 12px;
 }
 .card h3 {
-    font-size: 13px; font-weight: 600;
+    font-size: 13.5px; font-weight: 650;
     color: var(--text-primary);
     margin-bottom: 12px;
     letter-spacing: -0.1px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
 }
 
 /* === Overview === */
 .overview-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
     margin-bottom: 12px;
 }
 .overview-card {
     background: var(--bg-layer);
     border-radius: var(--radius-md);
     border: 1px solid var(--border-l2);
-    padding: 20px 24px;
+    box-shadow: var(--shadow-sm);
+    padding: 13px 14px 12px;
     transition: border-color var(--duration) var(--ease);
     cursor: default;
 }
-.overview-card:hover { border-color: var(--border-l3); }
-.overview-card .value { font-size: 30px; font-weight: 650; color: var(--text-primary); letter-spacing: -0.6px; line-height: 1.15; }
-.overview-card .label { font-size: 11.5px; color: var(--text-tertiary); margin-top: 6px; font-weight: 500; letter-spacing: 0.2px; }
+.overview-card .oc-icon {
+    width: 26px; height: 26px; border-radius: 9px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; line-height: 1; margin-bottom: 8px;
+    background: var(--bg-hover);
+}
+.overview-card .value {
+    font-size: 21px; font-weight: 700; color: var(--text-primary);
+    letter-spacing: -0.5px; line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+.overview-card .label { font-size: 11.5px; color: var(--text-tertiary); margin-top: 3px; font-weight: 550; }
+.overview-card.pos .value { color: var(--pos); }
+.overview-card.neg .value { color: var(--neg); }
+.overview-card.net .value { color: var(--accent); }
+.overview-card.pos .oc-icon { background: var(--pos-light); }
+.overview-card.neg .oc-icon { background: var(--neg-light); }
+.overview-card.net .oc-icon { background: var(--accent-light); }
 .overview-charts .card { margin-bottom: 0; }
+
+/* === 概览顶部问候 === */
+.ov-hello { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 2px 0 12px; }
+.oh-date { font-size: 21px; font-weight: 700; letter-spacing: -0.4px; line-height: 1.2; }
+.oh-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 3px; }
+.oh-btn {
+    flex-shrink: 0; min-height: 40px; padding: 0 16px;
+    border-radius: var(--radius-full); border: none;
+    background: linear-gradient(180deg, #37795A, var(--accent));
+    color: #fff; font-size: 13px; font-weight: 700; font-family: inherit;
+    box-shadow: 0 3px 10px rgba(47,107,79,0.28); cursor: pointer;
+    transition: transform var(--duration) var(--ease);
+}
+.oh-btn:active { transform: scale(0.96); }
 
 /* === Form === */
 .form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
-/* 保存按钮格：空 label 占位，与左侧输入框对齐 */
-.align-btn .custom-select {
-    position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; min-width: 96px; width: fit-content;
-    border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
-    font-size: 15px; line-height: 1.4; color: var(--text-primary);
-}
-.custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
-.custom-select.open .sel-arrow { transform: rotate(180deg); }
-.sel-options {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
-    min-width: 100%; max-height: 240px; overflow-y: auto;
-    background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
-    display: none;
-}
-.custom-select.open .sel-options { display: block; }
-.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
-.sel-option:hover { background: var(--bg-hover); }
-.sel-option.sel-active { color: var(--accent); font-weight: 600; }
-/* 自定义日期选择器 */
-.custom-date {
-    position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; width: fit-content; min-width: 0;
-    border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
-    font-size: 15px; line-height: 1.4; color: var(--text-primary);
-}
-.custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
-.date-panel {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    min-width: 100%; max-height: 280px; overflow-y: auto;
-    background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
-    display: none;
-}
-.custom-date.open .date-panel { display: block; }
-.date-opt {
-    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
-}
-.date-opt:hover { background: var(--bg-hover); }
-.date-opt.sel-active { color: var(--accent); font-weight: 600; }
-.btn { width: 100%; white-space: nowrap; }
+.btn { width: auto; white-space: nowrap; }
+/* 表单里的保存/取消按钮撑满一行；其它位置（月份切换、表格内）按内容宽 */
+.form-actions .btn, .align-btn .btn { flex: 1 1 auto; }
 .form-row .form-actions { align-items: flex-end; }
-.form-group { display: flex; flex-direction: column; gap: 4px; }
-.form-group label { font-size: 11.5px; color: var(--text-secondary); font-weight: 550; letter-spacing: 0.1px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 11.5px; color: var(--text-secondary); font-weight: 650; letter-spacing: 0.1px; }
 .form-group input, .form-group select, .form-group textarea {
-    padding: 7px 11px;
+    padding: 10px 12px;
     border: 1px solid var(--border-l3);
     border-radius: var(--radius);
-    font-size: 13.5px;
+    font-size: 15px;
     font-family: inherit;
     color: var(--text-primary);
-    background: var(--bg-base);
+    background: var(--bg-layer);
     transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
     outline: none;
 }
-.form-group input:hover, .form-group select:hover, .form-group textarea:hover { border-color: var(--border-l3); }
+.form-group input:hover, .form-group select:hover, .form-group textarea:hover { border-color: var(--text-muted); }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-ring);
@@ -222,180 +224,166 @@ main { max-width: 1080px; margin: 0 auto; padding: 28px 32px 60px; }
 .form-group textarea { resize: vertical; min-height: 80px; }
 .form-actions { display: flex; align-items: flex-end; gap: 8px; }
 
-/* === Buttons === */
+/* === 自定义控件（下拉 / 日期） === */
 .custom-select {
     position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; min-width: 96px; width: fit-content;
+    padding: 10px 12px; min-width: 96px; width: fit-content;
     border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
+    background: var(--bg-layer); cursor: pointer; user-select: none;
     font-size: 15px; line-height: 1.4; color: var(--text-primary);
 }
 .custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
 .custom-select.open .sel-arrow { transform: rotate(180deg); }
 .sel-options {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
-    min-width: 100%; max-height: 240px; overflow-y: auto;
+    position: absolute; top: calc(100% + 6px); left: 0; z-index: 320;
+    min-width: 100%; max-height: 260px; overflow-y: auto;
     background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-overlay);
+    padding: 4px;
     display: none;
 }
 .custom-select.open .sel-options { display: block; }
-.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
+.sel-option { padding: 11px 13px; white-space: nowrap; cursor: pointer; font-size: 15px; border-radius: 8px; }
 .sel-option:hover { background: var(--bg-hover); }
-.sel-option.sel-active { color: var(--accent); font-weight: 600; }
+.sel-option.sel-active { color: var(--accent); font-weight: 700; background: var(--accent-light); }
 /* 自定义日期选择器 */
 .custom-date {
     position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; width: fit-content; min-width: 0;
+    padding: 10px 12px; width: fit-content; min-width: 0;
     border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
+    background: var(--bg-layer); cursor: pointer; user-select: none;
     font-size: 15px; line-height: 1.4; color: var(--text-primary);
 }
 .custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
 .date-panel {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    min-width: 100%; max-height: 280px; overflow-y: auto;
+    position: absolute; top: calc(100% + 6px); left: 0; z-index: 330;
+    min-width: 100%; max-height: 300px; overflow-y: auto;
     background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-overlay);
+    padding: 4px;
     display: none;
 }
 .custom-date.open .date-panel { display: block; }
 .date-opt {
-    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
+    padding: 11px 13px; cursor: pointer; font-size: 15px; white-space: nowrap; border-radius: 8px;
 }
 .date-opt:hover { background: var(--bg-hover); }
-.date-opt.sel-active { color: var(--accent); font-weight: 600; }
+.date-opt.sel-active { color: var(--accent); font-weight: 700; background: var(--accent-light); }
+
+/* === Buttons === */
 .btn {
     display: inline-flex; align-items: center; justify-content: center;
-    padding: 7px 18px; border: none; border-radius: var(--radius-full);
-    cursor: pointer; font-size: 13px; font-weight: 500;
-    font-family: inherit; transition: background var(--duration) var(--ease), opacity var(--duration) var(--ease);
-    line-height: 1.4; white-space: nowrap;
+    min-height: 42px; padding: 8px 18px;
+    border: none; border-radius: var(--radius-full);
+    cursor: pointer; font-size: 13.5px; font-weight: 650;
+    font-family: inherit; line-height: 1.4; white-space: nowrap;
     letter-spacing: 0.1px;
+    transition: transform var(--duration) var(--ease), background var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
 }
-.btn-save { background: var(--accent); color: #fff; }
-.btn-save:hover { background: #1e293b; }
-.btn-cancel { background: var(--bg-layer); color: var(--text-primary); border: 1px solid var(--border-l2); }
-.btn-cancel:hover { background: var(--bg-hover); border-color: var(--border-l3); }
-.btn-danger { background: var(--bg-layer); color: var(--text-secondary); border: 1px solid var(--border-l2); font-size: 12px; padding: 5px 14px; }
-.btn-danger:hover { background: var(--bg-hover); border-color: var(--border-l3); color: var(--text-primary); }
-.btn-sm { font-size: 12px; padding: 5px 14px; }
+.btn:active { transform: scale(0.97); }
+.btn-save {
+    background: linear-gradient(180deg, #37795A, var(--accent));
+    color: #fff; box-shadow: 0 3px 10px rgba(47,107,79,0.24);
+}
+.btn-save:hover { background: var(--accent-hover); }
+.btn-cancel { background: var(--bg-layer); color: var(--text-secondary); border: 1px solid var(--border-l2); }
+.btn-cancel:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-l3); }
+.btn-danger { background: transparent; color: var(--neg); border: 1px solid rgba(180,97,31,0.3); font-size: 12px; min-height: 34px; padding: 5px 12px; }
+.btn-danger:hover { background: var(--neg-light); }
+.btn-sm { font-size: 12.5px; min-height: 34px; padding: 6px 14px; }
+/* 表格里的按钮别撑满单元格，两个并排才好看 */
+td .btn { width: auto; }
 
 /* === Table === */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 th {
-    text-align: left; padding: 9px 12px;
-    color: var(--text-tertiary); font-weight: 550;
+    text-align: left; padding: 10px 10px;
+    color: var(--text-tertiary); font-weight: 700;
     font-size: 11px;
     border-bottom: 1px solid var(--border-l2);
-    white-space: nowrap; background: var(--bg-base);
-    letter-spacing: 0.2px;
+    white-space: nowrap; background: var(--bg-hover);
+    letter-spacing: 0.3px;
 }
-td { padding: 9px 12px; border-bottom: 1px solid var(--border-l1); color: var(--text-secondary); }
+td { padding: 11px 10px; border-bottom: 1px solid var(--border-l1); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+tbody tr:nth-child(even) td { background: #FCFAF4; }
+tbody tr:last-child td { border-bottom: none; }
 /* 表格日期下的时间小字 */
 .cell-time { font-size: 10px; color: var(--text-muted); line-height: 1.3; margin-top: 1px; }
 tbody tr { transition: background var(--duration) var(--ease); }
 tbody tr:hover td { background: var(--bg-hover); }
-.amount-plus, .amount-minus { color: var(--text-primary); font-weight: 550; }
-
-/* === 纪录 === */
-.record-item {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 10px 4px; border-bottom: 1px solid var(--border-l1);
-}
-.record-item:last-child { border-bottom: none; }
-.record-date { flex-shrink: 0; font-size: 11px; color: var(--text-tertiary); padding-top: 3px; font-weight: 500; }
-.record-content {
-    flex: 1; font-size: 14px; line-height: 1.5; color: var(--text-primary);
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-    word-break: break-word; cursor: pointer;
-}
-.record-content:hover { color: var(--accent); }
-.record-actions { display: flex; gap: 6px; flex-shrink: 0; }
-.record-main { flex: 1; min-width: 0; }
-.record-followup { font-size: 13px; color: var(--text-secondary); background: var(--bg-hover); border-radius: var(--radius-sm); padding: 8px 10px; margin-top: 6px; white-space: pre-wrap; line-height: 1.6; }
-.fu-toggle { font-size: 12px; color: var(--text-tertiary); background: none; border: none; cursor: pointer; padding: 5px 0 2px; margin-top: 2px; font-family: inherit; }
-.fu-toggle:hover { color: var(--accent); }
-.record-followup-edit textarea { width: 100%; min-height: 56px; font-size: 13px; font-family: inherit; padding: 8px 10px; border: 1px solid var(--border-l3); border-radius: var(--radius-sm); background: var(--bg-base); resize: vertical; outline: none; margin-top: 6px; }
-.record-followup-edit textarea:focus { border-color: var(--accent); }
-.record-item.done .record-content { color: var(--text-muted); text-decoration: line-through; }
-.record-item.done .record-content:hover { color: var(--text-muted); }
-
+.amount-plus { color: var(--pos); font-weight: 700; }
+.amount-minus { color: var(--neg); font-weight: 700; }
 /* === Mood === */
-.mood-picker { display: flex; gap: 10px; flex-wrap: wrap; }
+.mood-picker { display: flex; gap: 8px; flex-wrap: wrap; }
 .mood-btn {
-    font-size: 30px; padding: 10px 16px; border: 2px solid var(--border-l2);
+    font-size: 30px; padding: 11px 15px; border: 2px solid var(--border-l2);
     border-radius: var(--radius-md); background: var(--bg-layer); cursor: pointer;
+    box-shadow: var(--shadow-sm);
     transition: all var(--duration) var(--ease); line-height: 1;
 }
-.mood-btn:hover { border-color: var(--border-l3); transform: translateY(-2px); }
-.mood-btn.locked { opacity: 0.6; cursor: not-allowed; }
-.mood-btn.locked:hover { transform: none; border-color: var(--border-l2); }
-.mood-btn.locked.active { opacity: 1; cursor: default; }
-.mood-btn.locked.active:hover { border-color: var(--accent); transform: scale(1.15); }
-.mood-btn.active { border-color: var(--accent); background: var(--accent-light); transform: scale(1.15); box-shadow: 0 0 0 3px var(--accent-ring); }
-.mood-calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.mood-btn:active { transform: scale(0.94); }
+.mood-btn.active { border-color: var(--accent); background: var(--accent-light); transform: scale(1.1); box-shadow: 0 0 0 3px var(--accent-ring); }
+.mood-calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
 .mood-day {
-    aspect-ratio: 1; border-radius: var(--radius-sm); display: flex; flex-direction: column;
+    aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column;
     align-items: center; justify-content: center; font-size: 10px; color: var(--text-tertiary);
     border: 1px solid var(--border-l1); background: var(--bg-hover); cursor: pointer;
+    transition: transform var(--duration) var(--ease);
 }
+.mood-day:active { transform: scale(0.93); }
 .mood-day.selected { outline: 2px solid var(--accent); outline-offset: -2px; }
 .mood-day .emoji { font-size: 16px; line-height: 1.3; }
 .mood-day.empty { border: none; background: transparent; }
-.mood-day.today { box-shadow: 0 0 0 1px var(--border-l2); }
+.mood-day.today { box-shadow: inset 0 0 0 1.5px var(--accent); }
 .mood-legend { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; flex-wrap: wrap; font-size: 11px; color: var(--text-tertiary); }
 
 /* === Weather === */
-.weather-picker { display: flex; gap: 10px; flex-wrap: wrap; }
+.weather-picker { display: flex; gap: 8px; flex-wrap: wrap; }
 .weather-btn {
-    font-size: 26px; padding: 10px 14px; border: 2px solid var(--border-l2);
+    font-size: 26px; padding: 10px 12px; border: 2px solid var(--border-l2);
     border-radius: var(--radius-md); background: var(--bg-layer); cursor: pointer;
-    transition: all var(--duration) var(--ease); line-height: 1.2; min-width: 72px;
-    text-align: center; font-family: inherit;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--duration) var(--ease); line-height: 1.2; min-width: 70px;
+    text-align: center; font-family: inherit; color: var(--text-primary);
 }
-.weather-btn span { display: block; font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-top: 4px; }
-.weather-btn:hover { border-color: var(--border-l3); transform: translateY(-2px); }
-.weather-btn.active { border-color: var(--accent); background: var(--accent-light); transform: scale(1.06); box-shadow: 0 0 0 3px var(--accent-ring); }
-.weather-btn.locked { opacity: 0.6; cursor: not-allowed; }
-.weather-btn.locked:hover { transform: none; border-color: var(--border-l2); }
-.weather-btn.locked.active { opacity: 1; cursor: default; }
-.weather-btn.locked.active:hover { border-color: var(--accent); }
+.weather-btn span { display: block; font-size: 11.5px; color: var(--text-secondary); font-weight: 600; margin-top: 4px; }
+.weather-btn:active { transform: scale(0.94); }
+.weather-btn.active { border-color: var(--accent); background: var(--accent-light); transform: scale(1.04); box-shadow: 0 0 0 3px var(--accent-ring); }
 
 /* === Electricity === */
 #elecSummary {
     background: var(--bg-hover);
-    padding: 10px 14px; border-radius: var(--radius);
+    padding: 12px 14px; border-radius: var(--radius-md);
     margin-bottom: 10px; font-size: 13px; color: var(--text-secondary);
     letter-spacing: 0.1px; line-height: 1.9;
 }
-#elecSummary strong { color: var(--text-primary); }
+#elecSummary strong { color: var(--text-primary); font-weight: 700; }
 
 /* === 常用记账快捷条 === */
 .quick-chips {
-    display: flex; gap: 6px; overflow-x: auto;
-    margin: 0 0 12px; padding-bottom: 2px;
+    display: flex; gap: 7px; overflow-x: auto;
+    margin: 0 0 12px; padding: 2px 0 4px;
     -webkit-overflow-scrolling: touch;
 }
 .quick-chips:empty { display: none; }
 .quick-chip {
-    flex: 0 0 auto; padding: 6px 12px; border-radius: 999px;
-    border: 1px solid var(--border-l2); background: var(--bg-base);
-    font-size: 12.5px; font-family: inherit; color: var(--text-secondary);
-    cursor: pointer; white-space: nowrap;
+    flex: 0 0 auto; min-height: 36px; padding: 7px 15px; border-radius: var(--radius-full);
+    border: 1px solid var(--border-l2); background: var(--bg-layer);
+    font-size: 13px; font-weight: 600; font-family: inherit; color: var(--text-secondary);
+    box-shadow: var(--shadow-sm); cursor: pointer; white-space: nowrap;
+    transition: transform var(--duration) var(--ease), background var(--duration) var(--ease);
 }
-.quick-chip b { color: var(--text-primary); font-weight: 600; }
-.quick-chip:active { background: var(--accent-light); border-color: var(--accent-ring); color: var(--accent); }
+.quick-chip:active { transform: scale(0.95); background: var(--accent-light); border-color: var(--accent-ring); color: var(--accent); }
 
 /* === 右下角"记一笔"悬浮按钮（让开底部导航） === */
 .fab {
-    position: fixed; right: 14px; bottom: 72px; z-index: 150;
-    height: 46px; padding: 0 18px; border-radius: 23px;
+    position: fixed; right: 14px; bottom: calc(72px + env(safe-area-inset-bottom, 0)); z-index: 150;
+    height: 48px; padding: 0 20px; border-radius: 24px;
     display: flex; align-items: center; justify-content: center;
-    background: var(--accent); color: #fff; border: none;
-    font-size: 14px; font-weight: 600; font-family: inherit;
-    box-shadow: 0 6px 20px rgba(59,130,246,0.38);
+    background: linear-gradient(180deg, #37795A, var(--accent)); color: #fff; border: none;
+    font-size: 14.5px; font-weight: 700; font-family: inherit;
+    box-shadow: 0 8px 24px rgba(47,107,79,0.35);
     cursor: pointer;
 }
 .fab:active { transform: scale(0.96); }
@@ -436,73 +424,78 @@ tbody tr:hover td { background: var(--bg-hover); }
 .cat-detail-item .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cat-detail-item .a { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text-primary); }
 
-/* === 每日页（心情+天气+描述，v1.8.3） === */
-.day-label { font-size: 11.5px; color: var(--text-secondary); font-weight: 550; margin-bottom: 6px; letter-spacing: 0.1px; }
+/* === 每日页（心情+天气+描述） === */
+.day-label { font-size: 11.5px; color: var(--text-secondary); font-weight: 700; margin-bottom: 6px; letter-spacing: 0.2px; }
 #dayNote {
-    width: 100%; padding: 9px 12px; min-height: 68px; resize: vertical;
+    width: 100%; padding: 11px 12px; min-height: 72px; resize: vertical;
     border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); font-size: 13.5px; font-family: inherit;
+    background: var(--bg-layer); font-size: 14.5px; font-family: inherit;
     color: var(--text-primary); line-height: 1.6; outline: none;
+    transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
 }
 #dayNote:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
-.day-hint { font-size: 12px; color: var(--text-muted); }
+#dayNote::placeholder { color: var(--text-muted); }
+.day-hint { font-size: 12px; color: var(--text-tertiary); font-weight: 550; }
 .mood-day { position: relative; }
-.mood-day .w-emoji { position: absolute; top: 1px; right: 2px; font-size: 9px; line-height: 1; opacity: 0.9; }
+.mood-day .w-emoji { position: absolute; top: 2px; right: 3px; font-size: 9px; line-height: 1; opacity: 0.95; }
 /* 底部导航红点：今天还没记心情/天气 */
 .sidebar-item.has-dot { position: relative; }
 .sidebar-item.has-dot::after {
-    content: ''; position: absolute; top: 5px; right: 26%;
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #ef4444; box-shadow: 0 0 0 2px var(--bg-layer);
+    content: ''; position: absolute; top: 4px; right: 20%;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #E04B3A; box-shadow: 0 0 0 2px var(--bg-sidebar);
 }
 /* 概览顶部「今日」提示条 */
 .today-strip {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 14px; margin-bottom: 12px;
-    background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius-md); cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; margin-bottom: 12px;
+    background: linear-gradient(120deg, var(--accent-light), #FFFDF8 72%);
+    border: 1px solid var(--accent-ring);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+    cursor: pointer;
     font-size: 13px; color: var(--text-secondary);
 }
-.today-strip .ts-emoji { font-size: 17px; line-height: 1; }
-.today-strip .ts-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.today-strip .ts-go { color: var(--accent); font-size: 12.5px; font-weight: 600; white-space: nowrap; }
-.today-strip:active { background: var(--bg-hover); }
+.today-strip .ts-emoji { font-size: 18px; line-height: 1; }
+.today-strip .ts-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 550; }
+.today-strip .ts-go { color: var(--accent); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.today-strip:active { filter: brightness(0.98); }
 
 /* === Toast === */
 .toast {
-    position: fixed; top: 16px; right: 16px;
-    background: #1e293b; color: #fff;
-    padding: 10px 20px; border-radius: var(--radius-md); font-size: 13px;
-    z-index: 9999; opacity: 0; transform: translateY(-6px);
-    transition: all 0.18s var(--ease);
-    box-shadow: var(--shadow-md);
-    font-weight: 500; letter-spacing: 0.2px;
+    position: fixed; left: 50%; transform: translate(-50%, -8px); top: 18px;
+    background: #1B2A22; color: #fff;
+    padding: 11px 20px; border-radius: var(--radius-full); font-size: 13.5px;
+    z-index: 9999; opacity: 0;
+    transition: all 0.2s var(--ease);
+    box-shadow: var(--shadow-overlay);
+    font-weight: 600; letter-spacing: 0.2px; max-width: 88vw;
+    pointer-events: none;
 }
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.success { background: #1e293b; }
-.toast.error { background: #1e293b; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.success { background: #1B2A22; }
+.toast.error { background: #7A2E1E; }
 
 /* === Modal === */
 .modal-overlay {
     display: none; position: fixed; inset: 0;
-    background: rgba(15,23,42,0.3); backdrop-filter: blur(3px);
+    background: rgba(27,42,34,0.34); backdrop-filter: blur(3px);
     z-index: 300; align-items: center; justify-content: center;
 }
 .modal-overlay.show { display: flex; }
 .modal {
     background: var(--bg-layer); border-radius: var(--radius-lg);
-    padding: 28px; max-width: 440px; width: 92%;
+    padding: 24px; max-width: 440px; width: 90%;
     box-shadow: var(--shadow-overlay);
     border: 1px solid var(--border-l1);
 }
-.modal h4 { margin-bottom: 12px; font-size: 15px; font-weight: 600; color: var(--text-primary); }
-.modal .btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px; }
+.modal h4 { margin-bottom: 12px; font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.modal .btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
 .hidden-input { display: none; }
 
 /* === Chart Toggle (概览) === */
 .chart-toggle {
-    padding: 5px 16px; border: none; border-radius: var(--radius);
-    font-size: 12.5px; font-weight: 500; cursor: pointer;
+    padding: 7px 16px; border: none; border-radius: var(--radius-full);
+    font-size: 12.5px; font-weight: 650; cursor: pointer;
     background: transparent; color: var(--text-tertiary);
     transition: all var(--duration) var(--ease);
     font-family: inherit;
@@ -512,339 +505,77 @@ tbody tr:hover td { background: var(--bg-hover); }
 button:disabled { opacity: 0.35; cursor: not-allowed; }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d4d8dd; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #b0b5bc; }
+::-webkit-scrollbar-thumb { background: #D9D2C2; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #C4BBA8; }
 
-/* === Mobile Responsive === */
+/* === 手机端表单/表格布局（本项目只有手机端；上面的 :root 与组件样式已是手机观感） === */
 @media (max-width: 768px) {
-    .sidebar {
-        position: fixed; left: 0; right: 0; bottom: 0; top: auto;
-        width: 100%; height: 56px;
-        flex-direction: row; align-items: center;
-        background: var(--bg-layer);
-        border-right: none; border-top: 1px solid var(--border-l2);
-        z-index: 200;
-        padding: 0; box-shadow: 0 -1px 4px rgba(0,0,0,0.04);
-    }
-    .sidebar-nav {
-        flex: 1; flex-direction: row; overflow-x: auto; overflow-y: hidden;
-        padding: 0 4px; gap: 0; justify-content: space-around;
-    }
-    .sidebar-item {
-        flex-direction: column; gap: 2px;
-        padding: 4px 6px; border-radius: var(--radius-sm);
-        font-size: 10px; min-width: 44px; text-align: center;
-    }
-    .sidebar-item svg { width: 20px; height: 20px; }
-    .more-drawer { display: block; }
-    /* 抽屉子项：横向、正常字号 */
-    .more-drawer .sidebar-item { flex-direction: row; gap: 10px; font-size: 14px; padding: 13px 14px; }
-    .more-drawer .sidebar-item.active { color: var(--accent); background: var(--bg-active); }
-
-    .main-wrap { margin-left: 0; margin-bottom: 64px; }
-    main { padding: 10px 10px 20px; }
-
-    .overview-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .overview-card { padding: 12px 14px; }
-    .overview-card .value { font-size: 20px; }
-    .overview-card .label { font-size: 10px; margin-top: 4px; }
-
-    .card { padding: 12px 14px; margin-bottom: 8px; border-radius: var(--radius); }
-    .card h3 { font-size: 12px; margin-bottom: 10px; }
-
-    /* Form: responsive grid on mobile */
     .form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 10px;
         align-items: start;
     }
-    .form-row .form-actions { grid-column: 1 / -1; display: flex; gap: 8px; margin-top: 4px; align-items: center; justify-content: space-between; }
-    .form-row .form-actions .custom-select {
-    position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; min-width: 96px; width: fit-content;
-    border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
-    font-size: 15px; line-height: 1.4; color: var(--text-primary);
-}
-.custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
-.custom-select.open .sel-arrow { transform: rotate(180deg); }
-.sel-options {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
-    min-width: 100%; max-height: 240px; overflow-y: auto;
-    background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
-    display: none;
-}
-.custom-select.open .sel-options { display: block; }
-.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
-.sel-option:hover { background: var(--bg-hover); }
-.sel-option.sel-active { color: var(--accent); font-weight: 600; }
-/* 自定义日期选择器 */
-.custom-date {
-    position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; width: fit-content; min-width: 0;
-    border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
-    font-size: 15px; line-height: 1.4; color: var(--text-primary);
-}
-.custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
-.date-panel {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    min-width: 100%; max-height: 280px; overflow-y: auto;
-    background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
-    display: none;
-}
-.custom-date.open .date-panel { display: block; }
-.date-opt {
-    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
-}
-.date-opt:hover { background: var(--bg-hover); }
-.date-opt.sel-active { color: var(--accent); font-weight: 600; }
-.btn { flex: 1; justify-content: center; padding: 12px; min-height: 44px; }
-    /* 支出/收入表单：日期|分类|金额 一行，时间|描述(备注) 一行，保存一行 */
-    #expenseForm, #incomeForm { grid-template-columns: 1fr 1fr 1fr; }
-    #expenseForm .form-group:nth-child(5),
-    #incomeForm .form-group:nth-child(5) { grid-column: 2 / 4; }
-    #incLargeWrap { grid-column: 1 / -1; }
-    #expenseForm .form-actions,
-    #incomeForm .form-actions { grid-column: 1 / -1; justify-content: flex-end; align-self: end; margin-top: 4px; }
-    #expenseForm label { grid-column: 1 / -1; }
-    /* 保存按钮与左侧 input 精确对齐：视觉高度微调 */
-    #expenseForm .form-actions .btn, #incomeForm .form-actions .btn { min-height: 40px; margin-bottom: 1px; }
-    /* 财务表单：日期|流动资产 一行，其余两列排列，保存按钮单独整行 */
-    #section-finance .form-row .align-btn { grid-column: 1 / -1; }
-    #section-finance .align-btn label { display: none; }
-    #section-finance .align-btn .custom-select {
-    position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; min-width: 96px; width: fit-content;
-    border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
-    font-size: 15px; line-height: 1.4; color: var(--text-primary);
-}
-.custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
-.custom-select.open .sel-arrow { transform: rotate(180deg); }
-.sel-options {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
-    min-width: 100%; max-height: 240px; overflow-y: auto;
-    background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
-    display: none;
-}
-.custom-select.open .sel-options { display: block; }
-.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
-.sel-option:hover { background: var(--bg-hover); }
-.sel-option.sel-active { color: var(--accent); font-weight: 600; }
-/* 自定义日期选择器 */
-.custom-date {
-    position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; width: fit-content; min-width: 0;
-    border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
-    font-size: 15px; line-height: 1.4; color: var(--text-primary);
-}
-.custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
-.date-panel {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    min-width: 100%; max-height: 280px; overflow-y: auto;
-    background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
-    display: none;
-}
-.custom-date.open .date-panel { display: block; }
-.date-opt {
-    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
-}
-.date-opt:hover { background: var(--bg-hover); }
-.date-opt.sel-active { color: var(--accent); font-weight: 600; }
-.btn { width: 100%; min-height: 44px; }
-    /* 用电表单：日期|读数 一行，保存按钮单独整行 */
-    #section-electricity .form-row .align-btn { grid-column: 1 / -1; }
-    #section-electricity .align-btn label { display: none; }
-    #section-electricity .align-btn .custom-select {
-    position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; min-width: 96px; width: fit-content;
-    border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
-    font-size: 15px; line-height: 1.4; color: var(--text-primary);
-}
-.custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
-.custom-select.open .sel-arrow { transform: rotate(180deg); }
-.sel-options {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
-    min-width: 100%; max-height: 240px; overflow-y: auto;
-    background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
-    display: none;
-}
-.custom-select.open .sel-options { display: block; }
-.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
-.sel-option:hover { background: var(--bg-hover); }
-.sel-option.sel-active { color: var(--accent); font-weight: 600; }
-/* 自定义日期选择器 */
-.custom-date {
-    position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; width: fit-content; min-width: 0;
-    border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
-    font-size: 15px; line-height: 1.4; color: var(--text-primary);
-}
-.custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
-.date-panel {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    min-width: 100%; max-height: 280px; overflow-y: auto;
-    background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
-    display: none;
-}
-.custom-date.open .date-panel { display: block; }
-.date-opt {
-    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
-}
-.date-opt:hover { background: var(--bg-hover); }
-.date-opt.sel-active { color: var(--accent); font-weight: 600; }
-.btn { width: 100%; min-height: 44px; }
-
-    .form-group { gap: 3px; min-width: 0; }
-    .form-group label { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+    .form-row .form-actions { grid-column: 1 / -1; display: flex; gap: 8px; margin-top: 6px; align-items: center; justify-content: flex-end; }
+    .form-group { gap: 4px; min-width: 0; }
+    .form-group label { font-size: 12px; }
     .form-group input, .form-group select, .form-group textarea {
-        width: 100% !important; font-size: 16px; padding: 10px 12px;
-        border-radius: var(--radius); border: 1px solid var(--border-l3);
-        background: var(--bg-base); min-width: 0;
+        width: 100% !important; font-size: 16px; padding: 11px 12px; min-width: 0;
     }
     /* 日期框：日历图标贴近文字，不飘到最右 */
     #expenseForm input[type="date"], #incomeForm input[type="date"],
     #section-finance input[type="date"], #section-electricity input[type="date"] {
-        width: auto !important; min-width: 0;
-        padding-right: 4px;
+        width: auto !important; padding-right: 4px;
     }
     #expenseForm input[type="date"]::-webkit-calendar-picker-indicator,
     #incomeForm input[type="date"]::-webkit-calendar-picker-indicator,
     #section-finance input[type="date"]::-webkit-calendar-picker-indicator,
-    #section-electricity input[type="date"]::-webkit-calendar-picker-indicator {
-        margin: 0 0 0 2px;
-        padding: 0;
-    }
-    /* 自定义分类下拉（div 实现，不依赖浏览器原生控件渲染） */
-    .custom-select {
-        position: relative; display: inline-flex; align-items: center; gap: 8px;
-        padding: 9px 12px; min-width: 96px; width: fit-content;
-        border: 1px solid var(--border-l3); border-radius: var(--radius);
-        background: var(--bg-base); cursor: pointer; user-select: none;
-        font-size: 15px; line-height: 1.4; color: var(--text-primary);
-    }
-    .custom-select .sel-arrow { display: inline-flex; color: var(--text-tertiary); transition: transform .18s; }
-    .custom-select.open .sel-arrow { transform: rotate(180deg); }
-    .sel-options {
-        position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
-        min-width: 100%; max-height: 240px; overflow-y: auto;
-        background: var(--bg-layer); border: 1px solid var(--border-l2);
-        border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
-        display: none;
-    }
-    .custom-select.open .sel-options { display: block; }
-    .sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
-    .sel-option:hover { background: var(--bg-hover); }
-    .sel-option.sel-active { color: var(--accent); font-weight: 600; }
+    #section-electricity input[type="date"]::-webkit-calendar-picker-indicator { margin: 0 0 0 2px; padding: 0; }
 
-    .custom-select {
-    position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; min-width: 96px; width: fit-content;
-    border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
-    font-size: 15px; line-height: 1.4; color: var(--text-primary);
-}
-.custom-select .sel-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform .18s; }
-.custom-select.open .sel-arrow { transform: rotate(180deg); }
-.sel-options {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 320;
-    min-width: 100%; max-height: 240px; overflow-y: auto;
-    background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
-    display: none;
-}
-.custom-select.open .sel-options { display: block; }
-.sel-option { padding: 10px 14px; white-space: nowrap; cursor: pointer; font-size: 15px; }
-.sel-option:hover { background: var(--bg-hover); }
-.sel-option.sel-active { color: var(--accent); font-weight: 600; }
-/* 自定义日期选择器 */
-.custom-date {
-    position: relative; display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 12px; width: fit-content; min-width: 0;
-    border: 1px solid var(--border-l3); border-radius: var(--radius);
-    background: var(--bg-base); cursor: pointer; user-select: none;
-    font-size: 15px; line-height: 1.4; color: var(--text-primary);
-}
-.custom-date .date-icon { display: inline-flex; color: var(--text-tertiary); }
-.date-panel {
-    position: absolute; top: calc(100% + 4px); left: 0; z-index: 330;
-    min-width: 100%; max-height: 280px; overflow-y: auto;
-    background: var(--bg-layer); border: 1px solid var(--border-l2);
-    border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0,0,0,.12);
-    display: none;
-}
-.custom-date.open .date-panel { display: block; }
-.date-opt {
-    padding: 10px 14px; cursor: pointer; font-size: 15px; white-space: nowrap;
-}
-.date-opt:hover { background: var(--bg-hover); }
-.date-opt.sel-active { color: var(--accent); font-weight: 600; }
-.btn { padding: 10px 20px; font-size: 14px; border-radius: var(--radius); }
-    .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: var(--radius-sm); }
+    /* 支出/收入表单：日期|分类|金额 一行，时间|描述 一行，保存一行 */
+    #expenseForm, #incomeForm { grid-template-columns: 1fr 1fr 1fr; }
+    #expenseForm .form-group:nth-child(5),
+    #incomeForm .form-group:nth-child(5) { grid-column: 2 / 4; }
+    #incLargeWrap { grid-column: 1 / -1; }
+    #expenseForm .form-actions, #incomeForm .form-actions { grid-column: 1 / -1; justify-content: flex-end; margin-top: 4px; }
+    #expenseForm label { grid-column: 1 / -1; }
+    #expenseForm .form-actions .btn, #incomeForm .form-actions .btn { min-height: 44px; }
 
-    table { font-size: 12px; }
-    th, td { padding: 6px 6px; }
-    th { font-size: 10px; }
-    /* 收入/支出表格：固定列宽占满，操作列贴右不留白 */
+    /* 财务 / 用电：一行两个，保存按钮单独整行 */
+    #section-finance .form-row .align-btn,
+    #section-electricity .form-row .align-btn { grid-column: 1 / -1; }
+    #section-finance .align-btn label,
+    #section-electricity .align-btn label { display: none; }
+
+    /* 表格：固定列宽占满，操作列并排不换行 */
+    table { font-size: 12.5px; }
+    th, td { padding: 9px 5px; }
     #expenseTable, #incomeTable { table-layout: fixed; }
     #expenseTable th, #incomeTable th,
-    #expenseTable td, #incomeTable td {
-        padding: 6px 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    #expenseTable th:nth-child(1), #incomeTable th:nth-child(1) { width: 20%; }
-    #expenseTable th:nth-child(2), #incomeTable th:nth-child(2) { width: 13%; }
-    #expenseTable th:nth-child(3), #incomeTable th:nth-child(3) { width: 17%; }
-    #expenseTable th:nth-child(4), #incomeTable th:nth-child(4) { width: 18%; }
-    #expenseTable th:nth-child(5), #incomeTable th:nth-child(5) { width: 32%; }
-    #expenseTable td:last-child, #incomeTable td:last-child { white-space: nowrap; }
-    #expenseTable .btn-sm, #incomeTable .btn-sm { padding: 5px 6px; font-size: 11px; }
+    #expenseTable td, #incomeTable td { padding: 9px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* 支出：分类名短，描述长；收入：分类名长（日常收入），备注多为空 */
+    #expenseTable th:nth-child(1), #incomeTable th:nth-child(1) { width: 18%; }
+    #expenseTable th:nth-child(2) { width: 16%; }
+    #expenseTable th:nth-child(3) { width: 18%; }
+    #expenseTable th:nth-child(4) { width: 20%; }
+    #expenseTable th:nth-child(5) { width: 28%; }
+    #incomeTable th:nth-child(2) { width: 21%; }
+    #incomeTable th:nth-child(3) { width: 17%; }
+    #incomeTable th:nth-child(4) { width: 16%; }
+    #incomeTable th:nth-child(5) { width: 28%; }
     #expenseTable td:last-child, #incomeTable td:last-child { display: flex; gap: 4px; align-items: center; white-space: nowrap; }
-    #expenseTable .btn-danger, #incomeTable .btn-danger { color: #dc2626; background: rgba(220,38,38,.06); border-color: rgba(220,38,38,.3); }
+    #expenseTable .btn-sm, #incomeTable .btn-sm { padding: 5px 7px; font-size: 11.5px; }
 
-    .toast { left: 12px; right: 12px; top: auto; bottom: 72px; text-align: center; border-radius: var(--radius-md); }
-
-    .modal { padding: 20px 16px; margin: 0 12px; }
-
-    .sidebar-item span { font-size: 10px; }
-
-    .mood-btn { font-size: 26px; padding: 10px 6px; flex: 1; max-width: none; }
-    .record-content { font-size: 14px; }
-    .record-actions .btn-sm { padding: 5px 8px; font-size: 11px; }
-    .weather-btn { font-size: 22px; padding: 8px 10px; min-width: 0; flex: 1; }
-    .weather-btn span { font-size: 11px; }
+    /* 心情 / 天气按钮均分一行 */
+    .mood-btn { font-size: 26px; padding: 10px 4px; flex: 1; }
+    .weather-btn { font-size: 22px; padding: 9px 6px; min-width: 0; flex: 1; }
     .mood-calendar { gap: 4px; }
     .mood-day .emoji { font-size: 14px; }
-    .mood-legend { justify-content: flex-start; }
 
-    /* Ensure tap targets are big enough */
-    .sidebar-item { min-height: 44px; justify-content: center; }
-    .btn-danger, .btn-cancel { min-height: 32px; }
+    .modal { padding: 20px 16px; }
 }
-/* 桌面端：日期/分类控件固定宽度，与金额/备注对齐（!important 强制） */
-.custom-select { width: 110px !important; }
-.custom-date { width: 140px !important; }
-/* 移动端：覆盖回贴合内容 */
-@media (max-width: 768px) {
-    #expenseForm .custom-select, #incomeForm .custom-select { width: fit-content !important; }
-    #expenseForm .custom-date, #incomeForm .custom-date { width: fit-content !important; }
-}
-
-/* ════════════════════════════════════════════════════════════════
-   桌面端 UI 重构（≥769px）—— 全部规则限定在桌面断点内，不影响手机端
-   ════════════════════════════════════════════════════════════════ */
 </style>
 </head>
 <body>
@@ -886,7 +617,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <button class="sidebar-item drawer-btn" onclick="exportData(); closeMore();">⬇ 导出备份</button>
         <button class="sidebar-item drawer-btn" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="more-drawer-ver" id="appVersionM">v1.8.3</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.9.0</div>
     </div>
 </nav>
 
@@ -896,19 +627,27 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <main>
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
+    <div class="ov-hello">
+        <div>
+            <div class="oh-date" id="ohDate">今天</div>
+            <div class="oh-sub" id="ohSub"></div>
+        </div>
+        <button class="oh-btn" onclick="quickAddExpense()">＋ 记一笔</button>
+    </div>
     <div class="today-strip" id="todayStrip" onclick="switchTab('mood')"></div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-        <button class="btn btn-cancel btn-sm" onclick="ovPrevMonth()">◀ 上月</button>
-        <input type="month" id="ovMonth" onchange="ovMonthChange()" style="padding:6px 10px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-layer);font-size:13px;font-family:inherit;outline:none">
-        <button class="btn btn-cancel btn-sm" onclick="ovNextMonth()">下月 ▶</button>
+        <button class="btn btn-cancel btn-sm" onclick="ovPrevMonth()">◀</button>
+        <input type="month" id="ovMonth" onchange="ovMonthChange()" style="padding:8px 10px;border:1px solid var(--border-l3);border-radius:var(--radius);background:var(--bg-layer);font-size:14px;font-family:inherit;outline:none;color:var(--text-primary)">
+        <button class="btn btn-cancel btn-sm" onclick="ovNextMonth()">▶</button>
+        <span style="font-size:12px;color:var(--text-tertiary)" id="ovRangeHint"></span>
     </div>
     <div class="overview-cards" id="overviewCards">
-        <div class="overview-card"><div class="value">—</div><div class="label">收入</div></div>
-        <div class="overview-card"><div class="value">—</div><div class="label">副业收入</div></div>
-        <div class="overview-card"><div class="value">—</div><div class="label">工资收入</div></div>
-        <div class="overview-card"><div class="value">—</div><div class="label">支出</div></div>
-        <div class="overview-card"><div class="value">—</div><div class="label">大额支出</div></div>
-        <div class="overview-card"><div class="value">—</div><div class="label">结余</div></div>
+        <div class="overview-card pos"><div class="oc-icon">💰</div><div class="value">—</div><div class="label">本月收入</div></div>
+        <div class="overview-card pos"><div class="oc-icon">🌱</div><div class="value">—</div><div class="label">副业收入</div></div>
+        <div class="overview-card pos"><div class="oc-icon">🏦</div><div class="value">—</div><div class="label">工资收入</div></div>
+        <div class="overview-card neg"><div class="oc-icon">🧾</div><div class="value">—</div><div class="label">本月支出</div></div>
+        <div class="overview-card neg"><div class="oc-icon">🏷️</div><div class="value">—</div><div class="label">大额支出</div></div>
+        <div class="overview-card net"><div class="oc-icon">📊</div><div class="value">—</div><div class="label">结余</div></div>
     </div>
     <div class="overview-charts">
         <div class="card">
@@ -1099,7 +838,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     </div>
 </section>
 
-<!-- ═══════════════ 心情（合并天气 + 每日描述，v1.8.3） ═══════════════ -->
+<!-- ═══════════════ 心情（合并天气 + 每日描述，v1.8.0 起） ═══════════════ -->
 <section id="section-mood" class="section">
     <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
@@ -1334,6 +1073,12 @@ function preloadMoreTabs() {
             })
             .catch(() => {});   // 预加载失败静默，点开对应页面时再现场加载
     });
+    // 支出/收入也预加载一下，概览那句"今天记了几笔"才准
+    p = p.then(() => {
+        if (!apiCache.expenses) return api('/api/expense').then(d => { apiCache.expenses = d; cacheMeta.expenses = Date.now(); saveCache(); });
+    }).catch(() => {}).then(() => {
+        if (!apiCache.incomes) return api('/api/income').then(d => { apiCache.incomes = d; cacheMeta.incomes = Date.now(); saveCache(); });
+    }).catch(() => {}).then(() => renderOverviewHello());
 }
 
 // 刷新失败提示限频（避免连续失败刷屏）
@@ -1514,6 +1259,32 @@ function switchTab(name) {
 // 全站共享的"当前查看月份"：概览 / 支出 / 收入 / 统计 共用，切一次四页同步
 const VIEW_MONTH = { current: thisMonthStr() };
 
+// 概览顶部：日期 + 星期 + 今天记了几笔（顺手给个"记一笔"入口）
+function renderOverviewHello() {
+    const d = new Date();
+    const wd = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][d.getDay()];
+    const el = $('ohDate');
+    if (el) el.textContent = (d.getMonth() + 1) + '月' + d.getDate() + '日 · ' + wd;
+    const sub = $('ohSub');
+    if (!sub) return;
+    const today = todayStr();
+    const exps = apiCache.expenses || _expData || [];
+    const incs = apiCache.incomes || _incData || [];
+    const ne = exps.filter(r => r.date === today).length;
+    const ni = incs.filter(r => r.date === today).length;
+    if (ne || ni) {
+        sub.textContent = '今天已记 ' + [ne ? ne + ' 笔支出' : '', ni ? ni + ' 笔收入' : ''].filter(Boolean).join(' · ');
+    } else {
+        sub.textContent = '今天还没记账';
+    }
+}
+
+// 顶部「＋ 记一笔」：直接跳到支出并聚焦金额（少一次翻页找表单）
+function quickAddExpense() {
+    switchTab('expense');
+    setTimeout(() => { if (typeof focusExpenseForm === 'function') focusExpenseForm(); }, 280);
+}
+
 function viewMonthShift(delta) {
     let [y, m] = VIEW_MONTH.current.split('-').map(Number);
     m += delta;
@@ -1545,16 +1316,21 @@ async function loadOverview() {
     $('ovMonth').value = month;
     ensureDayData();          // 顺带刷新"今日"提示条和导航红点（有缓存时不会重复请求）
     renderTodayStrip();
+    renderOverviewHello();
     const render = (d) => {
         const { data, incomes, expenses } = d;
+        // 卡片数字：0 不带符号，避免出现 "-0" / "+0"
+        const ovNum = (v, sign) => { const n = Number(v || 0); return n ? (sign && n > 0 ? sign : '') + n.toFixed(0) : '0'; };
+        const bal = Number(data.balance || 0);
         $('overviewCards').innerHTML = `
-            <div class="overview-card"><div class="value" >+${Number(data.total_income || 0).toFixed(1)}</div><div class="label">${month} 收入</div></div>
-            <div class="overview-card"><div class="value" >+${Number(data.side_income || 0).toFixed(1)}</div><div class="label">${month} 副业收入</div></div>
-            <div class="overview-card"><div class="value" >+${Number(data.large_income || 0).toFixed(1)}</div><div class="label">${month} 工资收入</div></div>
-            <div class="overview-card"><div class="value" >-${Number(data.total_expense || 0).toFixed(1)}</div><div class="label">${month} 支出</div></div>
-            <div class="overview-card"><div class="value" >${Number(data.large_expense || 0).toFixed(1)}</div><div class="label">${month} 大额支出</div></div>
-            <div class="overview-card"><div class="value">${Number(data.balance || 0).toFixed(1)}</div><div class="label">${month} 结余</div></div>
+            <div class="overview-card pos"><div class="oc-icon">💰</div><div class="value">${ovNum(data.total_income, '+')}</div><div class="label">收入</div></div>
+            <div class="overview-card pos"><div class="oc-icon">🌱</div><div class="value">${ovNum(data.side_income, '+')}</div><div class="label">副业收入</div></div>
+            <div class="overview-card pos"><div class="oc-icon">🏦</div><div class="value">${ovNum(data.large_income, '+')}</div><div class="label">工资收入</div></div>
+            <div class="overview-card neg"><div class="oc-icon">🧾</div><div class="value">${ovNum(data.total_expense, '-')}</div><div class="label">日常支出</div></div>
+            <div class="overview-card neg"><div class="oc-icon">🏷️</div><div class="value">${ovNum(data.large_expense, '-')}</div><div class="label">大额支出</div></div>
+            <div class="overview-card ${bal < 0 ? 'neg' : 'net'}"><div class="oc-icon">📊</div><div class="value">${ovNum(data.balance, '+')}</div><div class="label">结余</div></div>
         `;
+        $('ovRangeHint').textContent = month === thisMonthStr() ? '本月' : month + ' 账单';
 
         // Aggregate by day for selected month（图表剔除工资收入与大额支出，避免突出）
         const [yy, mm] = month.split('-').map(Number);
@@ -1573,7 +1349,7 @@ async function loadOverview() {
         STATE._ovExpData = labels.map(k => days[k].exp);
         STATE._ovChart = 'income';
         const ovLd = $('ovChartLoading'); if (ovLd) ovLd.style.display = 'none';
-        drawOverviewChart('overviewChart', labels, [{ label: '收入', data: STATE._ovIncData, color: '#3b82f6' }], '元');
+        drawOverviewChart('overviewChart', labels, [{ label: '收入', data: STATE._ovIncData, color: '#2F855A' }], '元');
     };
     try {
         await smartLoad('overview_' + month, async () => {
@@ -1584,7 +1360,7 @@ async function loadOverview() {
             ]);
             return { data, incomes, expenses, month };
         }, render);
-    } catch(e) { document.getElementById('overviewCards').innerHTML = '<div class="card" style="color:#ef4444">加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)) + '</div>'; console.error('overview err:', e); }
+    } catch(e) { document.getElementById('overviewCards').innerHTML = '<div class="card" style="color:#B4611F">加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)) + '</div>'; console.error('overview err:', e); }
 }
 
 function switchOvChart(type) {
@@ -1596,7 +1372,7 @@ function switchOvChart(type) {
     btn.classList.add('active');
     $('overviewChartTitle').textContent = type === 'income' ? '本月收入' : '本月支出';
     const data = type === 'income' ? STATE._ovIncData : STATE._ovExpData;
-    drawOverviewChart('overviewChart', STATE._ovLabels, [{ label: type === 'income' ? '收入' : '支出', data: data, color: '#3b82f6' }], '元');
+    drawOverviewChart('overviewChart', STATE._ovLabels, [{ label: type === 'income' ? '收入' : '支出', data: data, color: type === 'income' ? '#2F855A' : '#B4611F' }], '元');
 }
 
 function drawOverviewChart(canvasId, labels, series, unit) {
@@ -1659,11 +1435,11 @@ function drawOverviewChart(canvasId, labels, series, unit) {
         ctx.clearRect(0, 0, W, H);
 
         // Grid
-        ctx.strokeStyle = '#e8e5df'; ctx.lineWidth = 1;
+        ctx.strokeStyle = '#E6E0D2'; ctx.lineWidth = 1;
         for (let i = 0; i <= 4; i++) {
             const gy = pad.top + (ph / 4) * i;
             ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(W - pad.right, gy); ctx.stroke();
-            ctx.fillStyle = '#8c8c8c'; ctx.font = '10px -apple-system, sans-serif'; ctx.textAlign = 'right';
+            ctx.fillStyle = '#8A948E'; ctx.font = '10px -apple-system, sans-serif'; ctx.textAlign = 'right';
             const val = yMax - (yMax / 4) * i;
             ctx.fillText((val >= 1000 ? (val/1000).toFixed(1)+'k' : val.toFixed(0)), pad.left - 6, gy + 4);
         }
@@ -1674,7 +1450,7 @@ function drawOverviewChart(canvasId, labels, series, unit) {
         labels.forEach((l, i) => {
             if (i % step === 0 || i === labels.length - 1) {
                 const day = l.slice(-2);
-                ctx.fillStyle = (activeIdx === i) ? '#3b82f6' : '#8c8c8c';
+                ctx.fillStyle = (activeIdx === i) ? '#2F6B4F' : '#8A948E';
                 ctx.font = (activeIdx === i) ? 'bold 10px -apple-system, sans-serif' : '9px -apple-system, sans-serif';
                 ctx.fillText(day, xScale(i), H - pad.bottom + 14);
             }
@@ -1796,7 +1572,7 @@ async function loadExpenses() {
 
 // ═══════════ 常用记账快捷条：近 60 天最常记的「分类+描述」，点一下预填 ═══════════
 // 你实际有 29 次 deepseekapi、26 次早餐、18 次充电，这类重复劳动应该一次点击完成
-// v1.8.3 起只填分类+描述，不再带金额（金额每次都不一样，带着反而要改）
+// v1.8.2 起只填分类+描述，不再带金额（金额每次都不一样，带着反而要改）
 function buildQuickChips(data) {
     const d = new Date(Date.now() - 60 * 86400000);
     const cut = d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
@@ -2181,7 +1957,7 @@ async function loadFinances() {
     const labels = data.map(r => r.date);
     STATE._finLabels = labels;
     STATE._finSeries = [
-        { label: '总资产', data: data.map(finTotal), color: '#1d4ed8', bold: true },
+        { label: '总资产', data: data.map(finTotal), color: '#2F6B4F', bold: true },
     ];
     drawFinanceChart(labels, STATE._finSeries);
 
@@ -2256,22 +2032,22 @@ function drawFinanceChart(labels, series) {
     ctx.clearRect(0, 0, W, H);
 
     // Grid lines
-    ctx.strokeStyle = '#e8e5df';
+    ctx.strokeStyle = '#E6E0D2';
     ctx.lineWidth = 1;
     const gridLines = 5;
     for (let i = 0; i <= gridLines; i++) {
         const y = pad.top + (ph / gridLines) * i;
         ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
         const val = yMax - ((yMax - yMin) / gridLines) * i;
-        ctx.fillStyle = '#8c8c8c'; ctx.font = '11px -apple-system, sans-serif'; ctx.textAlign = 'right';
+        ctx.fillStyle = '#8A948E'; ctx.font = '11px -apple-system, sans-serif'; ctx.textAlign = 'right';
         ctx.fillText((val / 10000).toFixed(1) + 'w', pad.left - 8, y + 4);
     }
 
-    // X labels
+    // X labels（只写「月-日」，否则 5 个 YYYY-MM-DD 会互相压住）
     ctx.textAlign = 'center';
     labels.forEach((l, i) => {
-        ctx.fillStyle = '#8c8c8c'; ctx.font = '10px -apple-system, sans-serif';
-        ctx.fillText(l, xScale(i), H - pad.bottom + 18);
+        ctx.fillStyle = '#8A948E'; ctx.font = '10px -apple-system, sans-serif';
+        ctx.fillText(String(l).slice(5), xScale(i), H - pad.bottom + 18);
     });
 
     // Draw lines
@@ -2301,7 +2077,7 @@ function drawFinanceChart(labels, series) {
     series.forEach(s => {
         ctx.fillStyle = s.color;
         ctx.fillRect(lx, 4, 14, 3);
-        ctx.fillStyle = '#3a3a3a'; ctx.font = '11px -apple-system, sans-serif'; ctx.textAlign = 'left';
+        ctx.fillStyle = '#1B2A22'; ctx.font = '11px -apple-system, sans-serif'; ctx.textAlign = 'left';
         ctx.fillText(s.label, lx + 18, 10);
         lx += ctx.measureText(s.label).width + 40;
     });
@@ -2314,7 +2090,7 @@ function drawFinanceChart(labels, series) {
         wrap.className = '_hot';
         wrap.style.cssText = 'position:absolute;left:'+(h.x-40)+'px;top:'+(h.y-20)+'px;width:80px;height:40px;cursor:default;z-index:2;';
         const tip = document.createElement('div');
-        tip.style.cssText = 'display:none;position:absolute;left:8px;top:-32px;background:#333;color:#fff;padding:4px 8px;border-radius:4px;font-size:12px;white-space:nowrap;pointer-events:none;';
+        tip.style.cssText = 'display:none;position:absolute;left:8px;top:-32px;background:#1B2A22;color:#fff;padding:4px 8px;border-radius:4px;font-size:12px;white-space:nowrap;pointer-events:none;';
         const v = h.value >= 10000 ? (h.value/10000).toFixed(2)+'w' : h.value.toFixed(0);
         tip.innerHTML = '<span style="color:' + h.color + '">●</span> ' + h.label + ' <b>' + v + '</b><br><span style="font-size:10px;opacity:0.7">' + esc(h.date) + '</span>';
         wrap.appendChild(tip);
@@ -2533,10 +2309,11 @@ async function loadStats() {
         if (loading) loading.style.display = 'none';
         const { ov, expCat, incCat, trendInc, trendExp, trendLabels } = d;
         const grandTotal = expCat.reduce((s, r) => s + r.total, 0);
+        // 金额格式化：负数写成 -¥68.86，不要 ¥-68.86
+        const money = (v) => { const n = Number(v || 0); return (n < 0 ? '-¥' : '¥') + Math.abs(n).toFixed(2); };
         // 概览已有 6 张卡片，这里只留一行紧凑汇总，省手机屏幕高度
-        $('statsSummary').innerHTML = '支出 <strong>¥' + grandTotal.toFixed(2) + '</strong> ｜ 收入 <strong>¥'
-            + Number(ov.total_income || 0).toFixed(2) + '</strong> ｜ 结余 <strong>¥'
-            + Number(ov.balance || 0).toFixed(2) + '</strong>';
+        $('statsSummary').innerHTML = '支出 <strong>' + money(grandTotal) + '</strong> ｜ 收入 <strong>'
+            + money(ov.total_income) + '</strong> ｜ 结余 <strong>' + money(ov.balance) + '</strong>';
         $('statsExpenseTable').innerHTML = renderCatTable(expCat, grandTotal);
         $('statsCatDetail').innerHTML = '';        // 换月后清掉上个月的下钻明细
         STATE._statsMonthExp = null;
@@ -2547,8 +2324,8 @@ async function loadStats() {
         drawDonutChart('statsDonut', expCat.map(r => ({ label: r.category, value: r.total })), grandTotal);
         drawTrendChart('statsTrendChart', trendLabels, trendInc, trendExp);
         $('statsTrendLegend').innerHTML =
-            '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#3b82f6;display:inline-block"></span>收入</span>' +
-            '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#ef4444;display:inline-block"></span>支出</span>';
+            '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#2F855A;display:inline-block"></span>收入</span>' +
+            '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#B4611F;display:inline-block"></span>支出</span>';
     };
     try {
         await smartLoad(key, () => fetchStatsData(month), render);
@@ -2600,7 +2377,7 @@ async function toggleCatDetail(tr) {
               + '</div>').join('')
             + '</div>';
     } catch (e) {
-        box.innerHTML = '<div class="cat-detail-box" style="color:#ef4444">明细加载失败：' + esc(e.message || e) + '</div>';
+        box.innerHTML = '<div class="cat-detail-box" style="color:#B4611F">明细加载失败：' + esc(e.message || e) + '</div>';
     }
 }
 
@@ -2613,7 +2390,7 @@ function closeCatDetail() {
 function drawDonutChart(canvasId, items, total) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
-    const COLORS = ['#3b82f6','#60a5fa','#f59e0b','#ef4444','#10b981','#8b5cf6','#ec4899','#14b8a6'];
+    const COLORS = ['#2F6B4F','#4F8A6B','#8FB49C','#C99A2E','#B4611F','#7A6A4F','#5B7A8C','#9C6B8A'];
     // 图例放 canvas 下方（HTML 布局，不重叠）
     const legend = document.getElementById('statsDonutLegend');
     if (legend) {
@@ -2631,7 +2408,7 @@ function drawDonutChart(canvasId, items, total) {
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, W, H);
     if (!items || items.length === 0 || total <= 0) {
-        ctx.fillStyle = '#adb2b8'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillStyle = '#9BA7A0'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
         ctx.fillText('本月暂无支出数据', W/2, H/2);
         return;
     }
@@ -2650,9 +2427,9 @@ function drawDonutChart(canvasId, items, total) {
         start += ang;
     });
     ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill();
-    ctx.fillStyle = '#0f1115'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#1B2A22'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center';
     ctx.fillText('¥' + total.toFixed(0), cx, cy + 2);
-    ctx.fillStyle = '#adb2b8'; ctx.font = '10px sans-serif';
+    ctx.fillStyle = '#9BA7A0'; ctx.font = '10px sans-serif';
     ctx.fillText('总支出', cx, cy + 16);
 }
 
@@ -2675,8 +2452,8 @@ function drawTrendChart(canvasId, labels, incData, expData) {
     const x = i => pad.left + (labels.length > 1 ? (i / (labels.length - 1)) * pw : pw / 2);
     const y = v => pad.top + ph - (v / yMax) * ph;
     const series = [
-        { data: incData, color: '#3b82f6' },
-        { data: expData, color: '#ef4444' },
+        { data: incData, color: '#2F855A' },
+        { data: expData, color: '#B4611F' },
     ];
     // 每个 x 位置的判别区间（半格宽）
     const colW = labels.length > 1 ? pw / (labels.length - 1) : pw;
@@ -2697,11 +2474,11 @@ function drawTrendChart(canvasId, labels, incData, expData) {
     function draw(idx) {
         ctx.clearRect(0, 0, W, H);
         // grid
-        ctx.strokeStyle = '#e8e5df'; ctx.lineWidth = 1;
+        ctx.strokeStyle = '#E6E0D2'; ctx.lineWidth = 1;
         for (let i = 0; i <= 4; i++) {
             const gy = pad.top + (ph / 4) * i;
             ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(W - pad.right, gy); ctx.stroke();
-            ctx.fillStyle = '#8c8c8c'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+            ctx.fillStyle = '#8A948E'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
             const val = yMax - (yMax / 4) * i;
             ctx.fillText(val >= 1000 ? (val/1000).toFixed(1) + 'k' : val.toFixed(0), pad.left - 6, gy + 4);
         }
@@ -2718,12 +2495,13 @@ function drawTrendChart(canvasId, labels, incData, expData) {
             ctx.stroke();
             ctx.restore();
         }
-        // x labels（激活时高亮）
+        // x labels（激活时高亮）：05 → 5月，更短更好认
         ctx.textAlign = 'center'; ctx.font = '10px sans-serif';
         labels.forEach((l, i) => {
-            ctx.fillStyle = (idx === i) ? '#3b82f6' : '#8c8c8c';
+            ctx.fillStyle = (idx === i) ? '#2F6B4F' : '#8A948E';
             if (idx === i) ctx.font = 'bold 10px sans-serif'; else ctx.font = '10px sans-serif';
-            ctx.fillText(l, x(i), H - pad.bottom + 14);
+            const t = /^\d{2}$/.test(String(l)) ? Number(l) + '月' : String(l);
+            ctx.fillText(t, x(i), H - pad.bottom + 14);
         });
         // lines
         series.forEach(s => {
@@ -2792,7 +2570,7 @@ function drawTrendChart(canvasId, labels, incData, expData) {
 }
 
 
-// ═══════════════ 每日：心情 + 天气 + 描述（v1.8.3 合并三页） ═══════════════
+// ═══════════════ 每日：心情 + 天气 + 描述（v1.8.0 合并三页） ═══════════════
 // 原来「心情」「天气」是两个页面、还都折在"更多"抽屉里，导致经常忘记填；
 // 「纪录」几乎没在用。现在合并成底部导航上的一个「心情」页：心情 + 天气 + 多行描述。
 const MOOD_EMOJI = {1:'😞', 2:'🙁', 3:'😐', 4:'🙂', 5:'😄'};
@@ -3039,7 +2817,7 @@ function redrawVisibleCharts() {
     if (t === 'overview' && STATE._ovLabels && STATE._ovLabels.length) {
         const kind = STATE._ovChart === 'income' ? 'income' : 'expense';
         const data = kind === 'income' ? STATE._ovIncData : STATE._ovExpData;
-        drawOverviewChart('overviewChart', STATE._ovLabels, [{ label: kind === 'income' ? '收入' : '支出', data: data, color: '#3b82f6' }], '元');
+        drawOverviewChart('overviewChart', STATE._ovLabels, [{ label: kind === 'income' ? '收入' : '支出', data: data, color: kind === 'income' ? '#2F855A' : '#B4611F' }], '元');
     } else if (t === 'finance' && STATE._finLabels && STATE._finSeries) {
         drawFinanceChart(STATE._finLabels, STATE._finSeries);
     } else if (t === 'stats' && STATE._statsLast) {
@@ -3107,6 +2885,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     syncDateUI('exp_date'); syncDateUI('inc_date');
     renderIncQuickChips();          // 收入快捷条（分类一键选中）
+    renderOverviewHello();          // 概览问候头（日期 + 今天记了几笔）
     $('statsMonth').value = today.slice(0,7);
     // 版本号同步到浏览器标签标题（页面内版本号看"更多"抽屉底部）
     try {
