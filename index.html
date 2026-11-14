@@ -3,56 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#2F6B4F">
-<link rel="manifest" href='data:application/manifest+json,{"name":"日知录记账","short_name":"日知录","start_url":".","display":"standalone","background_color":"#F7F4EC","theme_color":"#2F6B4F","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%232F6B4F%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2752%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E%E8%AE%B0%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232F6B4F'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232F6B4F'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%E8%AE%B0%3C/text%3E%3C/svg%3E">
-<title>日知录记账 v1.9.0</title>
+<meta name="theme-color" content="#4FA8E8">
+<link rel="manifest" href="assets/manifest.json">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/sheep-64.png">
+<link rel="apple-touch-icon" href="assets/sheep-192.png">
+<title>日知录记账 v1.10.0</title>
 <style>
-/* === 日知录 Design System v1.9.0 — 墨绿 + 米白（手账纸感） === */
+/* === 日知录 Design System v1.10.0 — 白 + 淡蓝（小羊主题） === */
 :root {
-    /* 底色：米白纸 */
-    --bg-base: #F7F4EC;
+    /* 底色：白 + 极淡天空蓝 */
+    --bg-base: #F2F8FF;
     --bg-layer: #FFFFFF;
-    --bg-hover: #F1EDE3;
-    --bg-active: #E8E2D4;
-    --bg-sidebar: #FFFDF8;
+    --bg-hover: #EDF5FD;
+    --bg-active: #E1EEFB;
+    --bg-sidebar: #FFFFFF;
 
-    /* 文字：墨绿灰阶（对比度都够手机看清） */
-    --text-primary: #1B2A22;
-    --text-secondary: #55625B;
-    --text-tertiary: #7D8A83;
-    --text-muted: #9BA7A0;
+    /* 文字：冷调墨蓝灰阶 */
+    --text-primary: #1C3348;
+    --text-secondary: #55708A;
+    --text-tertiary: #86A0B6;
+    --text-muted: #A9BFD1;
 
     /* 描边 */
-    --border-l1: rgba(27,42,34,0.06);
-    --border-l2: rgba(27,42,34,0.10);
-    --border-l3: rgba(27,42,34,0.16);
+    --border-l1: rgba(28,51,72,0.06);
+    --border-l2: rgba(28,51,72,0.10);
+    --border-l3: rgba(28,51,72,0.16);
 
-    /* 主色：墨绿 */
-    --accent: #2F6B4F;
-    --accent-hover: #24563F;
-    --accent-light: #E6F0EA;
-    --accent-ring: rgba(47,107,79,0.16);
+    /* 主色：天空蓝 */
+    --accent: #4FA8E8;
+    --accent-hover: #3B94D6;
+    --accent-light: #E8F4FE;
+    --accent-ring: rgba(79,168,232,0.20);
 
-    /* 语义色：收入 / 支出 / 提醒 */
-    --pos: #2F855A;
-    --pos-light: #E7F3EC;
-    --neg: #B4611F;
-    --neg-light: #FBEEE2;
-    --warn: #C99A2E;
+    /* 语义色：收入薄荷青 / 支出珊瑚粉 / 提醒鹅黄 */
+    --pos: #17A98F;
+    --pos-light: #E4F7F3;
+    --neg: #F07A6A;
+    --neg-light: #FDEDEA;
+    --warn: #F5B942;
 
-    /* 圆角（比原来更圆，卡片更像纸片） */
+    /* 圆角 */
     --radius-sm: 8px;
     --radius: 10px;
     --radius-md: 14px;
     --radius-lg: 18px;
     --radius-full: 999px;
 
-    /* 阴影：暖调，不用纯黑 */
-    --shadow-sm: 0 1px 2px rgba(60,48,28,0.05), 0 2px 8px rgba(60,48,28,0.04);
-    --shadow-md: 0 4px 16px rgba(60,48,28,0.07);
-    --shadow-overlay: 0 12px 40px rgba(60,48,28,0.14);
+    /* 阴影：冷调淡蓝，不用纯黑 */
+    --shadow-sm: 0 1px 2px rgba(28,76,120,0.05), 0 2px 8px rgba(28,76,120,0.05);
+    --shadow-md: 0 4px 16px rgba(28,76,120,0.08);
+    --shadow-overlay: 0 12px 40px rgba(28,76,120,0.16);
 
     --ease: cubic-bezier(0.4, 0, 0.2, 1);
     --duration: 0.16s;
@@ -63,7 +63,7 @@ canvas { display: block; }
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     background: var(--bg-base);
-    background-image: radial-gradient(120% 60% at 50% 0%, #FCFAF4 0%, var(--bg-base) 60%);
+    background-image: radial-gradient(120% 55% at 50% 0%, #FFFFFF 0%, #EFF7FF 55%, var(--bg-base) 100%);
     background-attachment: fixed;
     color: var(--text-primary);
     font-size: 14.5px;
@@ -74,6 +74,23 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
+/* === 小羊 IP（Fluent Emoji · MIT） === */
+.sheep { display: inline-block; vertical-align: middle; object-fit: contain; }
+.sheep-hero {
+    width: 58px; height: 58px; flex-shrink: 0;
+    padding: 6px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #FFFFFF 0%, #E7F4FF 62%, #D8ECFF 100%);
+    box-shadow: inset 0 0 0 1px rgba(79,168,232,0.18), 0 4px 12px rgba(79,168,232,0.18);
+    animation: sheepBob 4.5s ease-in-out infinite;
+}
+@keyframes sheepBob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50%      { transform: translateY(-3px) rotate(2deg); }
+}
+.sheep-empty { width: 46px; height: 46px; opacity: 0.9; margin-bottom: 6px; }
+.sheep-drawer { width: 22px; height: 22px; vertical-align: -5px; margin-right: 6px; }
+@media (prefers-reduced-motion: reduce) { .sheep-hero { animation: none; } }
+
 /* === 底部导航（唯一布局，PC 上同样生效） === */
 .sidebar {
     position: fixed; left: 0; right: 0; bottom: 0; top: auto;
@@ -81,7 +98,7 @@ body {
     display: flex; flex-direction: row; align-items: center;
     background: var(--bg-sidebar);
     border-top: 1px solid var(--border-l2);
-    box-shadow: 0 -2px 12px rgba(60,48,28,0.05);
+    box-shadow: 0 -2px 12px rgba(28,76,120,0.05);
     z-index: 200;
     padding: 0 4px env(safe-area-inset-bottom, 0);
 }
@@ -104,12 +121,12 @@ body {
 .sidebar-item svg { width: 21px; height: 21px; flex-shrink: 0; opacity: 0.75; color: currentColor; transition: opacity var(--duration) var(--ease), transform var(--duration) var(--ease); }
 .sidebar-item.active svg { opacity: 1; }
 /* 移动端更多抽屉 */
-.more-overlay { display: none; position: fixed; inset: 0; background: rgba(27,42,34,0.32); z-index: 230; backdrop-filter: blur(2px); }
+.more-overlay { display: none; position: fixed; inset: 0; background: rgba(28,51,72,0.30); z-index: 230; backdrop-filter: blur(2px); }
 .more-overlay.show { display: block; }
 .more-drawer {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 240;
     background: var(--bg-layer); border-radius: 20px 20px 0 0;
-    box-shadow: 0 -12px 40px rgba(60,48,28,0.16); padding: 8px 10px calc(16px + env(safe-area-inset-bottom, 0));
+    box-shadow: 0 -12px 40px rgba(28,76,120,0.16); padding: 8px 10px calc(16px + env(safe-area-inset-bottom, 0));
     transform: translateY(100%); transition: transform 0.24s var(--ease);
     max-height: 82vh; overflow-y: auto;
 }
@@ -183,15 +200,16 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 12px 24px; }
 .overview-charts .card { margin-bottom: 0; }
 
 /* === 概览顶部问候 === */
-.ov-hello { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 2px 0 12px; }
-.oh-date { font-size: 21px; font-weight: 700; letter-spacing: -0.4px; line-height: 1.2; }
-.oh-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 3px; }
+.ov-hello { display: flex; align-items: center; gap: 10px; margin: 2px 0 12px; }
+.oh-text { flex: 1; min-width: 0; }
+.oh-date { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; line-height: 1.2; }
+.oh-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .oh-btn {
-    flex-shrink: 0; min-height: 40px; padding: 0 16px;
+    flex-shrink: 0; min-height: 40px; padding: 0 15px;
     border-radius: var(--radius-full); border: none;
-    background: linear-gradient(180deg, #37795A, var(--accent));
+    background: linear-gradient(180deg, #6FBDF2, var(--accent));
     color: #fff; font-size: 13px; font-weight: 700; font-family: inherit;
-    box-shadow: 0 3px 10px rgba(47,107,79,0.28); cursor: pointer;
+    box-shadow: 0 3px 10px rgba(79,168,232,0.32); cursor: pointer;
     transition: transform var(--duration) var(--ease);
 }
 .oh-btn:active { transform: scale(0.96); }
@@ -282,8 +300,8 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 12px 24px; }
 }
 .btn:active { transform: scale(0.97); }
 .btn-save {
-    background: linear-gradient(180deg, #37795A, var(--accent));
-    color: #fff; box-shadow: 0 3px 10px rgba(47,107,79,0.24);
+    background: linear-gradient(180deg, #6FBDF2, var(--accent));
+    color: #fff; box-shadow: 0 3px 10px rgba(79,168,232,0.28);
 }
 .btn-save:hover { background: var(--accent-hover); }
 .btn-cancel { background: var(--bg-layer); color: var(--text-secondary); border: 1px solid var(--border-l2); }
@@ -306,7 +324,7 @@ th {
     letter-spacing: 0.3px;
 }
 td { padding: 11px 10px; border-bottom: 1px solid var(--border-l1); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
-tbody tr:nth-child(even) td { background: #FCFAF4; }
+tbody tr:nth-child(even) td { background: #F7FBFF; }
 tbody tr:last-child td { border-bottom: none; }
 /* 表格日期下的时间小字 */
 .cell-time { font-size: 10px; color: var(--text-muted); line-height: 1.3; margin-top: 1px; }
@@ -381,9 +399,9 @@ tbody tr:hover td { background: var(--bg-hover); }
     position: fixed; right: 14px; bottom: calc(72px + env(safe-area-inset-bottom, 0)); z-index: 150;
     height: 48px; padding: 0 20px; border-radius: 24px;
     display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(180deg, #37795A, var(--accent)); color: #fff; border: none;
+    background: linear-gradient(180deg, #6FBDF2, var(--accent)); color: #fff; border: none;
     font-size: 14.5px; font-weight: 700; font-family: inherit;
-    box-shadow: 0 8px 24px rgba(47,107,79,0.35);
+    box-shadow: 0 8px 24px rgba(79,168,232,0.38);
     cursor: pointer;
 }
 .fab:active { transform: scale(0.96); }
@@ -443,7 +461,7 @@ tbody tr:hover td { background: var(--bg-hover); }
 .sidebar-item.has-dot::after {
     content: ''; position: absolute; top: 4px; right: 20%;
     width: 8px; height: 8px; border-radius: 50%;
-    background: #E04B3A; box-shadow: 0 0 0 2px var(--bg-sidebar);
+    background: #F07A6A; box-shadow: 0 0 0 2px var(--bg-sidebar);
 }
 /* 概览顶部「今日」提示条 */
 .today-strip {
@@ -463,7 +481,7 @@ tbody tr:hover td { background: var(--bg-hover); }
 /* === Toast === */
 .toast {
     position: fixed; left: 50%; transform: translate(-50%, -8px); top: 18px;
-    background: #1B2A22; color: #fff;
+    background: #17324A; color: #fff;
     padding: 11px 20px; border-radius: var(--radius-full); font-size: 13.5px;
     z-index: 9999; opacity: 0;
     transition: all 0.2s var(--ease);
@@ -472,13 +490,13 @@ tbody tr:hover td { background: var(--bg-hover); }
     pointer-events: none;
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
-.toast.success { background: #1B2A22; }
-.toast.error { background: #7A2E1E; }
+.toast.success { background: #17324A; }
+.toast.error { background: #B4483A; }
 
 /* === Modal === */
 .modal-overlay {
     display: none; position: fixed; inset: 0;
-    background: rgba(27,42,34,0.34); backdrop-filter: blur(3px);
+    background: rgba(28,51,72,0.30); backdrop-filter: blur(3px);
     z-index: 300; align-items: center; justify-content: center;
 }
 .modal-overlay.show { display: flex; }
@@ -507,8 +525,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #D9D2C2; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #C4BBA8; }
+::-webkit-scrollbar-thumb { background: #D7E6F2; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #BFD5E6; }
 
 /* === 手机端表单/表格布局（本项目只有手机端；上面的 :root 与组件样式已是手机观感） === */
 @media (max-width: 768px) {
@@ -608,7 +626,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
     <!-- "更多"抽屉：低频页面 + 备份操作 -->
     <div class="more-overlay" id="moreOverlay" onclick="closeMore()"></div>
     <div class="more-drawer" id="moreDrawer">
-        <div class="more-drawer-title">更多功能</div>
+        <div class="more-drawer-title"><img class="sheep sheep-drawer" src="assets/sheep.png" alt="">更多功能</div>
         <a class="sidebar-item" data-tab="payday" onclick="switchTab('payday')">发工资</a>
         <a class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">财务</a>
         <a class="sidebar-item" data-tab="electricity" onclick="switchTab('electricity')">用电</a>
@@ -617,7 +635,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <button class="sidebar-item drawer-btn" onclick="exportData(); closeMore();">⬇ 导出备份</button>
         <button class="sidebar-item drawer-btn" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="more-drawer-ver" id="appVersionM">v1.9.0</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.10.0</div>
     </div>
 </nav>
 
@@ -628,7 +646,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 <!-- ═══════════════ 概览 ═══════════════ -->
 <section id="section-overview" class="section active">
     <div class="ov-hello">
-        <div>
+        <img class="sheep sheep-hero" src="assets/sheep.png" alt="小羊" width="58" height="58">
+        <div class="oh-text">
             <div class="oh-date" id="ohDate">今天</div>
             <div class="oh-sub" id="ohSub"></div>
         </div>
@@ -1349,7 +1368,7 @@ async function loadOverview() {
         STATE._ovExpData = labels.map(k => days[k].exp);
         STATE._ovChart = 'income';
         const ovLd = $('ovChartLoading'); if (ovLd) ovLd.style.display = 'none';
-        drawOverviewChart('overviewChart', labels, [{ label: '收入', data: STATE._ovIncData, color: '#2F855A' }], '元');
+        drawOverviewChart('overviewChart', labels, [{ label: '收入', data: STATE._ovIncData, color: '#17A98F' }], '元');
     };
     try {
         await smartLoad('overview_' + month, async () => {
@@ -1360,7 +1379,7 @@ async function loadOverview() {
             ]);
             return { data, incomes, expenses, month };
         }, render);
-    } catch(e) { document.getElementById('overviewCards').innerHTML = '<div class="card" style="color:#B4611F">加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)) + '</div>'; console.error('overview err:', e); }
+    } catch(e) { document.getElementById('overviewCards').innerHTML = '<div class="card" style="color:#F07A6A">加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)) + '</div>'; console.error('overview err:', e); }
 }
 
 function switchOvChart(type) {
@@ -1372,7 +1391,7 @@ function switchOvChart(type) {
     btn.classList.add('active');
     $('overviewChartTitle').textContent = type === 'income' ? '本月收入' : '本月支出';
     const data = type === 'income' ? STATE._ovIncData : STATE._ovExpData;
-    drawOverviewChart('overviewChart', STATE._ovLabels, [{ label: type === 'income' ? '收入' : '支出', data: data, color: type === 'income' ? '#2F855A' : '#B4611F' }], '元');
+    drawOverviewChart('overviewChart', STATE._ovLabels, [{ label: type === 'income' ? '收入' : '支出', data: data, color: type === 'income' ? '#17A98F' : '#F07A6A' }], '元');
 }
 
 function drawOverviewChart(canvasId, labels, series, unit) {
@@ -1435,11 +1454,11 @@ function drawOverviewChart(canvasId, labels, series, unit) {
         ctx.clearRect(0, 0, W, H);
 
         // Grid
-        ctx.strokeStyle = '#E6E0D2'; ctx.lineWidth = 1;
+        ctx.strokeStyle = '#DFECF6'; ctx.lineWidth = 1;
         for (let i = 0; i <= 4; i++) {
             const gy = pad.top + (ph / 4) * i;
             ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(W - pad.right, gy); ctx.stroke();
-            ctx.fillStyle = '#8A948E'; ctx.font = '10px -apple-system, sans-serif'; ctx.textAlign = 'right';
+            ctx.fillStyle = '#86A0B6'; ctx.font = '10px -apple-system, sans-serif'; ctx.textAlign = 'right';
             const val = yMax - (yMax / 4) * i;
             ctx.fillText((val >= 1000 ? (val/1000).toFixed(1)+'k' : val.toFixed(0)), pad.left - 6, gy + 4);
         }
@@ -1450,7 +1469,7 @@ function drawOverviewChart(canvasId, labels, series, unit) {
         labels.forEach((l, i) => {
             if (i % step === 0 || i === labels.length - 1) {
                 const day = l.slice(-2);
-                ctx.fillStyle = (activeIdx === i) ? '#2F6B4F' : '#8A948E';
+                ctx.fillStyle = (activeIdx === i) ? '#4FA8E8' : '#86A0B6';
                 ctx.font = (activeIdx === i) ? 'bold 10px -apple-system, sans-serif' : '9px -apple-system, sans-serif';
                 ctx.fillText(day, xScale(i), H - pad.bottom + 14);
             }
@@ -1570,6 +1589,13 @@ async function loadExpenses() {
     } catch(e) { if (!apiCache.expenses) toast('支出数据加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error'); }
 }
 
+// 空状态：小羊 + 一句话（比一行灰字有温度）
+function sheepEmpty(colspan, text) {
+    return '<tr><td colspan="' + colspan + '" style="text-align:center;padding:22px 12px;color:var(--text-tertiary)">'
+        + '<img class="sheep sheep-empty" src="assets/sheep.png" alt="" width="46" height="46">'
+        + '<div style="font-size:13px">' + esc(text) + '</div></td></tr>';
+}
+
 // ═══════════ 常用记账快捷条：近 60 天最常记的「分类+描述」，点一下预填 ═══════════
 // 你实际有 29 次 deepseekapi、26 次早餐、18 次充电，这类重复劳动应该一次点击完成
 // v1.8.2 起只填分类+描述，不再带金额（金额每次都不一样，带着反而要改）
@@ -1684,8 +1710,7 @@ function renderExpenseTable() {
         + (big > 0 && big < total ? ' ｜ 其中大额 ¥' + big.toFixed(2) : '');
     const tbody = document.querySelector('#expenseTable tbody');
     if (rows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:28px">📭 '
-            + (LIST_STATE.expense.q ? '没搜到匹配的支出' : '这个月还没有支出记录') + '</td></tr>';
+        tbody.innerHTML = sheepEmpty(5, LIST_STATE.expense.q ? '没搜到匹配的支出' : '这个月还没有支出记录，小羊等你记一笔～');
     } else {
         tbody.innerHTML = rows.map(r => `
             <tr>
@@ -1708,8 +1733,7 @@ function renderIncomeTable() {
     $('incomeTotal').innerHTML = listRangeText('income') + ' · <b>' + rows.length + '</b> 笔 · 合计 <b>¥' + total.toFixed(2) + '</b>';
     const tbody = document.querySelector('#incomeTable tbody');
     if (rows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:28px">📭 '
-            + (LIST_STATE.income.q ? '没搜到匹配的收入' : '这个月还没有收入记录') + '</td></tr>';
+        tbody.innerHTML = sheepEmpty(5, LIST_STATE.income.q ? '没搜到匹配的收入' : '这个月还没有收入记录');
     } else {
         tbody.innerHTML = rows.map(r => `
             <tr>
@@ -1957,7 +1981,7 @@ async function loadFinances() {
     const labels = data.map(r => r.date);
     STATE._finLabels = labels;
     STATE._finSeries = [
-        { label: '总资产', data: data.map(finTotal), color: '#2F6B4F', bold: true },
+        { label: '总资产', data: data.map(finTotal), color: '#4FA8E8', bold: true },
     ];
     drawFinanceChart(labels, STATE._finSeries);
 
@@ -1978,7 +2002,7 @@ async function loadFinances() {
         </tr>`;
     }).join('');
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">📭 还没有财务快照，先记录一条资产数据吧</td></tr>';
+        tbody.innerHTML = sheepEmpty(7, '还没有财务快照，先记录一条资产数据吧');
     }
     };
     try {
@@ -2032,21 +2056,21 @@ function drawFinanceChart(labels, series) {
     ctx.clearRect(0, 0, W, H);
 
     // Grid lines
-    ctx.strokeStyle = '#E6E0D2';
+    ctx.strokeStyle = '#DFECF6';
     ctx.lineWidth = 1;
     const gridLines = 5;
     for (let i = 0; i <= gridLines; i++) {
         const y = pad.top + (ph / gridLines) * i;
         ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
         const val = yMax - ((yMax - yMin) / gridLines) * i;
-        ctx.fillStyle = '#8A948E'; ctx.font = '11px -apple-system, sans-serif'; ctx.textAlign = 'right';
+        ctx.fillStyle = '#86A0B6'; ctx.font = '11px -apple-system, sans-serif'; ctx.textAlign = 'right';
         ctx.fillText((val / 10000).toFixed(1) + 'w', pad.left - 8, y + 4);
     }
 
     // X labels（只写「月-日」，否则 5 个 YYYY-MM-DD 会互相压住）
     ctx.textAlign = 'center';
     labels.forEach((l, i) => {
-        ctx.fillStyle = '#8A948E'; ctx.font = '10px -apple-system, sans-serif';
+        ctx.fillStyle = '#86A0B6'; ctx.font = '10px -apple-system, sans-serif';
         ctx.fillText(String(l).slice(5), xScale(i), H - pad.bottom + 18);
     });
 
@@ -2077,7 +2101,7 @@ function drawFinanceChart(labels, series) {
     series.forEach(s => {
         ctx.fillStyle = s.color;
         ctx.fillRect(lx, 4, 14, 3);
-        ctx.fillStyle = '#1B2A22'; ctx.font = '11px -apple-system, sans-serif'; ctx.textAlign = 'left';
+        ctx.fillStyle = '#17324A'; ctx.font = '11px -apple-system, sans-serif'; ctx.textAlign = 'left';
         ctx.fillText(s.label, lx + 18, 10);
         lx += ctx.measureText(s.label).width + 40;
     });
@@ -2090,7 +2114,7 @@ function drawFinanceChart(labels, series) {
         wrap.className = '_hot';
         wrap.style.cssText = 'position:absolute;left:'+(h.x-40)+'px;top:'+(h.y-20)+'px;width:80px;height:40px;cursor:default;z-index:2;';
         const tip = document.createElement('div');
-        tip.style.cssText = 'display:none;position:absolute;left:8px;top:-32px;background:#1B2A22;color:#fff;padding:4px 8px;border-radius:4px;font-size:12px;white-space:nowrap;pointer-events:none;';
+        tip.style.cssText = 'display:none;position:absolute;left:8px;top:-32px;background:#17324A;color:#fff;padding:4px 8px;border-radius:4px;font-size:12px;white-space:nowrap;pointer-events:none;';
         const v = h.value >= 10000 ? (h.value/10000).toFixed(2)+'w' : h.value.toFixed(0);
         tip.innerHTML = '<span style="color:' + h.color + '">●</span> ' + h.label + ' <b>' + v + '</b><br><span style="font-size:10px;opacity:0.7">' + esc(h.date) + '</span>';
         wrap.appendChild(tip);
@@ -2212,7 +2236,7 @@ async function loadElectricities() {
             </tr>`;
         }).join('');
         if (rows.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px">📭 该周期（' + range.title + '）还没有用电记录</td></tr>';
+            tbody.innerHTML = sheepEmpty(4, '该周期（' + range.title + '）还没有用电记录');
         }
 
         // 周期总用电 = 周期内各次抄表耗电之和 = 上周期末次抄表 → 本周期末次抄表
@@ -2324,8 +2348,8 @@ async function loadStats() {
         drawDonutChart('statsDonut', expCat.map(r => ({ label: r.category, value: r.total })), grandTotal);
         drawTrendChart('statsTrendChart', trendLabels, trendInc, trendExp);
         $('statsTrendLegend').innerHTML =
-            '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#2F855A;display:inline-block"></span>收入</span>' +
-            '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#B4611F;display:inline-block"></span>支出</span>';
+            '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#17A98F;display:inline-block"></span>收入</span>' +
+            '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#F07A6A;display:inline-block"></span>支出</span>';
     };
     try {
         await smartLoad(key, () => fetchStatsData(month), render);
@@ -2377,7 +2401,7 @@ async function toggleCatDetail(tr) {
               + '</div>').join('')
             + '</div>';
     } catch (e) {
-        box.innerHTML = '<div class="cat-detail-box" style="color:#B4611F">明细加载失败：' + esc(e.message || e) + '</div>';
+        box.innerHTML = '<div class="cat-detail-box" style="color:#F07A6A">明细加载失败：' + esc(e.message || e) + '</div>';
     }
 }
 
@@ -2390,7 +2414,7 @@ function closeCatDetail() {
 function drawDonutChart(canvasId, items, total) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
-    const COLORS = ['#2F6B4F','#4F8A6B','#8FB49C','#C99A2E','#B4611F','#7A6A4F','#5B7A8C','#9C6B8A'];
+    const COLORS = ['#4FA8E8','#7CC4F0','#A8DBF7','#17A98F','#F5B942','#F07A6A','#9B8CF0','#66C7D8'];
     // 图例放 canvas 下方（HTML 布局，不重叠）
     const legend = document.getElementById('statsDonutLegend');
     if (legend) {
@@ -2408,7 +2432,7 @@ function drawDonutChart(canvasId, items, total) {
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, W, H);
     if (!items || items.length === 0 || total <= 0) {
-        ctx.fillStyle = '#9BA7A0'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillStyle = '#A9BFD1'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
         ctx.fillText('本月暂无支出数据', W/2, H/2);
         return;
     }
@@ -2427,9 +2451,9 @@ function drawDonutChart(canvasId, items, total) {
         start += ang;
     });
     ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill();
-    ctx.fillStyle = '#1B2A22'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#17324A'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center';
     ctx.fillText('¥' + total.toFixed(0), cx, cy + 2);
-    ctx.fillStyle = '#9BA7A0'; ctx.font = '10px sans-serif';
+    ctx.fillStyle = '#A9BFD1'; ctx.font = '10px sans-serif';
     ctx.fillText('总支出', cx, cy + 16);
 }
 
@@ -2452,8 +2476,8 @@ function drawTrendChart(canvasId, labels, incData, expData) {
     const x = i => pad.left + (labels.length > 1 ? (i / (labels.length - 1)) * pw : pw / 2);
     const y = v => pad.top + ph - (v / yMax) * ph;
     const series = [
-        { data: incData, color: '#2F855A' },
-        { data: expData, color: '#B4611F' },
+        { data: incData, color: '#17A98F' },
+        { data: expData, color: '#F07A6A' },
     ];
     // 每个 x 位置的判别区间（半格宽）
     const colW = labels.length > 1 ? pw / (labels.length - 1) : pw;
@@ -2474,11 +2498,11 @@ function drawTrendChart(canvasId, labels, incData, expData) {
     function draw(idx) {
         ctx.clearRect(0, 0, W, H);
         // grid
-        ctx.strokeStyle = '#E6E0D2'; ctx.lineWidth = 1;
+        ctx.strokeStyle = '#DFECF6'; ctx.lineWidth = 1;
         for (let i = 0; i <= 4; i++) {
             const gy = pad.top + (ph / 4) * i;
             ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(W - pad.right, gy); ctx.stroke();
-            ctx.fillStyle = '#8A948E'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+            ctx.fillStyle = '#86A0B6'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
             const val = yMax - (yMax / 4) * i;
             ctx.fillText(val >= 1000 ? (val/1000).toFixed(1) + 'k' : val.toFixed(0), pad.left - 6, gy + 4);
         }
@@ -2486,7 +2510,7 @@ function drawTrendChart(canvasId, labels, incData, expData) {
         if (idx !== null && idx !== undefined) {
             const cx = x(idx);
             ctx.save();
-            ctx.strokeStyle = 'rgba(15,23,42,0.25)';
+            ctx.strokeStyle = 'rgba(28,51,72,0.25)';
             ctx.lineWidth = 1.5;
             ctx.setLineDash([4, 3]);
             ctx.beginPath();
@@ -2498,7 +2522,7 @@ function drawTrendChart(canvasId, labels, incData, expData) {
         // x labels（激活时高亮）：05 → 5月，更短更好认
         ctx.textAlign = 'center'; ctx.font = '10px sans-serif';
         labels.forEach((l, i) => {
-            ctx.fillStyle = (idx === i) ? '#2F6B4F' : '#8A948E';
+            ctx.fillStyle = (idx === i) ? '#4FA8E8' : '#86A0B6';
             if (idx === i) ctx.font = 'bold 10px sans-serif'; else ctx.font = '10px sans-serif';
             const t = /^\d{2}$/.test(String(l)) ? Number(l) + '月' : String(l);
             ctx.fillText(t, x(i), H - pad.bottom + 14);
@@ -2817,7 +2841,7 @@ function redrawVisibleCharts() {
     if (t === 'overview' && STATE._ovLabels && STATE._ovLabels.length) {
         const kind = STATE._ovChart === 'income' ? 'income' : 'expense';
         const data = kind === 'income' ? STATE._ovIncData : STATE._ovExpData;
-        drawOverviewChart('overviewChart', STATE._ovLabels, [{ label: kind === 'income' ? '收入' : '支出', data: data, color: kind === 'income' ? '#2F855A' : '#B4611F' }], '元');
+        drawOverviewChart('overviewChart', STATE._ovLabels, [{ label: kind === 'income' ? '收入' : '支出', data: data, color: kind === 'income' ? '#17A98F' : '#F07A6A' }], '元');
     } else if (t === 'finance' && STATE._finLabels && STATE._finSeries) {
         drawFinanceChart(STATE._finLabels, STATE._finSeries);
     } else if (t === 'stats' && STATE._statsLast) {
