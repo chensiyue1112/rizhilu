@@ -7,9 +7,9 @@
 <link rel="manifest" href="assets/manifest.json">
 <link rel="icon" type="image/png" sizes="64x64" href="assets/sheep-64.png">
 <link rel="apple-touch-icon" href="assets/sheep-192.png">
-<title>日知录记账 v1.10.2</title>
+<title>日知录记账 v1.11.0</title>
 <style>
-/* === 日知录 Design System v1.10.2 — 白 + 淡蓝（小羊主题） === */
+/* === 日知录 Design System v1.11.0 — 白 + 淡蓝（小羊主题） === */
 :root {
     /* 底色：白 + 极淡天空蓝 */
     --bg-base: #F2F8FF;
@@ -423,7 +423,24 @@ tbody tr:hover td { background: var(--bg-hover); }
 }
 .list-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
 
+/* === 统计：支出总览（全部时间） === */
+.all-exp-sum {
+    background: var(--bg-hover); border-radius: var(--radius-md);
+    padding: 11px 13px; margin-bottom: 10px;
+    font-size: 12.5px; color: var(--text-secondary); line-height: 1.9;
+}
+.all-exp-sum strong { color: var(--text-primary); font-weight: 700; }
+.all-exp-sum .big { font-size: 17px; color: var(--neg); font-weight: 800; letter-spacing: -0.3px; }
+/* 类内细项：超过一定高度内部滚动，不把页面拉太长 */
+.cat-detail-scroll { max-height: 320px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
 /* === 统计：分类下钻（明细行插在点击行下面） === */
+/* 两张分类表固定列宽，手机上不用横向滚动 */
+#statsExpenseTable table, #allExpTable table { table-layout: fixed; width: 100%; }
+#statsExpenseTable th:nth-child(1), #allExpTable th:nth-child(1) { width: 30%; }
+#statsExpenseTable th:nth-child(2), #allExpTable th:nth-child(2) { width: 26%; }
+#statsExpenseTable th:nth-child(3), #allExpTable th:nth-child(3) { width: 22%; }
+#statsExpenseTable th:nth-child(4), #allExpTable th:nth-child(4) { width: 22%; }
 .cat-row { cursor: pointer; }
 .cat-row td:first-child::after { content: ' ⌄'; color: var(--text-muted); font-size: 10px; }
 .cat-row.open td:first-child::after { content: ' ⌃'; }
@@ -443,8 +460,8 @@ tbody tr:hover td { background: var(--bg-hover); }
     display: flex; align-items: center; justify-content: space-between;
     font-weight: 700; color: var(--text-primary); margin-bottom: 8px;
 }
-.cat-detail-item { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; color: var(--text-secondary); }
-.cat-detail-item .d { color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cat-detail-item { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; color: var(--text-secondary); }
+.cat-detail-item .d { flex: 0 0 auto; color: var(--text-muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .cat-detail-item .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cat-detail-item .a { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text-primary); }
 
@@ -641,7 +658,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <button class="sidebar-item drawer-btn" onclick="exportData(); closeMore();">⬇ 导出备份</button>
         <button class="sidebar-item drawer-btn" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="more-drawer-ver" id="appVersionM">v1.10.2</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.11.0</div>
     </div>
 </nav>
 
@@ -916,6 +933,12 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <div id="statsDonutLegend" style="display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:8px;font-size:12px;color:var(--text-secondary)"></div>
         </div>
         <div class="table-wrap" id="statsExpenseTable" style="margin-top:8px"></div>
+    </div>
+    <!-- 全部时间的支出总览（只统计支出，点分类看类内细项） -->
+    <div class="card">
+        <h3>💰 支出总览 · 全部时间</h3>
+        <div id="allExpSummary" class="all-exp-sum"></div>
+        <div class="table-wrap" id="allExpTable"></div>
     </div>
     <div class="card">
         <h3>📈 近 6 个月收支趋势</h3>
@@ -1275,7 +1298,7 @@ function switchTab(name) {
     if (name === 'finance') loadFinances();
     if (name === 'electricity') loadElectricities();
     if (name === 'mood') loadDay();
-    if (name === 'stats') loadStats();
+    if (name === 'stats') { loadStats(); loadAllExpenseOverview(); }
     if (name === 'payday') initPayday();
 }
 
@@ -1327,7 +1350,7 @@ function setViewMonth(v) {
     if (t === 'overview') loadOverview();
     else if (t === 'expense') renderExpenseTable();
     else if (t === 'income') renderIncomeTable();
-    else if (t === 'stats') loadStats();
+    else if (t === 'stats') { loadStats(); loadAllExpenseOverview(); }
     updateListHead();
 }
 
@@ -2419,6 +2442,88 @@ function closeCatDetail() {
     document.querySelectorAll('.cat-row.open').forEach(x => x.classList.remove('open'));
 }
 
+// ═══════════ 支出总览（全部时间）：只统计支出，分类总计 + 类内细项 ═══════════
+let _allExpRows = null;
+const _firstMonth = (a, b) => (a && b ? Math.max(1, (Number(b.slice(0,4)) - Number(a.slice(0,4))) * 12 + (Number(b.slice(5,7)) - Number(a.slice(5,7))) + 1) : 0);
+
+async function loadAllExpenseOverview() {
+    const render = (rows) => { _allExpRows = rows || []; renderAllExpOverview(); };
+    try {
+        await smartLoad('expenses', () => api('/api/expense'), render);
+    } catch (e) {
+        const el = $('allExpTable');
+        if (el && !_allExpRows) el.innerHTML = '<div style="padding:16px;color:var(--text-tertiary);font-size:13px">支出总览加载失败：' + esc(e.message || e) + '</div>';
+    }
+}
+
+function renderAllExpOverview() {
+    const el = $('allExpTable'), sum = $('allExpSummary');
+    if (!el) return;
+    const rows = _allExpRows || [];
+    if (!rows.length) {
+        if (sum) sum.innerHTML = '';
+        el.innerHTML = '<table><tbody>' + sheepEmpty(4, '还没有支出记录') + '</tbody></table>';
+        return;
+    }
+    const total = rows.reduce((s, r) => s + Number(r.amount || 0), 0);
+    const dates = rows.map(r => r.date).filter(Boolean).sort();
+    const first = dates[0] || '', last = dates[dates.length - 1] || '';
+    const mCount = _firstMonth(first, last);
+    const money2 = (v) => Number(v || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const money0 = (v) => Number(v || 0).toLocaleString('zh-CN', { maximumFractionDigits: 0 });
+
+    sum.innerHTML = '总支出 <span class="big">¥' + money2(total) + '</span> ｜ <strong>' + rows.length + '</strong> 笔'
+        + ' ｜ 月均 <strong>¥' + (mCount ? money0(total / mCount) : 0) + '</strong>'
+        + '<br><span style="color:var(--text-tertiary)">' + first + ' ~ ' + last + ' · 跨 ' + mCount + ' 个月</span>';
+
+    const map = new Map();
+    rows.forEach(r => {
+        const c = r.category || '其他';
+        const it = map.get(c) || { cat: c, total: 0, count: 0, items: [] };
+        it.total += Number(r.amount || 0);
+        it.count += 1;
+        it.items.push(r);
+        map.set(c, it);
+    });
+    const cats = [...map.values()].sort((a, b) => b.total - a.total);
+    const head = '<thead><tr><th>分类</th><th>金额</th><th>占比</th><th>笔数</th></tr></thead>';
+    const body = cats.map(c => {
+        const pct = total ? (c.total / total * 100).toFixed(1) : '0.0';
+        return '<tr class="cat-row" data-cat="' + esc(c.cat) + '" onclick="toggleAllCatDetail(this)">'
+            + '<td>' + esc(c.cat) + '</td><td>' + money2(c.total) + '</td><td>' + pct + '%</td><td>' + c.count + '</td></tr>';
+    }).join('');
+    el.innerHTML = '<table>' + head + '<tbody>' + body + '</tbody></table>';
+}
+
+// 点分类行 → 在这一行下面展开该类「全部时间」的明细（内部可滚动，不把页面拉太长）
+function toggleAllCatDetail(tr) {
+    const cat = tr.getAttribute('data-cat');
+    if (tr.classList.contains('open')) { closeCatDetail(); return; }
+    closeCatDetail();
+    tr.classList.add('open');
+
+    const items = (_allExpRows || []).filter(r => (r.category || '其他') === cat)
+        .sort((a, b) => String(b.date + (b.time || '')).localeCompare(String(a.date + (a.time || ''))));
+    const sum = items.reduce((s, r) => s + Number(r.amount || 0), 0);
+
+    const detailTr = document.createElement('tr');
+    detailTr.className = 'cat-detail-row';
+    const td = document.createElement('td');
+    td.colSpan = 4;
+    td.innerHTML = '<div class="cat-detail-box">'
+        + '<div class="cat-detail-head"><span>' + esc(cat) + ' · ' + items.length + ' 笔 · ¥' + sum.toFixed(2)
+        + '</span><span style="cursor:pointer;color:var(--text-muted)" onclick="closeCatDetail()">收起 ✕</span></div>'
+        + '<div class="cat-detail-scroll">'
+        + items.map(r => '<div class="cat-detail-item">'
+            + '<span class="d">' + esc(r.date || '') + (r.time ? ' ' + esc(r.time) : '') + '</span>'
+            + '<span class="n">' + esc(r.description || '') + '</span>'
+            + '<span class="a">¥' + Number(r.amount || 0).toFixed(2) + '</span>'
+          + '</div>').join('')
+        + '</div></div>';
+    detailTr.appendChild(td);
+    tr.parentNode.insertBefore(detailTr, tr.nextSibling);
+}
+
 // ═══ 环形图（支出分类占比）═══
 function drawDonutChart(canvasId, items, total) {
     const canvas = document.getElementById(canvasId);
@@ -2879,7 +2984,7 @@ function autoRefresh() {
     else if (t === 'finance') loadFinances();
     else if (t === 'electricity') loadElectricities();
     else if (t === 'mood') loadDay();
-    else if (t === 'stats') loadStats();
+    else if (t === 'stats') { loadStats(); loadAllExpenseOverview(); }
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) autoRefresh(); });
 window.addEventListener('focus', autoRefresh);
@@ -2895,7 +3000,7 @@ function manualRefresh() {
     else if (t === 'finance') loadFinances();
     else if (t === 'electricity') loadElectricities();
     else if (t === 'mood') loadDay();
-    else if (t === 'stats') loadStats();
+    else if (t === 'stats') { loadStats(); loadAllExpenseOverview(); }
     ensureDayData(true);
     toast('已刷新为最新数据', 'success');
 }
