@@ -7,9 +7,9 @@
 <link rel="manifest" href="assets/manifest.json">
 <link rel="icon" type="image/png" sizes="64x64" href="assets/sheep-64.png">
 <link rel="apple-touch-icon" href="assets/sheep-192.png">
-<title>日知录记账 v1.11.0</title>
+<title>日知录记账 v1.11.1</title>
 <style>
-/* === 日知录 Design System v1.11.0 — 白 + 淡蓝（小羊主题） === */
+/* === 日知录 Design System v1.11.1 — 白 + 淡蓝（小羊主题） === */
 :root {
     /* 底色：白 + 极淡天空蓝 */
     --bg-base: #F2F8FF;
@@ -658,7 +658,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <button class="sidebar-item drawer-btn" onclick="exportData(); closeMore();">⬇ 导出备份</button>
         <button class="sidebar-item drawer-btn" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="more-drawer-ver" id="appVersionM">v1.11.0</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.11.1</div>
     </div>
 </nav>
 
@@ -1617,6 +1617,9 @@ async function loadExpenses() {
     } catch(e) { if (!apiCache.expenses) toast('支出数据加载失败: ' + (e && e.message ? e.message : JSON.stringify(e)), 'error'); }
 }
 
+// 金额格式：统一千分位，明细和表头都用它
+function fmtMoney(v) { return '¥' + Number(v || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
 // 空状态：小羊 + 一句话（比一行灰字有温度）
 function sheepEmpty(colspan, text) {
     return '<tr><td colspan="' + colspan + '" style="text-align:center;padding:22px 12px;color:var(--text-tertiary)">'
@@ -2424,12 +2427,12 @@ async function toggleCatDetail(tr) {
             .sort((a, b) => (b.date + (b.time || '')).localeCompare(a.date + (a.time || '')));
         const sum = items.reduce((s, r) => s + Number(r.amount || 0), 0);
         td.innerHTML = '<div class="cat-detail-box">'
-            + '<div class="cat-detail-head"><span>' + esc(cat) + ' · ' + items.length + ' 笔 · ¥' + sum.toFixed(2)
+            + '<div class="cat-detail-head"><span>' + esc(cat) + ' · ' + items.length + ' 笔 · ' + fmtMoney(sum)
             + '</span><span style="cursor:pointer;color:var(--text-muted)" onclick="closeCatDetail()">收起 ✕</span></div>'
             + items.map(r => '<div class="cat-detail-item">'
                 + '<span class="d">' + esc((r.date || '').slice(5)) + (r.time ? ' ' + esc(r.time) : '') + '</span>'
                 + '<span class="n">' + esc(r.description || '') + '</span>'
-                + '<span class="a">¥' + Number(r.amount || 0).toFixed(2) + '</span>'
+                + '<span class="a">' + fmtMoney(r.amount) + '</span>'
               + '</div>').join('')
             + '</div>';
     } catch (e) {
@@ -2511,13 +2514,13 @@ function toggleAllCatDetail(tr) {
     const td = document.createElement('td');
     td.colSpan = 4;
     td.innerHTML = '<div class="cat-detail-box">'
-        + '<div class="cat-detail-head"><span>' + esc(cat) + ' · ' + items.length + ' 笔 · ¥' + sum.toFixed(2)
+        + '<div class="cat-detail-head"><span>' + esc(cat) + ' · ' + items.length + ' 笔 · ' + fmtMoney(sum)
         + '</span><span style="cursor:pointer;color:var(--text-muted)" onclick="closeCatDetail()">收起 ✕</span></div>'
         + '<div class="cat-detail-scroll">'
         + items.map(r => '<div class="cat-detail-item">'
             + '<span class="d">' + esc(r.date || '') + (r.time ? ' ' + esc(r.time) : '') + '</span>'
             + '<span class="n">' + esc(r.description || '') + '</span>'
-            + '<span class="a">¥' + Number(r.amount || 0).toFixed(2) + '</span>'
+            + '<span class="a">' + fmtMoney(r.amount) + '</span>'
           + '</div>').join('')
         + '</div></div>';
     detailTr.appendChild(td);
