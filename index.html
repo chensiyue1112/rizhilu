@@ -7,9 +7,9 @@
 <link rel="manifest" href="assets/manifest.json">
 <link rel="icon" type="image/png" sizes="64x64" href="assets/sheep-64.png">
 <link rel="apple-touch-icon" href="assets/sheep-192.png">
-<title>日知录记账 v1.10.1</title>
+<title>日知录记账 v1.10.2</title>
 <style>
-/* === 日知录 Design System v1.10.1 — 白 + 淡蓝（小羊主题） === */
+/* === 日知录 Design System v1.10.2 — 白 + 淡蓝（小羊主题） === */
 :root {
     /* 底色：白 + 极淡天空蓝 */
     --bg-base: #F2F8FF;
@@ -423,19 +423,25 @@ tbody tr:hover td { background: var(--bg-hover); }
 }
 .list-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
 
-/* === 统计：分类下钻 === */
+/* === 统计：分类下钻（明细行插在点击行下面） === */
 .cat-row { cursor: pointer; }
 .cat-row td:first-child::after { content: ' ⌄'; color: var(--text-muted); font-size: 10px; }
 .cat-row.open td:first-child::after { content: ' ⌃'; }
-.cat-row.open td { background: var(--bg-hover); }
-#statsCatDetail { margin-top: 10px; }
+.cat-row.open td { background: var(--bg-hover); font-weight: 700; }
+.cat-detail-row td {
+    padding: 0 0 10px !important;
+    background: var(--bg-layer) !important;
+    border-bottom: 1px solid var(--border-l1);
+}
 .cat-detail-box {
     background: var(--bg-hover); border-radius: var(--radius);
     padding: 10px 12px; font-size: 12.5px;
+    animation: catDetailIn 0.16s var(--ease);
 }
+@keyframes catDetailIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 .cat-detail-box .cat-detail-head {
     display: flex; align-items: center; justify-content: space-between;
-    font-weight: 600; color: var(--text-primary); margin-bottom: 8px;
+    font-weight: 700; color: var(--text-primary); margin-bottom: 8px;
 }
 .cat-detail-item { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; color: var(--text-secondary); }
 .cat-detail-item .d { color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -635,7 +641,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <button class="sidebar-item drawer-btn" onclick="exportData(); closeMore();">⬇ 导出备份</button>
         <button class="sidebar-item drawer-btn" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="more-drawer-ver" id="appVersionM">v1.10.1</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.10.2</div>
     </div>
 </nav>
 
@@ -910,7 +916,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
             <div id="statsDonutLegend" style="display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:8px;font-size:12px;color:var(--text-secondary)"></div>
         </div>
         <div class="table-wrap" id="statsExpenseTable" style="margin-top:8px"></div>
-        <div id="statsCatDetail"></div>
     </div>
     <div class="card">
         <h3>📈 近 6 个月收支趋势</h3>
@@ -2339,7 +2344,7 @@ async function loadStats() {
         $('statsSummary').innerHTML = '支出 <strong>' + money(grandTotal) + '</strong> ｜ 收入 <strong>'
             + money(ov.total_income) + '</strong> ｜ 结余 <strong>' + money(ov.balance) + '</strong>';
         $('statsExpenseTable').innerHTML = renderCatTable(expCat, grandTotal);
-        $('statsCatDetail').innerHTML = '';        // 换月后清掉上个月的下钻明细
+        closeCatDetail();                          // 换月后收起上个月的下钻明细
         STATE._statsMonthExp = null;
         $('statsIncomeTable').innerHTML = renderTable(
             ['分类','金额','笔数'],
@@ -2372,18 +2377,22 @@ function renderCatTable(expCat, grandTotal) {
     return '<table>' + head + '<tbody>' + body + '</tbody></table>';
 }
 
-// 点分类行 → 展开该分类本月明细（第一次点才请求，之后用内存缓存）
+// 点分类行 → 就在这一行下面展开该分类本月明细（第一次点才请求，之后用内存缓存）
 async function toggleCatDetail(tr) {
     const cat = tr.getAttribute('data-cat');
-    const box = $('statsCatDetail');
-    if (tr.classList.contains('open')) {          // 再点一次收起
-        tr.classList.remove('open');
-        box.innerHTML = '';
-        return;
-    }
-    document.querySelectorAll('.cat-row.open').forEach(x => x.classList.remove('open'));
+    if (tr.classList.contains('open')) { closeCatDetail(); return; }   // 再点一次收起
+    closeCatDetail();                                                 // 同时只开一个
     tr.classList.add('open');
-    box.innerHTML = '<div class="cat-detail-box">⏳ 加载中…</div>';
+
+    // 明细行插在点击行正下方，而不是表格末尾
+    const detailTr = document.createElement('tr');
+    detailTr.className = 'cat-detail-row';
+    const td = document.createElement('td');
+    td.colSpan = 4;
+    td.innerHTML = '<div class="cat-detail-box">⏳ 加载中…</div>';
+    detailTr.appendChild(td);
+    tr.parentNode.insertBefore(detailTr, tr.nextSibling);
+
     try {
         if (!STATE._statsMonthExp) {
             STATE._statsMonthExp = await api('/api/expense?month=' + VIEW_MONTH.current);
@@ -2391,7 +2400,7 @@ async function toggleCatDetail(tr) {
         const items = STATE._statsMonthExp.filter(r => r.category === cat)
             .sort((a, b) => (b.date + (b.time || '')).localeCompare(a.date + (a.time || '')));
         const sum = items.reduce((s, r) => s + Number(r.amount || 0), 0);
-        box.innerHTML = '<div class="cat-detail-box">'
+        td.innerHTML = '<div class="cat-detail-box">'
             + '<div class="cat-detail-head"><span>' + esc(cat) + ' · ' + items.length + ' 笔 · ¥' + sum.toFixed(2)
             + '</span><span style="cursor:pointer;color:var(--text-muted)" onclick="closeCatDetail()">收起 ✕</span></div>'
             + items.map(r => '<div class="cat-detail-item">'
@@ -2401,12 +2410,12 @@ async function toggleCatDetail(tr) {
               + '</div>').join('')
             + '</div>';
     } catch (e) {
-        box.innerHTML = '<div class="cat-detail-box" style="color:#F07A6A">明细加载失败：' + esc(e.message || e) + '</div>';
+        td.innerHTML = '<div class="cat-detail-box" style="color:#F07A6A">明细加载失败：' + esc(e.message || e) + '</div>';
     }
 }
 
 function closeCatDetail() {
-    $('statsCatDetail').innerHTML = '';
+    document.querySelectorAll('.cat-detail-row').forEach(el => el.remove());
     document.querySelectorAll('.cat-row.open').forEach(x => x.classList.remove('open'));
 }
 
