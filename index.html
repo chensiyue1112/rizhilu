@@ -7,9 +7,9 @@
 <link rel="manifest" href="assets/manifest.json">
 <link rel="icon" type="image/png" sizes="64x64" href="assets/sheep-64.png">
 <link rel="apple-touch-icon" href="assets/sheep-192.png">
-<title>日知录记账 v1.11.1</title>
+<title>日知录记账 v1.12.0</title>
 <style>
-/* === 日知录 Design System v1.11.1 — 白 + 淡蓝（小羊主题） === */
+/* === 日知录 Design System v1.12.0 — 白 + 淡蓝（小羊主题） === */
 :root {
     /* 底色：白 + 极淡天空蓝 */
     --bg-base: #F2F8FF;
@@ -423,7 +423,18 @@ tbody tr:hover td { background: var(--bg-hover); }
 }
 .list-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
 
-/* === 统计：支出总览（全部时间） === */
+/* === 统计：支出总览（全部时间，独立页面） === */
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.all-exp-note { font-size: 11.5px; color: var(--text-tertiary); margin-bottom: 10px; }
+.stat-jump {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 12px 14px; margin-bottom: 12px;
+    background: var(--bg-layer); border: 1px solid var(--border-l2);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+    font-size: 13px; color: var(--text-secondary); cursor: pointer;
+}
+.stat-jump:active { background: var(--bg-hover); }
+.stat-jump-go { color: var(--accent); font-weight: 700; font-size: 12.5px; white-space: nowrap; }
 .all-exp-sum {
     background: var(--bg-hover); border-radius: var(--radius-md);
     padding: 11px 13px; margin-bottom: 10px;
@@ -653,12 +664,13 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <a class="sidebar-item" data-tab="payday" onclick="switchTab('payday')">发工资</a>
         <a class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">财务</a>
         <a class="sidebar-item" data-tab="electricity" onclick="switchTab('electricity')">用电</a>
+        <a class="sidebar-item" data-tab="allexp" onclick="switchTab('allexp')">支出总览</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">统计</a>
         <button class="sidebar-item drawer-btn" onclick="manualRefresh(); closeMore();">⟳ 刷新数据</button>
         <button class="sidebar-item drawer-btn" onclick="exportData(); closeMore();">⬇ 导出备份</button>
         <button class="sidebar-item drawer-btn" onclick="document.getElementById('importFile').click()">⬆ 导入备份</button>
         <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importData(this)">
-        <div class="more-drawer-ver" id="appVersionM">v1.11.1</div>
+        <div class="more-drawer-ver" id="appVersionM">v1.12.0</div>
     </div>
 </nav>
 
@@ -934,11 +946,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         </div>
         <div class="table-wrap" id="statsExpenseTable" style="margin-top:8px"></div>
     </div>
-    <!-- 全部时间的支出总览（只统计支出，点分类看类内细项） -->
-    <div class="card">
-        <h3>💰 支出总览 · 全部时间</h3>
-        <div id="allExpSummary" class="all-exp-sum"></div>
-        <div class="table-wrap" id="allExpTable"></div>
+    <div class="stat-jump" onclick="switchTab('allexp')">
+        <span>💰 想看全部时间的支出总览？</span><span class="stat-jump-go">去支出总览 ›</span>
     </div>
     <div class="card">
         <h3>📈 近 6 个月收支趋势</h3>
@@ -946,6 +955,19 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--text-secondary);flex-wrap:wrap" id="statsTrendLegend"></div>
     </div>
     <div class="card"><h3>📊 收入分类</h3><div class="table-wrap" id="statsIncomeTable"></div></div>
+</section>
+
+<!-- ═══════════════ 支出总览（全部时间，独立页面） ═══════════════ -->
+<section id="section-allexp" class="section">
+    <div class="card">
+        <div class="card-head">
+            <h3 style="margin:0">💰 支出总览</h3>
+            <button class="btn btn-cancel btn-sm" onclick="loadAllExpenseOverview(true)" title="刷新">⟳</button>
+        </div>
+        <div class="all-exp-note">统计全部时间的支出，不受月份限制</div>
+        <div id="allExpSummary" class="all-exp-sum"></div>
+        <div class="table-wrap" id="allExpTable"></div>
+    </div>
 </section>
 </main>
 </div>
@@ -1298,7 +1320,8 @@ function switchTab(name) {
     if (name === 'finance') loadFinances();
     if (name === 'electricity') loadElectricities();
     if (name === 'mood') loadDay();
-    if (name === 'stats') { loadStats(); loadAllExpenseOverview(); }
+    if (name === 'stats') loadStats();
+    if (name === 'allexp') loadAllExpenseOverview();
     if (name === 'payday') initPayday();
 }
 
@@ -1350,7 +1373,8 @@ function setViewMonth(v) {
     if (t === 'overview') loadOverview();
     else if (t === 'expense') renderExpenseTable();
     else if (t === 'income') renderIncomeTable();
-    else if (t === 'stats') { loadStats(); loadAllExpenseOverview(); }
+    else if (t === 'stats') loadStats();
+    else if (t === 'allexp') loadAllExpenseOverview(true);
     updateListHead();
 }
 
@@ -2449,7 +2473,8 @@ function closeCatDetail() {
 let _allExpRows = null;
 const _firstMonth = (a, b) => (a && b ? Math.max(1, (Number(b.slice(0,4)) - Number(a.slice(0,4))) * 12 + (Number(b.slice(5,7)) - Number(a.slice(5,7))) + 1) : 0);
 
-async function loadAllExpenseOverview() {
+async function loadAllExpenseOverview(force) {
+    if (force) { invalidateKey('expenses'); }
     const render = (rows) => { _allExpRows = rows || []; renderAllExpOverview(); };
     try {
         await smartLoad('expenses', () => api('/api/expense'), render);
@@ -2987,7 +3012,8 @@ function autoRefresh() {
     else if (t === 'finance') loadFinances();
     else if (t === 'electricity') loadElectricities();
     else if (t === 'mood') loadDay();
-    else if (t === 'stats') { loadStats(); loadAllExpenseOverview(); }
+    else if (t === 'stats') loadStats();
+    else if (t === 'allexp') loadAllExpenseOverview(true);
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) autoRefresh(); });
 window.addEventListener('focus', autoRefresh);
@@ -3003,7 +3029,8 @@ function manualRefresh() {
     else if (t === 'finance') loadFinances();
     else if (t === 'electricity') loadElectricities();
     else if (t === 'mood') loadDay();
-    else if (t === 'stats') { loadStats(); loadAllExpenseOverview(); }
+    else if (t === 'stats') loadStats();
+    else if (t === 'allexp') loadAllExpenseOverview(true);
     ensureDayData(true);
     toast('已刷新为最新数据', 'success');
 }
@@ -3039,7 +3066,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 刷新后停留在当前页面（从 URL hash 恢复）；老的 #weather / #record 已合并进 #mood
     let savedTab = (location.hash || '').replace('#', '');
     if (savedTab === 'weather' || savedTab === 'record') savedTab = 'mood';
-    if (['overview','expense','income','finance','electricity','mood','stats','payday'].includes(savedTab)) {
+    if (['overview','expense','income','finance','electricity','mood','stats','allexp','payday'].includes(savedTab)) {
         switchTab(savedTab);
     } else {
         loadOverview();
