@@ -3,8 +3,8 @@
   "short_name": "日知录",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#F2F8FF",
-  "theme_color": "#4FA8E8",
+  "background_color": "#F4F3EF",
+  "theme_color": "#F4F3EF",
   "icons": [
     {
       "src": "sheep-192.png",
